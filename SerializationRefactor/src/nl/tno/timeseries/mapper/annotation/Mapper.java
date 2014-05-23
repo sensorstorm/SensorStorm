@@ -7,15 +7,13 @@ import java.lang.annotation.Target;
 
 import nl.tno.timeseries.mapper.api.CustomParticlePojoMapper;
 
+/**
+ * Defines a custom mapper for a Particle class
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE })
 public @interface Mapper {
 
-	/**
-	 * Defines the object as particle
-	 * 
-	 * @return
-	 */
 	@SuppressWarnings("rawtypes")
 	Class<? extends CustomParticlePojoMapper> value();
 

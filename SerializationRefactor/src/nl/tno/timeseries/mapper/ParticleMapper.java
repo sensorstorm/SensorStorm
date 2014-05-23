@@ -4,7 +4,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,59 +13,75 @@ import nl.tno.timeseries.mapper.annotation.Mapper;
 import nl.tno.timeseries.mapper.annotation.TupleField;
 import nl.tno.timeseries.mapper.api.CustomParticlePojoMapper;
 import nl.tno.timeseries.mapper.api.Particle;
-import nl.tno.timeseries.test.AutoMappedParticle;
-import nl.tno.timeseries.test.DoubleMeasurement;
-import nl.tno.timeseries.test.SelfMappedParticle;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 
 public class ParticleMapper {
 
+	public static final Logger log = LoggerFactory.getLogger(ParticleMapper.class);
+
 	public static final String SEQUENCE_NR = "sequenceNr";
 	public static final String STREAM_ID = "streamId";
 	public static final String PARTICLE_CLASS = "particleClass";
 
 	private static ConcurrentMap<Class<?>, CustomParticlePojoMapper<?>> customSerializers = new ConcurrentHashMap<>();
+	private static ConcurrentMap<Class<?>, Method> customSerializersMapMethods = new ConcurrentHashMap<>();
 	private static ConcurrentMap<Class<?>, ParticleClassInfo> particleClassInfos = new ConcurrentHashMap<>();
 
-	public static Values serialize(Particle particle) {
+	public static Values particleToValues(Particle particle) {
 		Class<? extends Particle> clazz = particle.getClass();
 		if (hasCustomSerializer(clazz)) {
-			// TODO is there an easier way to do this?
-			// TODO cache method, figuring out the serialize method is a constant overhead
-			Method serializeMethod = null;
-			CustomParticlePojoMapper<?> customSerializer = getCustomSerializer(clazz);
-			for (Method m : customSerializer.getClass().getMethods()) {
-				if (m.getName().equals("serialize")) {
-					serializeMethod = m;
-				}
-			}
+			CustomParticlePojoMapper<?> customSerializer = getCustomMapper(clazz);
+			Method serializeMethod = customSerializersMapMethods.get(clazz);
 			try {
-				return (Values) serializeMethod.invoke(customSerializer,
-						particle);
-			} catch (IllegalAccessException | IllegalArgumentException
-					| InvocationTargetException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				return (Values) serializeMethod.invoke(customSerializer, particle);
+			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+				log.error("Could not map particle to values", e);
 				return null;
 			}
-			// return customSerializer.serialize(particle);
 		} else {
-			return getParticleClassInfo(clazz).serialize(particle);
+			return getParticleClassInfo(clazz).particleToValues(particle);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T extends Particle> T deserialize(Tuple tuple, Class<T> clazz) {
+	public static <T extends Particle> T tupleToParticle(Tuple tuple, Class<T> clazz) {
 		if (hasCustomSerializer(clazz)) {
-			return (T) getCustomSerializer(clazz).deserialize(tuple);
+			return (T) getCustomMapper(clazz).tupleToParticle(tuple);
 		} else {
-			return getParticleClassInfo(clazz).deserialize(tuple, clazz);
+			return getParticleClassInfo(clazz).tupleToParticle(tuple, clazz);
 		}
 	}
 
-	// TODO is it faster to look up the class in the map?
+	public static Particle tupleToParticle(Tuple tuple) {
+		Class<?> clazz = null;
+		ParticleClassInfo particleClassInfo;
+		try {
+			clazz = Class.forName(tuple.getString(2));
+			particleClassInfo = getParticleClassInfo(clazz);
+		} catch (ClassNotFoundException e) {
+			particleClassInfo = null;
+		}
+		if (particleClassInfo != null) {
+			return (Particle) particleClassInfo.tupleToParticle(tuple, clazz);
+		} else {
+			// Maybe it has a custom mapper?
+			for (CustomParticlePojoMapper<?> m : customSerializers.values()) {
+				if (m.canMapTuple(tuple)) {
+					return m.tupleToParticle(tuple);
+				}
+			}
+			// Could not find a custom mapper. Now what?
+			throw new IllegalArgumentException(
+					"Could not find mapper for the tuple. If the particle has a custom mapper that the ParticleMapper doesn't know, tell the ParticleMapper by calling the ParticleMapper.inspectClass method.");
+		}
+	}
+
 	private static boolean hasCustomSerializer(Class<? extends Particle> clazz) {
 		for (Annotation a : clazz.getAnnotations()) {
 			if (a instanceof Mapper) {
@@ -78,10 +93,14 @@ public class ParticleMapper {
 
 	public static Fields getFields(Class<? extends Particle> clazz) {
 		if (hasCustomSerializer(clazz)) {
-			return getCustomSerializer(clazz).getFields();
+			return getCustomMapper(clazz).getFields();
 		} else {
 			return getParticleClassInfo(clazz).getFields();
 		}
+	}
+
+	public void inspectClass(Class<? extends Particle> clazz) {
+		getFields(clazz);
 	}
 
 	private static ParticleClassInfo getParticleClassInfo(Class<?> clazz) {
@@ -90,7 +109,6 @@ public class ParticleMapper {
 			return pci;
 		} else {
 			// Construct the ParticleClassInfo object.
-			// We also do the static validation here
 			// key = name of field, value = name in tuple
 			SortedMap<String, String> outputFields = new TreeMap<String, String>();
 			for (Field f : clazz.getDeclaredFields()) {
@@ -112,8 +130,7 @@ public class ParticleMapper {
 		}
 	}
 
-	private static CustomParticlePojoMapper<?> getCustomSerializer(
-			Class<?> clazz) {
+	private static CustomParticlePojoMapper<?> getCustomMapper(Class<?> clazz) {
 		CustomParticlePojoMapper<?> ps = customSerializers.get(clazz);
 		if (ps != null) {
 			return ps;
@@ -123,8 +140,15 @@ public class ParticleMapper {
 					if (a instanceof Mapper) {
 						Class<?> serializerClass = ((Mapper) a).value();
 						customSerializers.putIfAbsent(clazz,
-								(CustomParticlePojoMapper<?>) serializerClass
-										.newInstance());
+								(CustomParticlePojoMapper<?>) serializerClass.newInstance());
+						// Find the (first) map method
+						CustomParticlePojoMapper<?> customSerializer = getCustomMapper(clazz);
+						for (Method m : customSerializer.getClass().getMethods()) {
+							if (m.getName().equals("particleToValues")) {
+								customSerializersMapMethods.putIfAbsent(clazz, m);
+								break;
+							}
+						}
 						return customSerializers.get(clazz);
 					}
 				}
@@ -135,39 +159,6 @@ public class ParticleMapper {
 		}
 		// should not be possible to get here
 		return null;
-	}
-
-	public static void main(String[] args) {
-		AutoMappedParticle p = new AutoMappedParticle();
-		p.id = "id";
-		p.intId = 14;
-		p.sequenceNr = 100;
-		p.streamId = "Stream-1";
-		p.map = new HashMap<>();
-		System.out.println(ParticleMapper.getFields(p.getClass()));
-		Values serialized = ParticleMapper.serialize(p);
-		System.out.println(serialized);
-
-		SelfMappedParticle s = new SelfMappedParticle();
-		s.id = "id";
-		s.intId = 14;
-		s.sequenceNr = 100;
-		s.streamId = "Stream-1";
-		s.map = new HashMap<>();
-		System.out.println(ParticleMapper.getFields(s.getClass()));
-		System.out.println(ParticleMapper.serialize(s));
-		
-		DoubleMeasurement dm = new DoubleMeasurement();
-		dm.setSequenceNr(123);
-		dm.setStreamId("StreamID");
-		dm.setValue(15);
-		System.out.println(ParticleMapper.getFields(dm.getClass()));
-		System.out.println(ParticleMapper.serialize(dm));
-		try {
-			DoubleMeasurement.class.newInstance();
-		} catch (InstantiationException | IllegalAccessException e) {
-			throw new IllegalArgumentException("Particles should always have at least an empty constructor");
-		}
 	}
 
 }

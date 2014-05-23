@@ -1,10 +1,13 @@
 package nl.tno.timeseries.mapper.api;
 
+/**
+ * A default implementation of a {@link Particle} (for convenience).
+ */
 public abstract class AbstractParticle implements Particle {
 
 	protected String streamId;
 	protected long sequenceNr;
-	
+
 	@Override
 	public String getStreamId() {
 		return streamId;

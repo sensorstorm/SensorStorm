@@ -1,4 +1,4 @@
-package nl.tno.timeseries.test;
+package nl.tno.timeseries.mapping;
 
 import java.util.Map;
 
@@ -7,14 +7,12 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import nl.tno.timeseries.mapper.api.CustomParticlePojoMapper;
 
-public class SomeCustomMapper implements
-		CustomParticlePojoMapper<SelfMappedParticle> {
+public class SomeCustomMapper implements CustomParticlePojoMapper<SelfMappedParticle> {
 
-	private static Fields fields = new Fields("streamId", "sequenceNr",
-			"customNameForId", "intId", "map");
+	private static Fields fields = new Fields("streamId", "sequenceNr", "customNameForId", "intId", "map");
 
 	@Override
-	public Values serialize(SelfMappedParticle particle) {
+	public Values particleToValues(SelfMappedParticle particle) {
 		Values v = new Values();
 		v.add(particle.streamId);
 		v.add(particle.sequenceNr);
@@ -26,7 +24,7 @@ public class SomeCustomMapper implements
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public SelfMappedParticle deserialize(Tuple tuple) {
+	public SelfMappedParticle tupleToParticle(Tuple tuple) {
 		SelfMappedParticle p = new SelfMappedParticle();
 		p.streamId = tuple.getStringByField("streamId");
 		p.sequenceNr = tuple.getLongByField("sequenceNr");
@@ -40,6 +38,11 @@ public class SomeCustomMapper implements
 	@Override
 	public Fields getFields() {
 		return fields;
+	}
+
+	@Override
+	public boolean canMapTuple(Tuple tuple) {
+		return tuple.contains("customNameForId");
 	}
 
 }
