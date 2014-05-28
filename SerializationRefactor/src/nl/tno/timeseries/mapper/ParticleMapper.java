@@ -9,10 +9,10 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import nl.tno.timeseries.interfaces.Particle;
 import nl.tno.timeseries.mapper.annotation.Mapper;
 import nl.tno.timeseries.mapper.annotation.TupleField;
 import nl.tno.timeseries.mapper.api.CustomParticlePojoMapper;
-import nl.tno.timeseries.mapper.api.Particle;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,8 +77,8 @@ public class ParticleMapper {
 				}
 			}
 			// Could not find a custom mapper. Now what?
-			throw new IllegalArgumentException(
-					"Could not find mapper for the tuple. If the particle has a custom mapper that the ParticleMapper doesn't know, tell the ParticleMapper by calling the ParticleMapper.inspectClass method.");
+			log.error("Could not find mapper for the tuple. If the particle has a custom mapper that the ParticleMapper doesn't know, tell the ParticleMapper by calling the ParticleMapper.inspectClass method.");
+			return null;
 		}
 	}
 

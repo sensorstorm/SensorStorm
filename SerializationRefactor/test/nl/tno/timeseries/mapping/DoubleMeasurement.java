@@ -1,8 +1,8 @@
 package nl.tno.timeseries.mapping;
 
+import nl.tno.timeseries.interfaces.Particle;
 import nl.tno.timeseries.mapper.annotation.TupleField;
-import nl.tno.timeseries.mapper.api.AbstractParticle;
-import nl.tno.timeseries.mapper.api.Particle;
+import nl.tno.timeseries.particles.AbstractParticle;
 
 public class DoubleMeasurement extends AbstractParticle implements Particle {
 
@@ -10,7 +10,7 @@ public class DoubleMeasurement extends AbstractParticle implements Particle {
 	}
 
 	public DoubleMeasurement(String streamId, long sequenceNr, double value) {
-		this.streamId = streamId;
+		this.channelId = streamId;
 		this.sequenceNr = sequenceNr;
 		this.value = value;
 	}

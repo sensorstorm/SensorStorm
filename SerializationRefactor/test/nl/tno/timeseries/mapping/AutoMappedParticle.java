@@ -2,8 +2,8 @@ package nl.tno.timeseries.mapping;
 
 import java.util.Map;
 
+import nl.tno.timeseries.interfaces.Particle;
 import nl.tno.timeseries.mapper.annotation.TupleField;
-import nl.tno.timeseries.mapper.api.Particle;
 
 public class AutoMappedParticle implements Particle {
 
@@ -22,7 +22,7 @@ public class AutoMappedParticle implements Particle {
 	public int shouldNotBeSaved;
 
 	@Override
-	public String getStreamId() {
+	public String getChannelId() {
 		return streamId;
 	}
 
@@ -32,7 +32,7 @@ public class AutoMappedParticle implements Particle {
 	}
 
 	@Override
-	public void setStreamId(String streamId) {
+	public void setChannelId(String streamId) {
 		this.streamId = streamId;
 	}
 

@@ -1,5 +1,6 @@
 package nl.tno.timeseries.mapper.api;
 
+import nl.tno.timeseries.interfaces.Particle;
 import nl.tno.timeseries.mapper.annotation.Mapper;
 import nl.tno.timeseries.mapper.annotation.TupleField;
 import backtype.storm.tuple.Fields;
