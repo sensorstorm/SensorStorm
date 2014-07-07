@@ -6,11 +6,11 @@ import java.util.Map;
 import nl.tno.timeseries.interfaces.DataParticle;
 import nl.tno.timeseries.interfaces.Particle;
 import nl.tno.timeseries.timer.TimedOperation;
-import nl.tno.timeseries.timer.TimerControllerÌnterface;
+import nl.tno.timeseries.timer.TimerControllerInterface;
 
 public class MyOperationT implements TimedOperation {
 	private static final long serialVersionUID = 773649574489299505L;
-	TimerControllerÌnterface timerController = null;
+	TimerControllerInterface timerController = null;
 	private String channelId;
 
 	@Override
@@ -32,7 +32,7 @@ public class MyOperationT implements TimedOperation {
 	}
 
 	@Override
-	public void setTimerController(TimerControllerÌnterface timerController) {
+	public void setTimerController(TimerControllerInterface timerController) {
 		this.timerController = timerController;
 		System.out.println("MyOperation.initTimer");
 //		timerController.registerOperationForRecurringTimerTask(channelId, 3, this);

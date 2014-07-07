@@ -6,7 +6,7 @@ import nl.tno.timeseries.interfaces.Particle;
 
 public interface TimerTaskInterface {
 
-	public void setTimerController(TimerControllerÌnterface timerController);
+	public void setTimerController(TimerControllerInterface timerController);
 	
 	public List<Particle> doTimerRecurringTask(long timestamp);
 

@@ -2,7 +2,7 @@ package nl.tno.timeseries.timer;
 
 
 
-public interface TimerControllerÌnterface {
+public interface TimerControllerInterface {
 
 	public void registerOperationForRecurringTimerTask(String channelId, long timerFreq, TimerTaskInterface timerTask);
 	

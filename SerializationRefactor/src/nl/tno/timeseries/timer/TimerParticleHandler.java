@@ -5,10 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import nl.tno.timeseries.interfaces.MetaParticle;
-import nl.tno.timeseries.interfaces.MetaParticleProcessor;
+import nl.tno.timeseries.interfaces.MetaParticleHandler;
 import nl.tno.timeseries.interfaces.Particle;
 
-public class TimerParticleProcessor implements MetaParticleProcessor, TimerControllerÌnterface, Serializable  {
+@MetaParticleHandlerDecleration(metaParticle = TimerTickParticle.class )
+public class TimerParticleHandler implements MetaParticleHandler, TimerControllerInterface, Serializable  {
 
 	private static final long serialVersionUID = 8622533504407023168L;
 	private RecurringTask recurringTask = null;

@@ -10,11 +10,11 @@ import org.slf4j.LoggerFactory;
 public class TimerChannelBolt extends ChannelBolt {
 	private Logger logger = LoggerFactory.getLogger(TimerChannelBolt.class);
 	private static final long serialVersionUID = -3958435345669417336L;
-	protected TimerParticleProcessor timerParticleProcessor;
+	protected TimerParticleHandler timerParticleProcessor;
 
 	public TimerChannelBolt(Class<? extends TimedOperation> operationClass, Class<? extends Particle> outputParticleClass) {
 		super(operationClass, outputParticleClass);
-		timerParticleProcessor = new TimerParticleProcessor();
+		timerParticleProcessor = new TimerParticleHandler();
 		addMetaProcessor(TimerTickParticle.class, timerParticleProcessor); 
 	}
 	

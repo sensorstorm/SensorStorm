@@ -7,7 +7,7 @@ import java.util.Map;
 
 import nl.tno.timeseries.interfaces.DataParticle;
 import nl.tno.timeseries.interfaces.MetaParticle;
-import nl.tno.timeseries.interfaces.MetaParticleProcessor;
+import nl.tno.timeseries.interfaces.MetaParticleHandler;
 import nl.tno.timeseries.interfaces.Operation;
 import nl.tno.timeseries.interfaces.Particle;
 import nl.tno.timeseries.mapper.ParticleMapper;
@@ -33,7 +33,7 @@ public class ChannelBolt extends BaseRichBolt {
 	protected Class<? extends Operation> operationClass;
 	protected Class<? extends Particle> outputParticleClass;
 	private Map<String, Operation> operations;
-	private Map<Class<? extends MetaParticle>, MetaParticleProcessor> metaProcessors;
+	private Map<Class<? extends MetaParticle>, MetaParticleHandler> metaProcessors;
 	protected int nrOfOutputFields;
 
 	public ChannelBolt(Class<? extends Operation> operationClass, Class<? extends Particle> outputParticleClass) {
@@ -41,7 +41,7 @@ public class ChannelBolt extends BaseRichBolt {
 		this.outputParticleClass = outputParticleClass;
 
 		operations = new HashMap<String, Operation>();
-		metaProcessors = new HashMap<Class<? extends MetaParticle>, MetaParticleProcessor>();
+		metaProcessors = new HashMap<Class<? extends MetaParticle>, MetaParticleHandler>();
 	}
 
 	@Override
@@ -67,7 +67,7 @@ public class ChannelBolt extends BaseRichBolt {
 		}
 	}
 
-	protected void addMetaProcessor(Class<? extends MetaParticle> metaParticle, MetaParticleProcessor metaProcessor) {
+	protected void addMetaProcessor(Class<? extends MetaParticle> metaParticle, MetaParticleHandler metaProcessor) {
 		metaProcessors.put(metaParticle, metaProcessor);
 	}
 
@@ -79,7 +79,7 @@ public class ChannelBolt extends BaseRichBolt {
 		if (inputParticle instanceof MetaParticle) {
 			List<Particle> metaParticleProcessorResult = null;
 			result = new ArrayList<>();
-			MetaParticleProcessor metaParticleProcessor = metaProcessors.get(inputParticle.getClass());
+			MetaParticleHandler metaParticleProcessor = metaProcessors.get(inputParticle.getClass());
 			if (metaParticleProcessor != null) {
 				metaParticleProcessorResult = metaParticleProcessor.execute((MetaParticle) inputParticle);
 			}
