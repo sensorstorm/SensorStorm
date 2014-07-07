@@ -24,6 +24,7 @@ public class ChannelSpout implements IRichSpout {
 	protected SpoutOutputCollector collector;
 	protected Fetcher fetcher;
 	protected Class<? extends Particle> outputParticleClass;
+	protected int nrOfOutputFields;
 
 	
 	public ChannelSpout(Fetcher fetcher, Class<? extends Particle> outputParticleClass) {
@@ -42,13 +43,16 @@ public class ChannelSpout implements IRichSpout {
 			logger.warn("Unable to configure channelSpout due to ", e);
 		}
 	}
-
+	
+	protected Fields getOutputFields() {
+		return ParticleMapper.getFields(outputParticleClass);
+	}
 	
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		Fields fields = ParticleMapper.getFields(outputParticleClass);
-		//@TODO merge fields with MetaParticle fields
-		declarer.declare(fields);
+		Fields outputFields = getOutputFields();
+		nrOfOutputFields = outputFields.size();
+		declarer.declare(outputFields);
 	}
 	
 
@@ -56,7 +60,7 @@ public class ChannelSpout implements IRichSpout {
 	public void nextTuple() {
 		DataParticle particle = fetcher.fetchParticle();
 		if (particle != null) {
-			collector.emit(ParticleMapper.particleToValues(particle));
+			collector.emit(ParticleMapper.particleToValues(particle, nrOfOutputFields));
 		}
 	}
 	

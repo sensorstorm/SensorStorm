@@ -4,6 +4,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -47,6 +48,18 @@ public class ParticleMapper {
 		} else {
 			return getParticleClassInfo(clazz).particleToValues(particle);
 		}
+	}
+
+	public static Values particleToValues(Particle particle, int expectedNrOfFields) {
+		Values values = particleToValues(particle);
+		if (values.size() > expectedNrOfFields) {
+			throw new IllegalArgumentException("Expected number of Fields (" + expectedNrOfFields
+					+ ") is smaller than the found number of fields (" + values.size() + ")");
+		}
+		while (values.size() < expectedNrOfFields) {
+			values.add(null);
+		}
+		return values;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -159,6 +172,16 @@ public class ParticleMapper {
 		}
 		// should not be possible to get here
 		return null;
+	}
+
+	public static Fields mergeFields(Fields one, Fields two) {
+		List<String> copy = one.toList();
+		for (String s : two.toList()) {
+			if (!copy.contains(s)) {
+				copy.add(s);
+			}
+		}
+		return new Fields(copy);
 	}
 
 }
