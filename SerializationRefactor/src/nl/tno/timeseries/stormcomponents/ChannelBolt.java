@@ -1,12 +1,12 @@
 package nl.tno.timeseries.stormcomponents;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import nl.tno.timeseries.interfaces.DataParticle;
 import nl.tno.timeseries.interfaces.MetaParticle;
+import nl.tno.timeseries.interfaces.MetaParticleProcessor;
 import nl.tno.timeseries.interfaces.Operation;
 import nl.tno.timeseries.interfaces.Particle;
 import nl.tno.timeseries.mapper.ParticleMapper;
@@ -30,14 +30,16 @@ public class ChannelBolt extends BaseRichBolt {
 	protected String boltName;
 	protected Class<? extends Operation> operationClass;
 	protected Class<? extends Particle> outputParticleClass;
-	private Map<String, OperationContext> operationInstances;
+	private Map<String, Operation> operations;
+	private Map<Class<? extends MetaParticle>, MetaParticleProcessor> metaProcessors;
 
 
 	public ChannelBolt(Class<? extends Operation> operationClass, Class<? extends Particle> outputParticleClass) {
 		this.operationClass = operationClass;
 		this.outputParticleClass = outputParticleClass;
 		
-		operationInstances = new HashMap<String, OperationContext>();
+		operations = new HashMap<String, Operation>();
+		metaProcessors = new HashMap<Class<? extends MetaParticle>, MetaParticleProcessor>();
 	}
 	
 	@Override
@@ -65,42 +67,62 @@ public class ChannelBolt extends BaseRichBolt {
 	}
 	
 	
+	protected void addMetaProcessor(Class<? extends MetaParticle> metaParticle, MetaParticleProcessor metaProcessor) {
+		metaProcessors.put(metaParticle, metaProcessor);
+	}
+	
+	
 	protected List<Particle> processParticle(Particle inputParticle) {
-		String channelId = inputParticle.getChannelId();
+		Operation operation = getOperation(inputParticle);
 		
-		// get context corresponding to the channel 
-		// create new operation context if it does not exists and add it to the list
-		OperationContext operationContext = operationInstances.get(channelId);
-		Operation operation;
-		if (operationContext == null) {
-			operationContext = new OperationContext(operationClass, stormConfig);
-			operationInstances.put(channelId, operationContext);
-			
-			// init operation
-			operation = operationContext.getOperation();
-			operation.init(channelId, inputParticle.getSequenceNr(), operationContext);
-		} else {
-			operation = operationContext.getOperation();
-		}
-
 		// process input particle and return result particles
-		List<Particle> result;
+		List<Particle> result = null;
 		if (inputParticle instanceof MetaParticle) {
-			result = operationContext.processMetaParticle((MetaParticle)inputParticle);
-		} else {
-			List<DataParticle> inputParticles = new ArrayList<DataParticle>();
-			inputParticles.add((DataParticle)inputParticle);
-			result = operation.execute(inputParticles);
-		}
+			MetaParticleProcessor metaParticleProcessor = metaProcessors.get(inputParticle.getClass());
+			if (metaParticleProcessor != null) {
+				result = metaParticleProcessor.execute((MetaParticle)inputParticle);
+			} 
+			// pass metaParticle on further in the topology
+			result.add(inputParticle);
+		} else if (inputParticle instanceof DataParticle) {
+			result = operation.execute((DataParticle)inputParticle);
+		} 
 		return result;
 	}
 
-
+	
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 		Fields fields = ParticleMapper.getFields(outputParticleClass);
-		//@TODO merge fields with MetaParticle fields
+		//TODO merge fields with MetaParticle fields
 		declarer.declare(fields);
 	}
 
+	
+	protected Operation getOperation(Particle inputParticle) {
+		String channelId = inputParticle.getChannelId();
+		Operation operation = operations.get(channelId);
+		if (operation == null) {	// first time this operations is used for this channelId
+			try {
+				operation = operationClass.newInstance();
+				initOperation(operation, inputParticle);
+				operations.put(channelId, operation);
+			} catch (InstantiationException | IllegalAccessException e) {
+				logger.error("Can not instantiate Operation class "+operationClass.getName());
+				operation = null;
+			}
+		}
+		return operation;
+	}
+
+	
+	/**
+	 * This method initializes the operation. It can be overriden if additional initialization is needed. 
+	 * @param operation
+	 * @param inputParticle
+	 */
+	protected void initOperation(Operation operation, Particle inputParticle) {
+		operation.init(inputParticle.getChannelId(), inputParticle.getSequenceNr(), stormConfig);
+	}
+	
 }

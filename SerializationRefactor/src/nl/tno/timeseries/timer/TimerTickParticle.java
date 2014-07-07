@@ -1,6 +1,7 @@
-package nl.tno.timeseries.particles;
+package nl.tno.timeseries.timer;
 
 import nl.tno.timeseries.interfaces.MetaParticle;
+import nl.tno.timeseries.particles.AbstractParticle;
 
 
 public class TimerTickParticle extends AbstractParticle implements MetaParticle {

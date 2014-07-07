@@ -6,7 +6,7 @@ import nl.tno.timeseries.interfaces.DataParticle;
 import nl.tno.timeseries.interfaces.Fetcher;
 import backtype.storm.task.TopologyContext;
 
-public class MyFetcher implements Fetcher {
+public class MyFetcherT implements Fetcher {
 	private static final long serialVersionUID = -4783593429530609215L;
 	long time = 0;
 	
@@ -26,7 +26,7 @@ public class MyFetcher implements Fetcher {
 	public DataParticle fetchParticle() {
 		try { Thread.sleep(100); } catch (InterruptedException e) {}
 		time = time + 1;
-		return new Measurement("S1", time, 1.0);
+		return new MeasurementT<Double>("S1", time, 1.0);
 	}
 
 }

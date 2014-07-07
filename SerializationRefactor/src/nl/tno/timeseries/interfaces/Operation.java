@@ -2,13 +2,12 @@ package nl.tno.timeseries.interfaces;
 
 import java.io.Serializable;
 import java.util.List;
-
-import nl.tno.timeseries.stormcomponents.OperationContext;
+import java.util.Map;
 
 public interface Operation extends Serializable {
 	
-	public void init(String channelID, long startSequenceNr, OperationContext operationContext);
+	public void init(String channelID, long startSequenceNr, @SuppressWarnings("rawtypes")Map stormConfig);
 	
-	public List<Particle> execute(List<DataParticle> inputParticles);
-
+	public List<Particle> execute(DataParticle inputParticles);
+	
 }

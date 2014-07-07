@@ -25,8 +25,6 @@ public class ChannelSpout implements IRichSpout {
 	protected Fetcher fetcher;
 	protected Class<? extends Particle> outputParticleClass;
 
-
-	
 	
 	public ChannelSpout(Fetcher fetcher, Class<? extends Particle> outputParticleClass) {
 		this.fetcher = fetcher;
@@ -63,8 +61,6 @@ public class ChannelSpout implements IRichSpout {
 	}
 	
 	
-	
-	
 
 	@Override
 	public void activate() {
@@ -85,19 +81,16 @@ public class ChannelSpout implements IRichSpout {
 	
 	@Override
 	public void fail(Object arg0) {
-		// TODO Auto-generated method stub
 		
 	}
 	@Override
 	public void ack(Object arg0) {
-		// TODO Auto-generated method stub
 	}
 
 
 
 	@Override
 	public Map<String, Object> getComponentConfiguration() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
