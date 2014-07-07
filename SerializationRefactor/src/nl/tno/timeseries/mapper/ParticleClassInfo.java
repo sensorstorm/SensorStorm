@@ -15,8 +15,8 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 
 /**
- * The ParticleClassInfo contains information en methods on how to map Particles
- * without a custom mapper
+ * The ParticleClassInfo contains information and methods on how to map
+ * Particles without a custom mapper
  */
 public class ParticleClassInfo {
 
