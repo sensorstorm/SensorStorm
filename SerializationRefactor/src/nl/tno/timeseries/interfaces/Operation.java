@@ -8,6 +8,6 @@ public interface Operation extends Serializable {
 	
 	public void init(String channelID, long startSequenceNr, @SuppressWarnings("rawtypes")Map stormConfig);
 	
-	public List<Particle> execute(DataParticle inputParticles);
+	public List<DataParticle> execute(List<DataParticle> inputParticles);
 	
 }

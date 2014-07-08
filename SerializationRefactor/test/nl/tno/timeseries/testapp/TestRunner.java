@@ -1,6 +1,6 @@
 package nl.tno.timeseries.testapp;
 
-import nl.tno.timeseries.timer.TimerChannelBolt;
+import nl.tno.timeseries.stormcomponents.ChannelBolt;
 import nl.tno.timeseries.timer.TimerChannelSpout;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
@@ -22,8 +22,8 @@ public class TestRunner {
 //		.shuffleGrouping("input");
 
 		
-		builder.setSpout("input", new TimerChannelSpout(new MyFetcherT(), MeasurementT.class, false, 500L));
-		builder.setBolt("src", new TimerChannelBolt(MyOperationT.class, MeasurementT.class), 1)
+		builder.setSpout("input", new TimerChannelSpout(new MyFetcherT(), MeasurementT.class, true, 1L));
+		builder.setBolt("src", new ChannelBolt(MyOperationT.class), 1)
 		.shuffleGrouping("input");
 		
 		localCluster.submitTopology(topologyName, config, builder.createTopology());

@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import nl.tno.timeseries.interfaces.DataParticle;
-import nl.tno.timeseries.interfaces.MetaParticle;
-import nl.tno.timeseries.interfaces.MetaParticleProcessor;
+import nl.tno.timeseries.batchers.EmptyBatcher;
+import nl.tno.timeseries.interfaces.Batcher;
+import nl.tno.timeseries.interfaces.EmitParticleInterface;
 import nl.tno.timeseries.interfaces.Operation;
 import nl.tno.timeseries.interfaces.Particle;
 import nl.tno.timeseries.mapper.ParticleMapper;
@@ -21,108 +21,86 @@ import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
-public class ChannelBolt extends BaseRichBolt {
+public class ChannelBolt extends BaseRichBolt implements EmitParticleInterface {
 	private static final long serialVersionUID = -5109656134961759532L;
-	
+
 	protected Logger logger = LoggerFactory.getLogger(ChannelBolt.class);
-	protected @SuppressWarnings("rawtypes") Map stormConfig;
+	protected @SuppressWarnings("rawtypes")Map stormConfig;
 	protected OutputCollector collector;
 	protected String boltName;
 	protected Class<? extends Operation> operationClass;
-	protected Class<? extends Particle> outputParticleClass;
-	private Map<String, Operation> operations;
-	private Map<Class<? extends MetaParticle>, MetaParticleProcessor> metaProcessors;
+	protected int nrOfOutputFields;
+	private Class<? extends Batcher> batcherClass;
 
+	
+	protected Map<String, ChannelManager> channelManagers;
 
-	public ChannelBolt(Class<? extends Operation> operationClass, Class<? extends Particle> outputParticleClass) {
+	public ChannelBolt(Class<? extends Operation> operationClass, Class<? extends Batcher> batcherClass) {
 		this.operationClass = operationClass;
-		this.outputParticleClass = outputParticleClass;
-		
-		operations = new HashMap<String, Operation>();
-		metaProcessors = new HashMap<Class<? extends MetaParticle>, MetaParticleProcessor>();
+		this.batcherClass = batcherClass;
+
+		channelManagers = new HashMap<String, ChannelManager>();
+	}
+
+	public ChannelBolt(Class<? extends Operation> operationClass) {
+		this(operationClass, EmptyBatcher.class);
 	}
 	
+	
 	@Override
-	public void prepare(@SuppressWarnings("rawtypes")Map conf, TopologyContext context, OutputCollector collector) {
+	public void prepare(@SuppressWarnings("rawtypes") Map conf, TopologyContext context, OutputCollector collector) {
 		this.stormConfig = conf;
 		this.collector = collector;
 		this.boltName = context.getThisComponentId();
 	}
-
 	
+
 	@Override
 	public void execute(Tuple tuple) {
 		Particle inputParticle = ParticleMapper.tupleToParticle(tuple);
 		if (inputParticle != null) {
-			List<Particle> outputParticles = null;
-
-			outputParticles = processParticle(inputParticle);
-
+			ChannelManager channelManager = getChannelManager(inputParticle.getChannelId());
+			List<Particle> outputParticles = channelManager.processParticle(inputParticle);
 			if (outputParticles != null) {
 				for (Particle outputParticle : outputParticles) {
-					collector.emit(ParticleMapper.particleToValues(outputParticle));
+					emitParticle(outputParticle);
 				}
 			}
 		}
 	}
-	
-	
-	protected void addMetaProcessor(Class<? extends MetaParticle> metaParticle, MetaParticleProcessor metaProcessor) {
-		metaProcessors.put(metaParticle, metaProcessor);
-	}
-	
-	
-	protected List<Particle> processParticle(Particle inputParticle) {
-		Operation operation = getOperation(inputParticle);
-		
-		// process input particle and return result particles
-		List<Particle> result = null;
-		if (inputParticle instanceof MetaParticle) {
-			MetaParticleProcessor metaParticleProcessor = metaProcessors.get(inputParticle.getClass());
-			if (metaParticleProcessor != null) {
-				result = metaParticleProcessor.execute((MetaParticle)inputParticle);
-			} 
-			// pass metaParticle on further in the topology
-			result.add(inputParticle);
-		} else if (inputParticle instanceof DataParticle) {
-			result = operation.execute((DataParticle)inputParticle);
-		} 
-		return result;
-	}
 
+	
+	private ChannelManager getChannelManager(String channelId) {
+		ChannelManager channelManager = channelManagers.get(channelId);
+		if (channelManager == null) {
+			channelManager = new ChannelManager(channelId, batcherClass, operationClass, stormConfig, this);
+			channelManagers.put(channelId, channelManager);
+		}
+		return channelManager;
+	}
+	
 	
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		Fields fields = ParticleMapper.getFields(outputParticleClass);
-		//@TODO merge fields with MetaParticle fields
+		// merge all output particle fields and meta particle fields
+		Fields fields = null;
+		List<Class<? extends Particle>> outputParticles = ChannelManager.getOutputParticles(operationClass);
+		for (Class<? extends Particle> outputParticleClass: outputParticles) {
+			if (fields == null) {
+				fields = ParticleMapper.getFields(outputParticleClass);
+			} else {
+				fields = ParticleMapper.mergeFields(fields, ParticleMapper.getFields(outputParticleClass));
+			}
+		}
+		
+		nrOfOutputFields = fields.size();
 		declarer.declare(fields);
 	}
 
-	
-	protected Operation getOperation(Particle inputParticle) {
-		String channelId = inputParticle.getChannelId();
-		Operation operation = operations.get(channelId);
-		if (operation == null) {	// first time this operations is used for this channelId
-			try {
-				operation = operationClass.newInstance();
-				initOperation(operation, inputParticle);
-				operations.put(channelId, operation);
-			} catch (InstantiationException | IllegalAccessException e) {
-				logger.error("Can not instantiate Operation class "+operationClass.getName());
-				operation = null;
-			}
-		}
-		return operation;
-	}
 
-	
-	/**
-	 * This method initializes the operation. It can be overriden if additional initialization is needed. 
-	 * @param operation
-	 * @param inputParticle
-	 */
-	protected void initOperation(Operation operation, Particle inputParticle) {
-		operation.init(inputParticle.getChannelId(), inputParticle.getSequenceNr(), stormConfig);
+	@Override
+	public void emitParticle(Particle particle) {
+		collector.emit(ParticleMapper.particleToValues(particle, nrOfOutputFields));
 	}
 	
 }
