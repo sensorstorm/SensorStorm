@@ -94,7 +94,7 @@ public class ChannelBolt extends BaseRichBolt {
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 		Fields fields = ParticleMapper.getFields(outputParticleClass);
-		//TODO merge fields with MetaParticle fields
+		//@TODO merge fields with MetaParticle fields
 		declarer.declare(fields);
 	}
 
