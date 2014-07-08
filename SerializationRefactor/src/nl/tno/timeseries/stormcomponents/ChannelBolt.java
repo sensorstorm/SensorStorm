@@ -30,11 +30,10 @@ public class ChannelBolt extends BaseRichBolt implements EmitParticleInterface {
 	protected String boltName;
 	protected Class<? extends Operation> operationClass;
 	protected int nrOfOutputFields;
-	private Class<? extends Batcher> batcherClass;
-
-	
+	protected Class<? extends Batcher> batcherClass;
 	protected Map<String, ChannelManager> channelManagers;
 
+	
 	public ChannelBolt(Class<? extends Operation> operationClass, Class<? extends Batcher> batcherClass) {
 		this.operationClass = operationClass;
 		this.batcherClass = batcherClass;

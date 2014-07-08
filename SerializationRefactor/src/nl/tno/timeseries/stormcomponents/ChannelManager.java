@@ -43,7 +43,7 @@ public class ChannelManager implements Serializable {
 		this.emitParticleHandler = emitParticleHandler;
 		
 		metaParticleHandlers = new ArrayList<MetaParticleHandler>();
-		System.out.println("Channel manager for cannel "+channelId+" created");
+		System.out.println("Channel manager for channel "+channelId+" created");
 	}
 
 	

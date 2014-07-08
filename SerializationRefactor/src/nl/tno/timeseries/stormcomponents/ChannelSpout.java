@@ -5,6 +5,7 @@ import java.util.Map;
 import nl.tno.timeseries.annotation.FetcherDeclaration;
 import nl.tno.timeseries.interfaces.DataParticle;
 import nl.tno.timeseries.interfaces.Fetcher;
+import nl.tno.timeseries.interfaces.Particle;
 import nl.tno.timeseries.mapper.ParticleMapper;
 
 import org.slf4j.Logger;
@@ -69,10 +70,15 @@ public class ChannelSpout implements IRichSpout {
 	public void nextTuple() {
 		DataParticle particle = fetcher.fetchParticle();
 		if (particle != null) {
-			collector.emit(ParticleMapper.particleToValues(particle, nrOfOutputFields));
+			emitParticle(particle);
 		}
 	}
 	
+	
+	protected void emitParticle(Particle particle) {
+		collector.emit(ParticleMapper.particleToValues(particle, nrOfOutputFields));
+	}
+
 	
 
 	@Override

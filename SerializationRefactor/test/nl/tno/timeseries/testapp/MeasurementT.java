@@ -29,7 +29,7 @@ public class MeasurementT<T> extends AbstractParticle implements DataParticle {
 	
 	@Override
 	public String toString() {
-		return "P["+channelId+","+sequenceNr+","+value+"]";
+		return "M["+channelId+","+sequenceNr+","+value+"]";
 	}
 	
 }

@@ -56,7 +56,7 @@ public class TimerChannelSpout extends ChannelSpout {
 		// first check to see if there are timerTicks to be emitted
 		if (mainTimerTickFreq != 0) {
 			emitTimerTicksInChannel(particle.getChannelId(), now);
-			collector.emit(ParticleMapper.particleToValues(particle, nrOfOutputFields));
+			emitParticle(particle);
 		}
 	}
 
@@ -79,7 +79,7 @@ public class TimerChannelSpout extends ChannelSpout {
 			lastKnownNows.put(channelId, lastKnownNow);
 
 			TimerTickParticle timerTickParticle = new TimerTickParticle(channelId, lastKnownNow);
-			collector.emit(ParticleMapper.particleToValues(timerTickParticle, nrOfOutputFields));
+			emitParticle(timerTickParticle);
 		}
 	}
 
