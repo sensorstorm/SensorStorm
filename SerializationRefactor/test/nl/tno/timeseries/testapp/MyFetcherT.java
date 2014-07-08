@@ -2,10 +2,12 @@ package nl.tno.timeseries.testapp;
 
 import java.util.Map;
 
+import nl.tno.timeseries.annotation.FetcherDeclaration;
 import nl.tno.timeseries.interfaces.DataParticle;
 import nl.tno.timeseries.interfaces.Fetcher;
 import backtype.storm.task.TopologyContext;
 
+@FetcherDeclaration(outputs={MeasurementT.class})
 public class MyFetcherT implements Fetcher {
 	private static final long serialVersionUID = -4783593429530609215L;
 	long time = 0;

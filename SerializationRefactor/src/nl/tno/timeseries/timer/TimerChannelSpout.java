@@ -5,7 +5,6 @@ import java.util.Map;
 
 import nl.tno.timeseries.interfaces.DataParticle;
 import nl.tno.timeseries.interfaces.Fetcher;
-import nl.tno.timeseries.interfaces.Particle;
 import nl.tno.timeseries.mapper.ParticleMapper;
 import nl.tno.timeseries.stormcomponents.ChannelSpout;
 import backtype.storm.tuple.Fields;
@@ -16,16 +15,15 @@ public class TimerChannelSpout extends ChannelSpout {
 	private Boolean useParticleTime;
 	private Map<String, Long> lastKnownNows = new HashMap<String, Long>();
 
-	public TimerChannelSpout(Fetcher fetcher, Class<? extends Particle> outputParticleClass) {
-		super(fetcher, outputParticleClass);
+	public TimerChannelSpout(Fetcher fetcher) {
+		super(fetcher);
 
 		mainTimerTickFreq = 1L;
 		useParticleTime = true;
 	}
 
-	public TimerChannelSpout(Fetcher fetcher, Class<? extends Particle> outputParticleClass, Boolean useParticleTime,
-			Long mainTimerTickFreq) {
-		super(fetcher, outputParticleClass);
+	public TimerChannelSpout(Fetcher fetcher, Boolean useParticleTime, Long mainTimerTickFreq) {
+		super(fetcher);
 
 		this.mainTimerTickFreq = mainTimerTickFreq;
 		this.useParticleTime = useParticleTime;

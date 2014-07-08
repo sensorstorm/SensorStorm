@@ -72,12 +72,14 @@ public class ChannelManager implements Serializable {
 			handleMetaParticle((MetaParticle)particle);
 			result.add(particle);
 		} else if (particle instanceof DataParticle) {
-			//TODO batcher
-			List<DataParticle> dataParticles = new ArrayList<DataParticle>();
-			dataParticles.add((DataParticle)particle);
-			List<DataParticle> outputDataParticles = operation.execute(dataParticles);
-			if (outputDataParticles != null) { 
-				result.addAll(outputDataParticles);
+			List<List<DataParticle>> batchedParticles = batcher.batch((DataParticle)particle);
+			if (batchedParticles != null) {
+				for (List<DataParticle> batchedParticle : batchedParticles) {
+					List<DataParticle> outputDataParticles = operation.execute(batchedParticle);
+					if (outputDataParticles != null) { 
+						result.addAll(outputDataParticles);
+					}
+				}
 			}
 		} else {
 			logger.warn("For channel "+channelId+": unknown particle type ("+particle.getClass().getName()+") to process");
@@ -89,15 +91,19 @@ public class ChannelManager implements Serializable {
 
 	
 	private void createOperation(Particle firstParticle) throws InstantiationException, IllegalAccessException {
+		batcher = batcherClass.newInstance();
+		batcher.init(firstParticle.getChannelId(), firstParticle.getSequenceNr(), stormConfig);
+		
 		operation = operationClass.newInstance();
 		operation.init(firstParticle.getChannelId(), firstParticle.getSequenceNr(), stormConfig);
+		
 		createMetaParticleHandlers(operation);
 	}
 
 	
 	private void createMetaParticleHandlers(Operation operation) throws InstantiationException, IllegalAccessException {
-		OperationDeclaration a = operation.getClass().getAnnotation(OperationDeclaration.class);
-		for (Class<? extends MetaParticleHandler> mph :  a.metaParticleHandlers()) {
+		OperationDeclaration operationDeclaration = operation.getClass().getAnnotation(OperationDeclaration.class);
+		for (Class<? extends MetaParticleHandler> mph :  operationDeclaration.metaParticleHandlers()) {
 			MetaParticleHandler newInstance = mph.newInstance();
 			newInstance.init(operation, emitParticleHandler);
 			metaParticleHandlers.add(newInstance);

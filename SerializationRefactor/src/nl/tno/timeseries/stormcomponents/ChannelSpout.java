@@ -2,9 +2,9 @@ package nl.tno.timeseries.stormcomponents;
 
 import java.util.Map;
 
+import nl.tno.timeseries.annotation.FetcherDeclaration;
 import nl.tno.timeseries.interfaces.DataParticle;
 import nl.tno.timeseries.interfaces.Fetcher;
-import nl.tno.timeseries.interfaces.Particle;
 import nl.tno.timeseries.mapper.ParticleMapper;
 
 import org.slf4j.Logger;
@@ -23,13 +23,11 @@ public class ChannelSpout implements IRichSpout {
 	
 	protected SpoutOutputCollector collector;
 	protected Fetcher fetcher;
-	protected Class<? extends Particle> outputParticleClass;
 	protected int nrOfOutputFields;
 
 	
-	public ChannelSpout(Fetcher fetcher, Class<? extends Particle> outputParticleClass) {
+	public ChannelSpout(Fetcher fetcher) {
 		this.fetcher = fetcher;
-		this.outputParticleClass = outputParticleClass;
 	}
 
 	
@@ -45,8 +43,19 @@ public class ChannelSpout implements IRichSpout {
 	}
 	
 	protected Fields getOutputFields() {
-		return ParticleMapper.getFields(outputParticleClass);
+		Fields fields = null;
+		FetcherDeclaration fetcherDeclaration = fetcher.getClass().getAnnotation(FetcherDeclaration.class);
+		for (Class<? extends DataParticle> outputParticleClass : fetcherDeclaration.outputs()) {
+			if (fields == null) {
+				fields = ParticleMapper.getFields(outputParticleClass);
+			} else {
+				fields = ParticleMapper.mergeFields(fields, ParticleMapper.getFields(outputParticleClass));
+			}
+		}
+		
+		return fields;
 	}
+	
 	
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {

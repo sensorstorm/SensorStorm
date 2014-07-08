@@ -8,7 +8,7 @@ import backtype.storm.topology.TopologyBuilder;
 
 public class TestRunner {	
 	private static final String topologyName = "timeserieslib-tester";
-	private long sleeptime = 10000;
+	private long sleeptime = 5000;
 
 	public void run() {
 		LocalCluster localCluster = new LocalCluster();
@@ -16,13 +16,7 @@ public class TestRunner {
 		TopologyBuilder builder = new TopologyBuilder();
 
 		
-//		builder.setSpout("input", new ChannelSpout(new MyFetcher(), Measurement.class));
-//		builder.setSpout("input", new TimerChannelSpout(new MyFetcher(), Measurement.class));
-//		builder.setBolt("src", new TimerChannelBolt(MyOperation.class, Measurement.class), 1)
-//		.shuffleGrouping("input");
-
-		
-		builder.setSpout("input", new TimerChannelSpout(new MyFetcherT(), MeasurementT.class, true, 1L));
+		builder.setSpout("input", new TimerChannelSpout(new MyFetcherT(), true, 1L));
 		builder.setBolt("src", new ChannelBolt(MyOperationT.class), 1)
 		.shuffleGrouping("input");
 		
