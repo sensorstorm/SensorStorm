@@ -3,6 +3,7 @@ package nl.tno.timeseries.testapp;
 import nl.tno.timeseries.batchers.EmptyBatcher;
 import nl.tno.timeseries.batchers.NumberOfParticlesBatcher;
 import nl.tno.timeseries.stormcomponents.ChannelBolt;
+import nl.tno.timeseries.stormcomponents.ChannelGrouperBolt;
 import nl.tno.timeseries.timer.TimerChannelSpout;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
@@ -27,7 +28,9 @@ public class TestRunner {
 */		
 
 		builder.setSpout("input", new TimerChannelSpout(new MyGroupFetcherT(), true, 1L));
-		builder.setBolt("src", new ChannelBolt(MyOperationT.class, EmptyBatcher.class), 1).shuffleGrouping("input");
+		builder.setBolt("grouper", new ChannelGrouperBolt(new MyChannelGrouper()), 1).shuffleGrouping("input");
+		builder.setBolt("src", new ChannelBolt(MyOperationT.class, EmptyBatcher.class), 1).shuffleGrouping("grouper");
+//		builder.setBolt("src", new ChannelBolt(MyOperationT.class, EmptyBatcher.class), 1).shuffleGrouping("input");
 
 		
 		localCluster.submitTopology(topologyName, config, builder.createTopology());

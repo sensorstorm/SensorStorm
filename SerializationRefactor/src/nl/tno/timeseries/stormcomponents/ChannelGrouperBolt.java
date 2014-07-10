@@ -1,12 +1,12 @@
 package nl.tno.timeseries.stormcomponents;
 
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
+import nl.tno.timeseries.annotation.ChannelGrouperDeclaration;
+import nl.tno.timeseries.interfaces.ChannelGrouper;
 import nl.tno.timeseries.interfaces.DataParticle;
-import nl.tno.timeseries.interfaces.GroupedParticle;
 import nl.tno.timeseries.interfaces.MetaParticle;
 import nl.tno.timeseries.interfaces.Particle;
 import nl.tno.timeseries.mapper.ParticleMapper;
@@ -18,7 +18,9 @@ import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
+import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+import backtype.storm.tuple.Values;
 
 public class ChannelGrouperBolt extends BaseRichBolt {
 	private static final long serialVersionUID = -4421389584087020459L;
@@ -27,22 +29,13 @@ public class ChannelGrouperBolt extends BaseRichBolt {
 	protected OutputCollector collector;
 	protected String boltName;
 	protected int nrOfOutputFields;
-	protected Map<String, Set<String>> channelGroups;
+	protected List<String> channelGroupIds;
+	protected ChannelGrouper channelGrouper;
 
 	
-	public ChannelGrouperBolt() {
-		channelGroups = new HashMap<String, Set<String>>();
-		
-		//TODO get config from external
-		Set<String> group1 = new HashSet<String>();
-		group1.add("S1");
-		group1.add("S2");
-		Set<String> group2 = new HashSet<String>();
-		group2.add("S2");
-		group2.add("S3");
-		
-		channelGroups.put("G1", group1);
-		channelGroups.put("G2", group2);
+	public ChannelGrouperBolt(ChannelGrouper grouper) {
+		this.channelGrouper = grouper;
+		channelGroupIds = new ArrayList<String>();
 	}
 	
 
@@ -51,20 +44,32 @@ public class ChannelGrouperBolt extends BaseRichBolt {
 		Particle inputParticle = ParticleMapper.tupleToParticle(tuple);
 
 		if (inputParticle instanceof DataParticle) {
-			groupDataParticle((DataParticle)inputParticle);
+			handleDataParticle((DataParticle)inputParticle);
 		} else if (inputParticle instanceof MetaParticle) {
-			// copy all metaParticles to the group channels
-			for (String groupId : channelGroups.keySet()) {
-				inputParticle.setChannelId(groupId);
-				emitParticle(inputParticle);
-			}
+			handleMetaParticle((MetaParticle)inputParticle);
 		}
 	}
 
-	
-	protected void groupDataParticle(DataParticle inputParticle) {
-	}
 
+	protected void handleDataParticle(DataParticle dataParticle) {
+		List<String> channelGroupIds = channelGrouper.getChannelGroupId(dataParticle.getChannelId());
+		for (String channelGroupId : channelGroupIds) {
+			if (!channelGroupIds.contains(channelGroupId)) {
+				channelGroupIds.add(channelGroupId);
+			}
+			emitParticle(dataParticle, channelGroupId);
+		}
+	}
+	
+	
+	protected void handleMetaParticle(MetaParticle metaParticle) {
+		// copy all metaParticles to the group channels
+		for (String channelGroupId : channelGroupIds) {
+			metaParticle.setChannelId(channelGroupId);
+			emitParticle(metaParticle, channelGroupId);
+		}
+	}
+	
 
 	@Override
 	public void prepare(@SuppressWarnings("rawtypes") Map conf, TopologyContext context, OutputCollector collector) {
@@ -75,13 +80,47 @@ public class ChannelGrouperBolt extends BaseRichBolt {
 
 	
 	@Override
-	public void declareOutputFields(OutputFieldsDeclarer arg0) {
-		// TODO Auto-generated method stub
+	public void declareOutputFields(OutputFieldsDeclarer declarer) {
+		Fields fields = null;
+		ChannelGrouperDeclaration channelGrouperDeclaration = channelGrouper.getClass().getAnnotation(ChannelGrouperDeclaration.class);
+		for (Class<? extends DataParticle> outputParticleClass : channelGrouperDeclaration.outputs()) {
+			if (fields == null) {
+				fields = ParticleMapper.getFields(outputParticleClass);
+			} else {
+				fields = ParticleMapper.mergeFields(fields, ParticleMapper.getFields(outputParticleClass));
+			}
+		}
+			
+		fields = ParticleMapper.mergeFields(fields, new Fields(ChannelGrouper.GROUPED_PARTICLE_FIELD));
+		nrOfOutputFields = fields.size();
+		declarer.declare(fields);
+
+//		String s = "[";
+//		for (String field : fields) {
+//			s = s + field + ", ";
+//		}
+//		s = s + "]";
+//
+//		System.out.println("group.declareOutputFields.nrOfOutputFields="+nrOfOutputFields+" fields="+s);
 	}
 
 	
-	public void emitParticle(Particle particle) {
-		collector.emit(ParticleMapper.particleToValues(particle, nrOfOutputFields));
+	public void emitParticle(Particle particle, String channelGroupId) {
+		// convert the particle to values without the channelGroupId field
+		Values values = ParticleMapper.particleToValues(particle, nrOfOutputFields-1);
+		values.add(channelGroupId);
+		collector.emit(values);
+
+		//		String s = "[";
+//		for (Object value : values) {
+//			if (value == null) {
+//				s = s + "null, ";
+//			} else {
+//				s = s + value.toString() + ", ";
+//			}
+//		}
+//		s = s + "]";
+//		System.out.println("group.emitParticle("+values.size()+") values="+s);
 	}
 
 }

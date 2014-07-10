@@ -27,9 +27,9 @@ public class MyOperationT implements Operation, TimerTaskInterface {
 		if (inputParticles != null)  {
 			for (DataParticle inputParticle : inputParticles) {
 				if (inputParticle instanceof MeasurementT<?>) {
-					System.out.println("MeasurementT received "+inputParticle);
+					System.out.println("Operation channel "+channelId+" MeasurementT received "+inputParticle);
 				} else {
-					System.out.println("Data particle received "+inputParticle);
+					System.out.println("Operation channel "+channelId+" Data particle received "+inputParticle);
 				}
 			}
 		}

@@ -6,6 +6,7 @@ import java.util.Map;
 
 import nl.tno.timeseries.batchers.EmptyBatcher;
 import nl.tno.timeseries.interfaces.Batcher;
+import nl.tno.timeseries.interfaces.ChannelGrouper;
 import nl.tno.timeseries.interfaces.EmitParticleInterface;
 import nl.tno.timeseries.interfaces.Operation;
 import nl.tno.timeseries.interfaces.Particle;
@@ -58,7 +59,19 @@ public class ChannelBolt extends BaseRichBolt implements EmitParticleInterface {
 	public void execute(Tuple tuple) {
 		Particle inputParticle = ParticleMapper.tupleToParticle(tuple);
 		if (inputParticle != null) {
-			ChannelManager channelManager = getChannelManager(inputParticle.getChannelId());
+			String selectChannelManagerId = inputParticle.getChannelId();
+			// determine if there was a channelGrouper in front of this bolt, if so use the channelGroup as grouper.
+			String channelGroupId;
+			try { 
+				channelGroupId = tuple.getStringByField(ChannelGrouper.GROUPED_PARTICLE_FIELD);
+			} catch (IllegalArgumentException e) {
+				channelGroupId = null;
+			}
+			if (channelGroupId != null) {
+				selectChannelManagerId = channelGroupId;
+			}
+			
+			ChannelManager channelManager = getChannelManager(selectChannelManagerId);
 			List<Particle> outputParticles = channelManager.processParticle(inputParticle);
 			if (outputParticles != null) {
 				for (Particle outputParticle : outputParticles) {
