@@ -7,6 +7,7 @@ import java.util.Map;
 
 import nl.tno.timeseries.interfaces.Batcher;
 import nl.tno.timeseries.interfaces.DataParticle;
+import nl.tno.timeseries.interfaces.DataParticleBatch;
 
 public class NumberOfParticlesBatcher implements Batcher, Serializable {
 
@@ -23,12 +24,12 @@ public class NumberOfParticlesBatcher implements Batcher, Serializable {
 	}
 
 	@Override
-	public List<List<DataParticle>> batch(DataParticle inputParticle) {
-		ArrayList<List<DataParticle>> result = new ArrayList<List<DataParticle>>();
+	public List<DataParticleBatch> batch(DataParticle inputParticle) {
+		ArrayList<DataParticleBatch> result = new ArrayList<DataParticleBatch>();
 		
 		buffer.add(inputParticle);
 		while (buffer.size() >= nrOfParticlesToBatch) {
-			ArrayList<DataParticle> batchedParticles = new ArrayList<DataParticle>(buffer.subList(0, nrOfParticlesToBatch));
+			DataParticleBatch batchedParticles = new DataParticleBatch(buffer.subList(0, nrOfParticlesToBatch));
 			buffer.removeAll(batchedParticles);
 			result.add(batchedParticles);
 		}

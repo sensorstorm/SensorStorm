@@ -7,13 +7,16 @@ import java.util.Map;
 
 import nl.tno.timeseries.annotation.MetaParticleHandlerDecleration;
 import nl.tno.timeseries.annotation.OperationDeclaration;
+import nl.tno.timeseries.interfaces.BatchOperation;
 import nl.tno.timeseries.interfaces.Batcher;
 import nl.tno.timeseries.interfaces.DataParticle;
+import nl.tno.timeseries.interfaces.DataParticleBatch;
 import nl.tno.timeseries.interfaces.EmitParticleInterface;
 import nl.tno.timeseries.interfaces.MetaParticle;
 import nl.tno.timeseries.interfaces.MetaParticleHandler;
 import nl.tno.timeseries.interfaces.Operation;
 import nl.tno.timeseries.interfaces.Particle;
+import nl.tno.timeseries.interfaces.SingleOperation;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,8 +38,20 @@ public class ChannelManager implements Serializable {
 	private Map stormConfig;
 
 	public ChannelManager(String channelId, Class<? extends Batcher> batcherClass,
+			Class<? extends BatchOperation> batchOperationClass, @SuppressWarnings("rawtypes") Map conf, EmitParticleInterface emitParticleHandler) {
+		channelManager(channelId, batcherClass, batchOperationClass, conf, emitParticleHandler);
+	}
+	
+	
+	public ChannelManager(String channelId, Class<? extends SingleOperation> operationClass, @SuppressWarnings("rawtypes") Map conf, 
+			EmitParticleInterface emitParticleHandler) {
+		channelManager(channelId, null, operationClass, conf, emitParticleHandler);
+	}
+		
+	private void channelManager(String channelId, Class<? extends Batcher> batcherClass, 
 			Class<? extends Operation> operationClass, @SuppressWarnings("rawtypes") Map conf, EmitParticleInterface emitParticleHandler) {
 		this.channelId = channelId;
+		this.operationClass = operationClass;
 		this.batcherClass = batcherClass;
 		this.operationClass = operationClass;
 		this.stormConfig = conf;
@@ -72,14 +87,20 @@ public class ChannelManager implements Serializable {
 			handleMetaParticle((MetaParticle)particle);
 			result.add(particle);
 		} else if (particle instanceof DataParticle) {
-			List<List<DataParticle>> batchedParticles = batcher.batch((DataParticle)particle);
-			if (batchedParticles != null) {
-				for (List<DataParticle> batchedParticle : batchedParticles) {
-					List<DataParticle> outputDataParticles = operation.execute(batchedParticle);
-					if (outputDataParticles != null) { 
-						result.addAll(outputDataParticles);
+			List<DataParticle> outputDataParticles = null;
+			if (batcher != null) {
+				List<DataParticleBatch> batchedParticles = batcher.batch((DataParticle)particle);
+				if (batchedParticles != null) {
+					for (DataParticleBatch batchedParticle : batchedParticles) {
+						outputDataParticles = ((BatchOperation)operation).execute(batchedParticle);
 					}
 				}
+			} else {
+				outputDataParticles = ((SingleOperation)operation).execute((DataParticle)particle);
+			}
+			
+			if (outputDataParticles != null) { 
+				result.addAll(outputDataParticles);
 			}
 		} else {
 			logger.warn("For channel "+channelId+": unknown particle type ("+particle.getClass().getName()+") to process");
@@ -95,7 +116,11 @@ public class ChannelManager implements Serializable {
 		batcher.init(firstParticle.getChannelId(), firstParticle.getSequenceNr(), stormConfig);
 		
 		operation = operationClass.newInstance();
-		operation.init(firstParticle.getChannelId(), firstParticle.getSequenceNr(), stormConfig);
+		if (operationClass.isAssignableFrom(BatchOperation.class)) {
+			((BatchOperation)operation).init(firstParticle.getChannelId(), firstParticle.getSequenceNr(), stormConfig);
+		} else if (operationClass.isAssignableFrom(Operation.class)) {
+			((Operation)operation).init(firstParticle.getChannelId(), firstParticle.getSequenceNr(), stormConfig);
+		} 
 		
 		createMetaParticleHandlers(operation);
 	}

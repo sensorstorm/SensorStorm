@@ -5,11 +5,13 @@ import java.util.List;
 import java.util.Map;
 
 import nl.tno.timeseries.batchers.EmptyBatcher;
+import nl.tno.timeseries.interfaces.BatchOperation;
 import nl.tno.timeseries.interfaces.Batcher;
 import nl.tno.timeseries.interfaces.ChannelGrouper;
 import nl.tno.timeseries.interfaces.EmitParticleInterface;
 import nl.tno.timeseries.interfaces.Operation;
 import nl.tno.timeseries.interfaces.Particle;
+import nl.tno.timeseries.interfaces.SingleOperation;
 import nl.tno.timeseries.mapper.ParticleMapper;
 
 import org.slf4j.Logger;
@@ -35,15 +37,18 @@ public class ChannelBolt extends BaseRichBolt implements EmitParticleInterface {
 	protected Map<String, ChannelManager> channelManagers;
 
 	
-	public ChannelBolt(Class<? extends Operation> operationClass, Class<? extends Batcher> batcherClass) {
-		this.operationClass = operationClass;
+	public ChannelBolt(Class<? extends Batcher> batcherClass, Class<? extends BatchOperation> batchOperationClass) {
+		this.operationClass = batchOperationClass;
 		this.batcherClass = batcherClass;
 
 		channelManagers = new HashMap<String, ChannelManager>();
 	}
 
 	public ChannelBolt(Class<? extends Operation> operationClass) {
-		this(operationClass, EmptyBatcher.class);
+		this.operationClass = operationClass;
+		this.batcherClass = EmptyBatcher.class;
+
+		channelManagers = new HashMap<String, ChannelManager>();
 	}
 	
 	
@@ -82,10 +87,17 @@ public class ChannelBolt extends BaseRichBolt implements EmitParticleInterface {
 	}
 
 	
+	@SuppressWarnings("unchecked")
 	private ChannelManager getChannelManager(String channelId) {
 		ChannelManager channelManager = channelManagers.get(channelId);
 		if (channelManager == null) {
-			channelManager = new ChannelManager(channelId, batcherClass, operationClass, stormConfig, this);
+			if (SingleOperation.class.isAssignableFrom(operationClass)) {
+				channelManager = new ChannelManager(channelId, (Class<? extends SingleOperation>)operationClass, stormConfig, this);
+			} else if (BatchOperation.class.isAssignableFrom(operationClass)) {
+				channelManager = new ChannelManager(channelId, batcherClass, (Class<? extends BatchOperation>)operationClass, stormConfig, this);
+			} else {
+				logger.error("Unknown operation "+operationClass.getName());
+			}
 			channelManagers.put(channelId, channelManager);
 		}
 		return channelManager;

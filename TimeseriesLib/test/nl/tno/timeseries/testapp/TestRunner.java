@@ -1,6 +1,5 @@
 package nl.tno.timeseries.testapp;
 
-import nl.tno.timeseries.batchers.EmptyBatcher;
 import nl.tno.timeseries.batchers.NumberOfParticlesBatcher;
 import nl.tno.timeseries.stormcomponents.ChannelBolt;
 import nl.tno.timeseries.stormcomponents.ChannelGrouperBolt;
@@ -18,19 +17,17 @@ public class TestRunner {
 		Config config = new Config();
 		TopologyBuilder builder = new TopologyBuilder();
 
-
-/*		
-		builder.setSpout("input", new TimerChannelSpout(new MyFetcherT(), true, 1L));
-//		builder.setBolt("src", new ChannelBolt(MyOperation.class), 1).shuffleGrouping("input");
-//		builder.setBolt("src", new ChannelBolt(MyOperation.class, EmptyBatcher.class), 1).shuffleGrouping("input");
-//		builder.setBolt("src", new ChannelBolt(MyOperation.class, NumberOfParticlesBatcher.class), 1).shuffleGrouping("input");
-		builder.setBolt("src", new ChannelBolt(MyBatchOperation.class, NumberOfParticlesBatcher.class), 1).shuffleGrouping("input");
-*/		
-
+/*
+		builder.setSpout("input", new TimerChannelSpout(new MyFetcher(), true, 1L));
+		builder.setBolt("src", new ChannelBolt(MyOperation.class), 1).shuffleGrouping("input");
+		builder.setBolt("src", new ChannelBolt(MyOperation.class), 1).shuffleGrouping("input");
+		builder.setBolt("src", new ChannelBolt(NumberOfParticlesBatcher.class, MyBatchOperation.class), 1).shuffleGrouping("input");
+		builder.setBolt("src", new ChannelBolt(NumberOfParticlesBatcher.class, MyBatchOperation.class), 1).shuffleGrouping("input");
+*/
 		builder.setSpout("input", new TimerChannelSpout(new MyGroupFetcher(), true, 1L));
 		builder.setBolt("grouper", new ChannelGrouperBolt(new MyChannelGrouper()), 1).shuffleGrouping("input");
-		builder.setBolt("src", new ChannelBolt(MyBatchOperation.class, NumberOfParticlesBatcher.class), 1).shuffleGrouping("grouper");
-//		builder.setBolt("src", new ChannelBolt(MyOperationT.class, EmptyBatcher.class), 1).shuffleGrouping("input");
+		builder.setBolt("src", new ChannelBolt(NumberOfParticlesBatcher.class, MyBatchOperation.class), 1).shuffleGrouping("grouper");
+//		builder.setBolt("src", new ChannelBolt(MyOperation.class), 1).shuffleGrouping("input");
 
 		
 		localCluster.submitTopology(topologyName, config, builder.createTopology());

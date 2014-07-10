@@ -4,14 +4,15 @@ import java.util.List;
 import java.util.Map;
 
 import nl.tno.timeseries.annotation.OperationDeclaration;
+import nl.tno.timeseries.interfaces.BatchOperation;
 import nl.tno.timeseries.interfaces.DataParticle;
-import nl.tno.timeseries.interfaces.Operation;
+import nl.tno.timeseries.interfaces.DataParticleBatch;
 import nl.tno.timeseries.timer.TimerControllerInterface;
 import nl.tno.timeseries.timer.TimerParticleHandler;
 import nl.tno.timeseries.timer.TimerTaskInterface;
 
 @OperationDeclaration(inputs = {Measurement.class}, outputs = {}, metaParticleHandlers = {TimerParticleHandler.class})
-public class MyOperation implements Operation, TimerTaskInterface {
+public class MyBatchOperation implements BatchOperation, TimerTaskInterface {
 	private static final long serialVersionUID = 773649574489299505L;
 	TimerControllerInterface timerController = null;
 	private String channelId;
@@ -19,19 +20,17 @@ public class MyOperation implements Operation, TimerTaskInterface {
 	@Override
 	public void init(String channelID, long startTimestamp, @SuppressWarnings("rawtypes")Map stormConfig) {
 		this.channelId = channelID;
-		System.out.println("init myoperation for channel "+channelID+" at "+startTimestamp);
+		System.out.println("init myoperation at "+startTimestamp);
 	}
 
 	@Override
-	public List<DataParticle> execute(List<DataParticle> inputParticles) {
+	public List<DataParticle> execute(DataParticleBatch inputParticles) {
 		if (inputParticles != null)  {
+			System.out.print("particle batch :[");
 			for (DataParticle inputParticle : inputParticles) {
-				if (inputParticle instanceof Measurement<?>) {
-					System.out.println("Operation channel "+channelId+" MeasurementT received "+inputParticle);
-				} else {
-					System.out.println("Operation channel "+channelId+" Data particle received "+inputParticle);
-				}
+				System.out.print(inputParticle+", ");
 			}
+			System.out.println("]");
 		}
 		return null;
 	}
@@ -39,6 +38,7 @@ public class MyOperation implements Operation, TimerTaskInterface {
 	@Override
 	public void setTimerController(TimerControllerInterface timerController) {
 		this.timerController = timerController;
+		System.out.println("MyOperation.initTimer");
 		timerController.registerOperationForRecurringTimerTask(channelId, 3, this);
 		timerController.registerOperationForSingleTimerTask(channelId, 5, this);
 	}
