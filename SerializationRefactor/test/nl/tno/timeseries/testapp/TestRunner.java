@@ -21,15 +21,15 @@ public class TestRunner {
 
 /*		
 		builder.setSpout("input", new TimerChannelSpout(new MyFetcherT(), true, 1L));
-//		builder.setBolt("src", new ChannelBolt(MyOperationT.class), 1).shuffleGrouping("input");
-//		builder.setBolt("src", new ChannelBolt(MyOperationT.class, EmptyBatcher.class), 1).shuffleGrouping("input");
-//		builder.setBolt("src", new ChannelBolt(MyOperationT.class, NumberOfParticlesBatcher.class), 1).shuffleGrouping("input");
-		builder.setBolt("src", new ChannelBolt(MyBatchOperationT.class, NumberOfParticlesBatcher.class), 1).shuffleGrouping("input");
+//		builder.setBolt("src", new ChannelBolt(MyOperation.class), 1).shuffleGrouping("input");
+//		builder.setBolt("src", new ChannelBolt(MyOperation.class, EmptyBatcher.class), 1).shuffleGrouping("input");
+//		builder.setBolt("src", new ChannelBolt(MyOperation.class, NumberOfParticlesBatcher.class), 1).shuffleGrouping("input");
+		builder.setBolt("src", new ChannelBolt(MyBatchOperation.class, NumberOfParticlesBatcher.class), 1).shuffleGrouping("input");
 */		
 
-		builder.setSpout("input", new TimerChannelSpout(new MyGroupFetcherT(), true, 1L));
+		builder.setSpout("input", new TimerChannelSpout(new MyGroupFetcher(), true, 1L));
 		builder.setBolt("grouper", new ChannelGrouperBolt(new MyChannelGrouper()), 1).shuffleGrouping("input");
-		builder.setBolt("src", new ChannelBolt(MyOperationT.class, EmptyBatcher.class), 1).shuffleGrouping("grouper");
+		builder.setBolt("src", new ChannelBolt(MyBatchOperation.class, NumberOfParticlesBatcher.class), 1).shuffleGrouping("grouper");
 //		builder.setBolt("src", new ChannelBolt(MyOperationT.class, EmptyBatcher.class), 1).shuffleGrouping("input");
 
 		

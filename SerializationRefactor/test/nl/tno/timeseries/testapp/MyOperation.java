@@ -10,8 +10,8 @@ import nl.tno.timeseries.timer.TimerControllerInterface;
 import nl.tno.timeseries.timer.TimerParticleHandler;
 import nl.tno.timeseries.timer.TimerTaskInterface;
 
-@OperationDeclaration(inputs = {MeasurementT.class}, outputs = {}, metaParticleHandlers = {TimerParticleHandler.class})
-public class MyOperationT implements Operation, TimerTaskInterface {
+@OperationDeclaration(inputs = {Measurement.class}, outputs = {}, metaParticleHandlers = {TimerParticleHandler.class})
+public class MyOperation implements Operation, TimerTaskInterface {
 	private static final long serialVersionUID = 773649574489299505L;
 	TimerControllerInterface timerController = null;
 	private String channelId;
@@ -26,7 +26,7 @@ public class MyOperationT implements Operation, TimerTaskInterface {
 	public List<DataParticle> execute(List<DataParticle> inputParticles) {
 		if (inputParticles != null)  {
 			for (DataParticle inputParticle : inputParticles) {
-				if (inputParticle instanceof MeasurementT<?>) {
+				if (inputParticle instanceof Measurement<?>) {
 					System.out.println("Operation channel "+channelId+" MeasurementT received "+inputParticle);
 				} else {
 					System.out.println("Operation channel "+channelId+" Data particle received "+inputParticle);

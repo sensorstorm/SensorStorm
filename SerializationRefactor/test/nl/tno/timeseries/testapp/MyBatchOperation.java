@@ -10,8 +10,8 @@ import nl.tno.timeseries.timer.TimerControllerInterface;
 import nl.tno.timeseries.timer.TimerParticleHandler;
 import nl.tno.timeseries.timer.TimerTaskInterface;
 
-@OperationDeclaration(inputs = {MeasurementT.class}, outputs = {}, metaParticleHandlers = {TimerParticleHandler.class})
-public class MyBatchOperationT implements Operation, TimerTaskInterface {
+@OperationDeclaration(inputs = {Measurement.class}, outputs = {}, metaParticleHandlers = {TimerParticleHandler.class})
+public class MyBatchOperation implements Operation, TimerTaskInterface {
 	private static final long serialVersionUID = 773649574489299505L;
 	TimerControllerInterface timerController = null;
 	private String channelId;

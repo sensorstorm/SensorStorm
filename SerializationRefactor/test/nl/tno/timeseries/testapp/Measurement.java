@@ -4,16 +4,16 @@ import nl.tno.timeseries.interfaces.DataParticle;
 import nl.tno.timeseries.mapper.annotation.TupleField;
 import nl.tno.timeseries.particles.AbstractParticle;
 
-public class MeasurementT<T> extends AbstractParticle implements DataParticle {
+public class Measurement<T> extends AbstractParticle implements DataParticle {
 
 	@TupleField
 	T value;
 	
-	public MeasurementT() {
+	public Measurement() {
 		
 	}
 	
-	public MeasurementT(String channelId, long timestamp, T value) {
+	public Measurement(String channelId, long timestamp, T value) {
 		setChannelId(channelId);
 		setSequenceNr(timestamp);
 		this.value = value;

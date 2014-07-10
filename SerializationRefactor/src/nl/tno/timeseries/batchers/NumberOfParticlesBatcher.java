@@ -17,7 +17,7 @@ public class NumberOfParticlesBatcher implements Batcher, Serializable {
 	@Override
 	public void init(String channelID, long startSequenceNr, @SuppressWarnings("rawtypes")Map stormConfig) {
 		//TODO haal dit uit de stormConfig
-		nrOfParticlesToBatch = 10;
+		nrOfParticlesToBatch = 2;
 		
 		buffer = new ArrayList<DataParticle>();
 	}
