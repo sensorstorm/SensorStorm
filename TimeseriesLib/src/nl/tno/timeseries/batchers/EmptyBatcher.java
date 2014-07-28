@@ -14,8 +14,8 @@ public class EmptyBatcher implements Batcher, Serializable {
 	private static final long serialVersionUID = 4857031702161919147L;
 
 	@Override
-	public void init(String channelID, long startSequenceNr, @SuppressWarnings("rawtypes")Map stormConfig) {
-		
+	public void init(String channelID, long startSequenceNr, @SuppressWarnings("rawtypes") Map stormConfig) {
+
 	}
 
 	@Override

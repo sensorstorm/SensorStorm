@@ -9,15 +9,14 @@ public abstract class AbstractParticle implements Particle {
 
 	protected String channelId;
 	protected long sequenceNr;
-	
+
 	public AbstractParticle() {
 	}
-	
+
 	public AbstractParticle(String channelId, long sequenceNr) {
 		this.channelId = channelId;
 		this.sequenceNr = sequenceNr;
 	}
-	
 
 	@Override
 	public String getChannelId() {
@@ -38,10 +37,9 @@ public abstract class AbstractParticle implements Particle {
 	public void setSequenceNr(long sequenceNr) {
 		this.sequenceNr = sequenceNr;
 	}
-	
-	
+
 	@Override
 	public String toString() {
-		return "P["+channelId+","+sequenceNr+"]";
+		return "P[" + channelId + "," + sequenceNr + "]";
 	}
 }

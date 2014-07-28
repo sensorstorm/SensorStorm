@@ -8,28 +8,33 @@ import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.topology.TopologyBuilder;
 
-public class TestRunner {	
+public class TestRunner {
 	private static final String topologyName = "timeserieslib-tester";
-	private long sleeptime = 5000;
+	private final long sleeptime = 5000;
 
 	public void run() {
 		LocalCluster localCluster = new LocalCluster();
 		Config config = new Config();
 		TopologyBuilder builder = new TopologyBuilder();
 
-/*
-		builder.setSpout("input", new TimerChannelSpout(new MyFetcher(), true, 1L));
-		builder.setBolt("src", new ChannelBolt(MyOperation.class), 1).shuffleGrouping("input");
-		builder.setBolt("src", new ChannelBolt(MyOperation.class), 1).shuffleGrouping("input");
-		builder.setBolt("src", new ChannelBolt(NumberOfParticlesBatcher.class, MyBatchOperation.class), 1).shuffleGrouping("input");
-		builder.setBolt("src", new ChannelBolt(NumberOfParticlesBatcher.class, MyBatchOperation.class), 1).shuffleGrouping("input");
-*/
-		builder.setSpout("input", new TimerChannelSpout(new MyGroupFetcher(), true, 1L));
-		builder.setBolt("grouper", new ChannelGrouperBolt(new MyChannelGrouper()), 1).shuffleGrouping("input");
-		builder.setBolt("src", new ChannelBolt(NumberOfParticlesBatcher.class, MyBatchOperation.class), 1).shuffleGrouping("grouper");
-//		builder.setBolt("src", new ChannelBolt(MyOperation.class), 1).shuffleGrouping("input");
+		/*
+		 * builder.setSpout("input", new TimerChannelSpout(new MyFetcher(),
+		 * true, 1L)); builder.setBolt("src", new
+		 * ChannelBolt(MyOperation.class), 1).shuffleGrouping("input");
+		 * builder.setBolt("src", new ChannelBolt(MyOperation.class),
+		 * 1).shuffleGrouping("input"); builder.setBolt("src", new
+		 * ChannelBolt(NumberOfParticlesBatcher.class, MyBatchOperation.class),
+		 * 1).shuffleGrouping("input"); builder.setBolt("src", new
+		 * ChannelBolt(NumberOfParticlesBatcher.class, MyBatchOperation.class),
+		 * 1).shuffleGrouping("input");
+		 */
+		builder.setSpout("input", new TimerChannelSpout(config, new MyGroupFetcher(), true, 1L));
+		builder.setBolt("grouper", new ChannelGrouperBolt(config, new MyChannelGrouper()), 1).shuffleGrouping("input");
+		builder.setBolt("src", new ChannelBolt(config, NumberOfParticlesBatcher.class, MyBatchOperation.class), 1)
+				.shuffleGrouping("grouper");
+		// builder.setBolt("src", new ChannelBolt(config, MyOperation.class),
+		// 1).shuffleGrouping("input");
 
-		
 		localCluster.submitTopology(topologyName, config, builder.createTopology());
 		System.out.println("Topology " + topologyName + " submitted");
 
@@ -41,17 +46,15 @@ public class TestRunner {
 			} catch (InterruptedException e) {
 			}
 		}
-		
+
 		System.out.println("Shutdown");
 		localCluster.killTopology(topologyName);
 		localCluster.shutdown();
 		System.exit(0);
 
-
 	}
-	
-	
-	public static void main(String[] args) throws Exception{
+
+	public static void main(String[] args) throws Exception {
 		TestRunner testRunner = new TestRunner();
 		testRunner.run();
 	}

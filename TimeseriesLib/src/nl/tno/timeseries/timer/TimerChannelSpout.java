@@ -7,26 +7,32 @@ import nl.tno.timeseries.interfaces.DataParticle;
 import nl.tno.timeseries.interfaces.Fetcher;
 import nl.tno.timeseries.mapper.ParticleMapper;
 import nl.tno.timeseries.stormcomponents.ChannelSpout;
+import nl.tno.timeseries.stormcomponents.MetaParticleUtil;
+import backtype.storm.Config;
 import backtype.storm.tuple.Fields;
 
 public class TimerChannelSpout extends ChannelSpout {
 	private static final long serialVersionUID = 2763848654616526657L;
-	private Long mainTimerTickFreq;
-	private Boolean useParticleTime;
-	private Map<String, Long> lastKnownNows = new HashMap<String, Long>();
+	private final Long mainTimerTickFreq;
+	private final Boolean useParticleTime;
+	private final Map<String, Long> lastKnownNows = new HashMap<String, Long>();
 
-	public TimerChannelSpout(Fetcher fetcher) {
-		super(fetcher);
+	public TimerChannelSpout(Config config, Fetcher fetcher) {
+		super(config, fetcher);
 
 		mainTimerTickFreq = 1L;
 		useParticleTime = true;
+
+		MetaParticleUtil.setMetaParticleFieldsWithParticle(config, TimerTickParticle.class);
 	}
 
-	public TimerChannelSpout(Fetcher fetcher, Boolean useParticleTime, Long mainTimerTickFreq) {
-		super(fetcher);
+	public TimerChannelSpout(Config config, Fetcher fetcher, Boolean useParticleTime, Long mainTimerTickFreq) {
+		super(config, fetcher);
 
 		this.mainTimerTickFreq = mainTimerTickFreq;
 		this.useParticleTime = useParticleTime;
+
+		MetaParticleUtil.setMetaParticleFieldsWithParticle(config, TimerTickParticle.class);
 	}
 
 	@Override

@@ -11,11 +11,11 @@ import nl.tno.timeseries.interfaces.MetaParticleHandler;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE })
 public @interface OperationDeclaration {
-	
+
 	Class<? extends DataParticle>[] inputs();
 
 	Class<? extends DataParticle>[] outputs() default {};
 
 	Class<? extends MetaParticleHandler>[] metaParticleHandlers() default {};
-	
+
 }

@@ -18,5 +18,4 @@ public class DataParticleBatch extends ArrayList<DataParticle> {
 		super(arg0);
 	}
 
-	
 }

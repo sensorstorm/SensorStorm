@@ -7,13 +7,12 @@ import backtype.storm.task.TopologyContext;
 
 public interface Fetcher extends Serializable {
 
-	public void prepare(@SuppressWarnings("rawtypes")Map stormConf, TopologyContext context) throws Exception;
-	
+	public void prepare(@SuppressWarnings("rawtypes") Map stormConf, TopologyContext context) throws Exception;
+
 	public void activate();
 
-	public void deactivate() ;
-	
-	public DataParticle fetchParticle();
-	
-}
+	public void deactivate();
 
+	public DataParticle fetchParticle();
+
+}

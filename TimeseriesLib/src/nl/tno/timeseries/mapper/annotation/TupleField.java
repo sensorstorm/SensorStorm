@@ -16,7 +16,8 @@ import nl.tno.timeseries.interfaces.Particle;
 public @interface TupleField {
 
 	/**
-	 * Name of this field in the tuple. If empty, the name of the field will be used
+	 * Name of this field in the tuple. If empty, the name of the field will be
+	 * used
 	 */
 	String name() default "";
 

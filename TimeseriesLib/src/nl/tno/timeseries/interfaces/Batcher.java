@@ -5,9 +5,8 @@ import java.util.Map;
 
 public interface Batcher {
 
-	public void init(String channelID, long startSequenceNr, @SuppressWarnings("rawtypes")Map stormConfig);
+	public void init(String channelID, long startSequenceNr, @SuppressWarnings("rawtypes") Map stormConfig);
 
 	public List<DataParticleBatch> batch(DataParticle inputParticle);
-	
 
 }
