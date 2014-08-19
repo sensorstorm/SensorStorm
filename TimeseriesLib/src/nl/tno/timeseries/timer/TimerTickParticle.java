@@ -12,17 +12,9 @@ public class TimerTickParticle extends AbstractParticle implements MetaParticle 
 		super(channelId, timestamp);
 	}
 
-	public long getTimestamp() {
-		return getSequenceNr();
-	}
-
-	public void setTimestamp(long timestamp) {
-		setSequenceNr(timestamp);
-	}
-
 	@Override
 	public String toString() {
-		return "T[" + channelId + "," + sequenceNr + "]";
+		return "T[" + channelId + "," + timestamp + "]";
 	}
 
 }

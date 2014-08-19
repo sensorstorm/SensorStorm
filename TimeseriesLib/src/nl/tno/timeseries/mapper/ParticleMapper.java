@@ -7,7 +7,6 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import nl.tno.timeseries.interfaces.Particle;
@@ -15,6 +14,7 @@ import nl.tno.timeseries.mapper.annotation.Mapper;
 import nl.tno.timeseries.mapper.annotation.TupleField;
 import nl.tno.timeseries.mapper.api.CustomParticlePojoMapper;
 
+import org.jboss.netty.util.internal.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +24,8 @@ import backtype.storm.tuple.Values;
 
 public class ParticleMapper {
 
-	public static final Logger log = LoggerFactory.getLogger(ParticleMapper.class);
+	public static final Logger log = LoggerFactory
+			.getLogger(ParticleMapper.class);
 
 	public static final String SEQUENCE_NR = "sequenceNr";
 	public static final String STREAM_ID = "streamId";
@@ -40,8 +41,10 @@ public class ParticleMapper {
 			CustomParticlePojoMapper<?> customSerializer = getCustomMapper(clazz);
 			Method serializeMethod = customSerializersMapMethods.get(clazz);
 			try {
-				return (Values) serializeMethod.invoke(customSerializer, particle);
-			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+				return (Values) serializeMethod.invoke(customSerializer,
+						particle);
+			} catch (IllegalAccessException | IllegalArgumentException
+					| InvocationTargetException e) {
 				log.error("Could not map particle to values", e);
 				return null;
 			}
@@ -50,11 +53,14 @@ public class ParticleMapper {
 		}
 	}
 
-	public static Values particleToValues(Particle particle, int expectedNrOfFields) {
+	public static Values particleToValues(Particle particle,
+			int expectedNrOfFields) {
 		Values values = particleToValues(particle);
 		if (values.size() > expectedNrOfFields) {
-			throw new IllegalArgumentException("Expected number of Fields (" + expectedNrOfFields
-					+ ") is smaller than the found number of fields (" + values.size() + ")");
+			throw new IllegalArgumentException("Expected number of Fields ("
+					+ expectedNrOfFields
+					+ ") is smaller than the found number of fields ("
+					+ values.size() + ")");
 		}
 		while (values.size() < expectedNrOfFields) {
 			values.add(null);
@@ -63,7 +69,8 @@ public class ParticleMapper {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T extends Particle> T tupleToParticle(Tuple tuple, Class<T> clazz) {
+	public static <T extends Particle> T tupleToParticle(Tuple tuple,
+			Class<T> clazz) {
 		if (hasCustomSerializer(clazz)) {
 			return (T) getCustomMapper(clazz).tupleToParticle(tuple);
 		} else {
@@ -153,12 +160,15 @@ public class ParticleMapper {
 					if (a instanceof Mapper) {
 						Class<?> serializerClass = ((Mapper) a).value();
 						customSerializers.putIfAbsent(clazz,
-								(CustomParticlePojoMapper<?>) serializerClass.newInstance());
+								(CustomParticlePojoMapper<?>) serializerClass
+										.newInstance());
 						// Find the (first) map method
 						CustomParticlePojoMapper<?> customSerializer = getCustomMapper(clazz);
-						for (Method m : customSerializer.getClass().getMethods()) {
+						for (Method m : customSerializer.getClass()
+								.getMethods()) {
 							if (m.getName().equals("particleToValues")) {
-								customSerializersMapMethods.putIfAbsent(clazz, m);
+								customSerializersMapMethods.putIfAbsent(clazz,
+										m);
 								break;
 							}
 						}

@@ -11,7 +11,7 @@ public class DoubleMeasurement extends AbstractParticle implements Particle {
 
 	public DoubleMeasurement(String streamId, long sequenceNr, double value) {
 		this.channelId = streamId;
-		this.sequenceNr = sequenceNr;
+		this.timestamp = sequenceNr;
 		this.value = value;
 	}
 
@@ -27,7 +27,7 @@ public class DoubleMeasurement extends AbstractParticle implements Particle {
 	}
 
 	public long getTimestamp() {
-		return this.sequenceNr;
+		return this.timestamp;
 	}
 
 }

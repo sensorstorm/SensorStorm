@@ -8,14 +8,14 @@ import nl.tno.timeseries.interfaces.Particle;
 public abstract class AbstractParticle implements Particle {
 
 	protected String channelId;
-	protected long sequenceNr;
+	protected long timestamp;
 
 	public AbstractParticle() {
 	}
 
-	public AbstractParticle(String channelId, long sequenceNr) {
+	public AbstractParticle(String channelId, long timestamp) {
 		this.channelId = channelId;
-		this.sequenceNr = sequenceNr;
+		this.timestamp = timestamp;
 	}
 
 	@Override
@@ -29,17 +29,17 @@ public abstract class AbstractParticle implements Particle {
 	}
 
 	@Override
-	public long getSequenceNr() {
-		return sequenceNr;
+	public long getTimestamp() {
+		return timestamp;
 	}
 
 	@Override
-	public void setSequenceNr(long sequenceNr) {
-		this.sequenceNr = sequenceNr;
+	public void setTimestamp(long timestamp) {
+		this.timestamp = timestamp;
 	}
 
 	@Override
 	public String toString() {
-		return "P[" + channelId + "," + sequenceNr + "]";
+		return "P[" + channelId + "," + timestamp + "]";
 	}
 }

@@ -2,14 +2,16 @@ package nl.tno.timeseries.mapping;
 
 import java.util.Map;
 
+import nl.tno.timeseries.mapper.api.CustomParticlePojoMapper;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
-import nl.tno.timeseries.mapper.api.CustomParticlePojoMapper;
 
-public class SomeCustomMapper implements CustomParticlePojoMapper<SelfMappedParticle> {
+public class SomeCustomMapper implements
+		CustomParticlePojoMapper<SelfMappedParticle> {
 
-	private static Fields fields = new Fields("streamId", "sequenceNr", "customNameForId", "intId", "map");
+	private static Fields fields = new Fields("streamId", "sequenceNr",
+			"customNameForId", "intId", "map");
 
 	@Override
 	public Values particleToValues(SelfMappedParticle particle) {

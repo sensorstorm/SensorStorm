@@ -18,7 +18,8 @@ public class MyBatchOperation implements BatchOperation, TimerTaskInterface {
 	private String channelId;
 
 	@Override
-	public void init(String channelID, long startTimestamp, @SuppressWarnings("rawtypes") Map stormConfig) {
+	public void init(String channelID, long startTimestamp,
+			@SuppressWarnings("rawtypes") Map stormConfig) {
 		this.channelId = channelID;
 		System.out.println("init myoperation at " + startTimestamp);
 	}
@@ -39,19 +40,22 @@ public class MyBatchOperation implements BatchOperation, TimerTaskInterface {
 	public void setTimerController(TimerControllerInterface timerController) {
 		this.timerController = timerController;
 		System.out.println("MyOperation.initTimer");
-		timerController.registerOperationForRecurringTimerTask(channelId, 3, this);
+		timerController.registerOperationForRecurringTimerTask(channelId, 3,
+				this);
 		timerController.registerOperationForSingleTimerTask(channelId, 5, this);
 	}
 
 	@Override
 	public List<DataParticle> doTimerRecurringTask(long timestamp) {
-		System.out.println("Recurring task for channel " + channelId + " at " + timestamp);
+		System.out.println("Recurring task for channel " + channelId + " at "
+				+ timestamp);
 		return null;
 	}
 
 	@Override
 	public List<DataParticle> doTimerSingleTask(long timestamp) {
-		System.out.println("Single task for channel " + channelId + " at " + timestamp);
+		System.out.println("Single task for channel " + channelId + " at "
+				+ timestamp);
 		return null;
 	}
 

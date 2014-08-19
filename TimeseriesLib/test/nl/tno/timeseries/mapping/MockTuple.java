@@ -13,8 +13,8 @@ import backtype.storm.tuple.Values;
  */
 public class MockTuple implements Tuple {
 
-	private List<String> fields;
-	private Values values;
+	private final List<String> fields;
+	private final Values values;
 
 	public MockTuple(Fields fields, Values values) {
 		this.fields = fields.toList();

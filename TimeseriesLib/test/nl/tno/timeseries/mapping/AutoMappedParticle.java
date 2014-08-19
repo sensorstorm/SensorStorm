@@ -27,7 +27,7 @@ public class AutoMappedParticle implements Particle {
 	}
 
 	@Override
-	public long getSequenceNr() {
+	public long getTimestamp() {
 		return sequenceNr;
 	}
 
@@ -37,7 +37,7 @@ public class AutoMappedParticle implements Particle {
 	}
 
 	@Override
-	public void setSequenceNr(long sequenceNr) {
+	public void setTimestamp(long sequenceNr) {
 		this.sequenceNr = sequenceNr;
 	}
 
@@ -50,7 +50,8 @@ public class AutoMappedParticle implements Particle {
 		result = prime * result + intId;
 		result = prime * result + ((map == null) ? 0 : map.hashCode());
 		result = prime * result + (int) (sequenceNr ^ (sequenceNr >>> 32));
-		result = prime * result + ((streamId == null) ? 0 : streamId.hashCode());
+		result = prime * result
+				+ ((streamId == null) ? 0 : streamId.hashCode());
 		return result;
 	}
 

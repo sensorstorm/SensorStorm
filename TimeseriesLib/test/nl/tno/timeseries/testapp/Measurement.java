@@ -15,12 +15,12 @@ public class Measurement<T> extends AbstractParticle implements DataParticle {
 	
 	public Measurement(String channelId, long timestamp, T value) {
 		setChannelId(channelId);
-		setSequenceNr(timestamp);
+		setTimestamp(timestamp);
 		this.value = value;
 	}
 	
 	public long getTimestamp() {
-		return getSequenceNr();
+		return getTimestamp();
 	}
 	
 	public T getValue() {
@@ -29,7 +29,7 @@ public class Measurement<T> extends AbstractParticle implements DataParticle {
 	
 	@Override
 	public String toString() {
-		return "M["+channelId+","+sequenceNr+","+value+"]";
+		return "M["+channelId+","+timestamp+","+value+"]";
 	}
 	
 }

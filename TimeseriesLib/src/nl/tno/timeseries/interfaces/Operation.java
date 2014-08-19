@@ -3,8 +3,30 @@ package nl.tno.timeseries.interfaces;
 import java.io.Serializable;
 import java.util.Map;
 
-public interface Operation extends Serializable {
+/**
+ * An operation performs the processing of particles in a channel. This is the
+ * abstract interface or the SingleOperation and the BatchOperation The
+ * ChannelBolt manages the operations, each channel will have its own operation
+ * instance. An operation is created at soon as the ChannelBolt gets a particle
+ * with an unknown channelid.
+ * 
+ * @author waaijbdvd
+ * 
+ */
+public abstract interface Operation extends Serializable {
 
-	public void init(String channelID, long startSequenceNr, @SuppressWarnings("rawtypes") Map stormConfig);
+	/**
+	 * Init this operation.
+	 * 
+	 * @param channelID
+	 *            The id of the channel this operation is connected to
+	 * @param startTimestamp
+	 *            The timestamp of the first particle, this is the first
+	 *            particle this operation instance have to process
+	 * @param stormConfig
+	 *            A reference to the storm config object
+	 */
+	public void init(String channelID, long startTimestamp,
+			@SuppressWarnings("rawtypes") Map stormConfig);
 
 }

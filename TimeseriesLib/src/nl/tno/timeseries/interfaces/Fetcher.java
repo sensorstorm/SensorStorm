@@ -5,14 +5,42 @@ import java.util.Map;
 
 import backtype.storm.task.TopologyContext;
 
+/**
+ * A fetcher is a retrieves data from a specific source. It is called from the
+ * spout and being passed in the spout constructor. The spout also takes care of
+ * meta particles and serialization.
+ * 
+ * @author waaijbdvd
+ * 
+ */
 public interface Fetcher extends Serializable {
 
-	public void prepare(@SuppressWarnings("rawtypes") Map stormConf, TopologyContext context) throws Exception;
+	/**
+	 * Prepare method for this fetcher. Init streams, open connections, files,
+	 * etc. It is called from the spout.open method
+	 * 
+	 * @param stormConf
+	 * @param context
+	 * @throws Exception
+	 */
+	public void prepare(@SuppressWarnings("rawtypes") Map stormConf,
+			TopologyContext context) throws Exception;
 
+	/**
+	 * activate the fetcher. It is called from the spout.activate
+	 */
 	public void activate();
 
+	/**
+	 * deactivate the fetcher. It is called from the spout.deactivate
+	 */
 	public void deactivate();
 
+	/**
+	 * Main method to return the next particle to be emited by the spout.
+	 * 
+	 * @return
+	 */
 	public DataParticle fetchParticle();
 
 }

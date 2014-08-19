@@ -20,12 +20,13 @@ import backtype.storm.tuple.Values;
  */
 public class ParticleClassInfo {
 
-	private static Logger log = LoggerFactory.getLogger(ParticleClassInfo.class);
+	private static Logger log = LoggerFactory
+			.getLogger(ParticleClassInfo.class);
 
 	// key = name of field, value = name in tuple
-	private SortedMap<String, String> fields;
-	private Fields outputFields;
-	private Class<?> clazz;;
+	private final SortedMap<String, String> fields;
+	private final Fields outputFields;
+	private final Class<?> clazz;;
 
 	public ParticleClassInfo(Class<?> clazz, SortedMap<String, String> fields) {
 		this.fields = fields;
@@ -42,21 +43,26 @@ public class ParticleClassInfo {
 	public <T> T tupleToParticle(Tuple tuple, Class<T> clazz) {
 		try {
 			assert clazz.equals(this.clazz);
-			Class<? extends Particle> particleClass = (Class<? extends Particle>) Class.forName(tuple.getString(2));
+			Class<? extends Particle> particleClass = (Class<? extends Particle>) Class
+					.forName(tuple.getString(2));
 			Particle particle = particleClass.newInstance();
 			particle.setChannelId(tuple.getString(0));
-			particle.setSequenceNr(tuple.getLong(1));
+			particle.setTimestamp(tuple.getLong(1));
 			for (Entry<String, String> e : fields.entrySet()) {
-				Field declaredField = particleClass.getDeclaredField(e.getKey());
+				Field declaredField = particleClass
+						.getDeclaredField(e.getKey());
 				declaredField.setAccessible(true);
-				declaredField.set(particle, tuple.getValueByField(e.getValue()));
+				declaredField
+						.set(particle, tuple.getValueByField(e.getValue()));
 			}
 			return (T) particle;
-		} catch (ClassNotFoundException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
+		} catch (ClassNotFoundException | IllegalAccessException
+				| NoSuchFieldException | SecurityException e) {
 			log.error("Was not able to map tuple to particle", e);
 			return null;
 		} catch (InstantiationException e) {
-			throw new IllegalArgumentException("Particles should always have at least an empty constructor");
+			throw new IllegalArgumentException(
+					"Particles should always have at least an empty constructor");
 		}
 	}
 
@@ -64,7 +70,7 @@ public class ParticleClassInfo {
 		try {
 			Values v = new Values();
 			v.add(particle.getChannelId());
-			v.add(particle.getSequenceNr());
+			v.add(particle.getTimestamp());
 			v.add(particle.getClass().getName());
 			for (String field : fields.keySet()) {
 				Field declaredField = clazz.getDeclaredField(field);
@@ -72,7 +78,8 @@ public class ParticleClassInfo {
 				v.add(declaredField.get(particle));
 			}
 			return v;
-		} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
+		} catch (IllegalArgumentException | IllegalAccessException
+				| NoSuchFieldException | SecurityException e) {
 			log.error("Was not able to map particle to value", e);
 			return null;
 		}

@@ -7,13 +7,14 @@ import nl.tno.timeseries.interfaces.DataParticle;
 import nl.tno.timeseries.interfaces.Fetcher;
 import backtype.storm.task.TopologyContext;
 
-@FetcherDeclaration(outputs={Measurement.class})
+@FetcherDeclaration(outputs = { Measurement.class })
 public class MyFetcher implements Fetcher {
 	private static final long serialVersionUID = -4783593429530609215L;
 	long time = 0;
-	
+
 	@Override
-	public void prepare(@SuppressWarnings("rawtypes")Map conf, TopologyContext context) throws Exception {
+	public void prepare(@SuppressWarnings("rawtypes") Map conf,
+			TopologyContext context) throws Exception {
 	}
 
 	@Override
@@ -26,7 +27,10 @@ public class MyFetcher implements Fetcher {
 
 	@Override
 	public DataParticle fetchParticle() {
-		try { Thread.sleep(100); } catch (InterruptedException e) {}
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+		}
 		time = time + 1;
 		return new Measurement<Double>("S1", time, 1.0);
 	}

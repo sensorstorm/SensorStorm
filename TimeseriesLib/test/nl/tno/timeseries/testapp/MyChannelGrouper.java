@@ -11,8 +11,7 @@ import java.util.Set;
 import nl.tno.timeseries.annotation.ChannelGrouperDeclaration;
 import nl.tno.timeseries.interfaces.ChannelGrouper;
 
-
-@ChannelGrouperDeclaration(outputs={Measurement.class})
+@ChannelGrouperDeclaration(outputs = { Measurement.class })
 public class MyChannelGrouper implements ChannelGrouper {
 	private static final long serialVersionUID = 2698236070436825601L;
 	protected Map<String, Set<String>> channelGroups;
@@ -25,12 +24,12 @@ public class MyChannelGrouper implements ChannelGrouper {
 		Set<String> group2 = new HashSet<String>();
 		group2.add("S2");
 		group2.add("S3");
-		
+
 		channelGroups.put("G1", group1);
 		channelGroups.put("G2", group2);
 
 	}
-	
+
 	@Override
 	public List<String> getChannelGroupId(String channelId) {
 		ArrayList<String> result = new ArrayList<String>();
@@ -39,7 +38,7 @@ public class MyChannelGrouper implements ChannelGrouper {
 				result.add(channelGroup.getKey());
 			}
 		}
-		return  result;
+		return result;
 	}
 
 }

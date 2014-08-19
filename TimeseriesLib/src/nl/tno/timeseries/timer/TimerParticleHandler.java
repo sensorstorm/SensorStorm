@@ -5,17 +5,19 @@ import java.util.List;
 
 import nl.tno.timeseries.annotation.MetaParticleHandlerDecleration;
 import nl.tno.timeseries.interfaces.DataParticle;
-import nl.tno.timeseries.interfaces.EmitParticleInterface;
 import nl.tno.timeseries.interfaces.MetaParticle;
-import nl.tno.timeseries.interfaces.MetaParticleHandler;
 import nl.tno.timeseries.interfaces.Operation;
+import nl.tno.timeseries.particles.EmitParticleInterface;
+import nl.tno.timeseries.particles.MetaParticleHandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @MetaParticleHandlerDecleration(metaParticle = TimerTickParticle.class)
-public class TimerParticleHandler implements MetaParticleHandler, TimerControllerInterface, Serializable {
-	protected Logger logger = LoggerFactory.getLogger(TimerParticleHandler.class);
+public class TimerParticleHandler implements MetaParticleHandler,
+		TimerControllerInterface, Serializable {
+	protected Logger logger = LoggerFactory
+			.getLogger(TimerParticleHandler.class);
 
 	private static final long serialVersionUID = 8622533504407023168L;
 	private RecurringTask recurringTask = null;
@@ -26,13 +28,15 @@ public class TimerParticleHandler implements MetaParticleHandler, TimerControlle
 	 * Connect the operation to this Timer
 	 */
 	@Override
-	public void init(Operation operation, EmitParticleInterface emitParticleHandler) {
+	public void init(Operation operation,
+			EmitParticleInterface emitParticleHandler) {
 		this.emitParticleHandler = emitParticleHandler;
 
 		if (operation instanceof TimerTaskInterface) {
 			((TimerTaskInterface) operation).setTimerController(this);
 		} else {
-			logger.error("Operation " + operation.getClass().getName()
+			logger.error("Operation "
+					+ operation.getClass().getName()
 					+ " can not be connected to a timer. It does not implements the TimerTaskInterface");
 		}
 	}
@@ -54,7 +58,8 @@ public class TimerParticleHandler implements MetaParticleHandler, TimerControlle
 					recurringTask.lastTimestamp = timestamp;
 				}
 				while (timestamp - recurringTask.lastTimestamp >= recurringTask.timerFreq) {
-					recurringTask.lastTimestamp = recurringTask.lastTimestamp + recurringTask.timerFreq;
+					recurringTask.lastTimestamp = recurringTask.lastTimestamp
+							+ recurringTask.timerFreq;
 					List<DataParticle> outputParticles = recurringTask.recurringTimerTaskHandler
 							.doTimerRecurringTask(recurringTask.lastTimestamp);
 					// emit all output particles
@@ -71,7 +76,8 @@ public class TimerParticleHandler implements MetaParticleHandler, TimerControlle
 	protected void executeSingleTasks(long timestamp) {
 		if (singleTask != null) {
 			if (singleTask.wakeupTime != 0) {
-				while ((singleTask.wakeupTime != 0) && (timestamp >= singleTask.wakeupTime)) {
+				while ((singleTask.wakeupTime != 0)
+						&& (timestamp >= singleTask.wakeupTime)) {
 					// eerst het element uit de lijst voordat de task wordt
 					// uitgevoerd
 					// omdat die task wel eens weer voor dezelfde sensor een
@@ -92,12 +98,14 @@ public class TimerParticleHandler implements MetaParticleHandler, TimerControlle
 	}
 
 	@Override
-	public void registerOperationForRecurringTimerTask(String channelId, long timerFreq, TimerTaskInterface timerTask) {
+	public void registerOperationForRecurringTimerTask(String channelId,
+			long timerFreq, TimerTaskInterface timerTask) {
 		recurringTask = new RecurringTask(timerFreq, 0, timerTask);
 	}
 
 	@Override
-	public void registerOperationForSingleTimerTask(String channelId, long wakeupTime, TimerTaskInterface timerTask) {
+	public void registerOperationForSingleTimerTask(String channelId,
+			long wakeupTime, TimerTaskInterface timerTask) {
 		singleTask = new SingleTask(wakeupTime, timerTask);
 	}
 
@@ -120,7 +128,8 @@ class SingleTask {
 	public long wakeupTime;
 	public TimerTaskInterface singleTimerTaskHandler;
 
-	public SingleTask(long sleepTimeSingleWakeup, TimerTaskInterface singleTimerTaskÌnterface) {
+	public SingleTask(long sleepTimeSingleWakeup,
+			TimerTaskInterface singleTimerTaskÌnterface) {
 		this.wakeupTime = sleepTimeSingleWakeup;
 		this.singleTimerTaskHandler = singleTimerTaskÌnterface;
 	}

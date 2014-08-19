@@ -16,7 +16,8 @@ public class NumberOfParticlesBatcher implements Batcher, Serializable {
 	private List<DataParticle> buffer;
 
 	@Override
-	public void init(String channelID, long startSequenceNr, @SuppressWarnings("rawtypes") Map stormConfig) {
+	public void init(String channelID, long startSequenceNr,
+			@SuppressWarnings("rawtypes") Map stormConfig) {
 		// TODO haal dit uit de stormConfig
 		nrOfParticlesToBatch = 2;
 
@@ -29,7 +30,8 @@ public class NumberOfParticlesBatcher implements Batcher, Serializable {
 
 		buffer.add(inputParticle);
 		while (buffer.size() >= nrOfParticlesToBatch) {
-			DataParticleBatch batchedParticles = new DataParticleBatch(buffer.subList(0, nrOfParticlesToBatch));
+			DataParticleBatch batchedParticles = new DataParticleBatch(
+					buffer.subList(0, nrOfParticlesToBatch));
 			buffer.removeAll(batchedParticles);
 			result.add(batchedParticles);
 		}

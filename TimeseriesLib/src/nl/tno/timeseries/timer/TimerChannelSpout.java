@@ -3,11 +3,11 @@ package nl.tno.timeseries.timer;
 import java.util.HashMap;
 import java.util.Map;
 
+import nl.tno.timeseries.channels.ChannelSpout;
 import nl.tno.timeseries.interfaces.DataParticle;
 import nl.tno.timeseries.interfaces.Fetcher;
 import nl.tno.timeseries.mapper.ParticleMapper;
-import nl.tno.timeseries.stormcomponents.ChannelSpout;
-import nl.tno.timeseries.stormcomponents.MetaParticleUtil;
+import nl.tno.timeseries.particles.MetaParticleUtil;
 import backtype.storm.Config;
 import backtype.storm.tuple.Fields;
 
@@ -23,16 +23,19 @@ public class TimerChannelSpout extends ChannelSpout {
 		mainTimerTickFreq = 1L;
 		useParticleTime = true;
 
-		MetaParticleUtil.setMetaParticleFieldsWithParticle(config, TimerTickParticle.class);
+		MetaParticleUtil.setMetaParticleFieldsWithParticle(config,
+				TimerTickParticle.class);
 	}
 
-	public TimerChannelSpout(Config config, Fetcher fetcher, Boolean useParticleTime, Long mainTimerTickFreq) {
+	public TimerChannelSpout(Config config, Fetcher fetcher,
+			Boolean useParticleTime, Long mainTimerTickFreq) {
 		super(config, fetcher);
 
 		this.mainTimerTickFreq = mainTimerTickFreq;
 		this.useParticleTime = useParticleTime;
 
-		MetaParticleUtil.setMetaParticleFieldsWithParticle(config, TimerTickParticle.class);
+		MetaParticleUtil.setMetaParticleFieldsWithParticle(config,
+				TimerTickParticle.class);
 	}
 
 	@Override
@@ -44,7 +47,7 @@ public class TimerChannelSpout extends ChannelSpout {
 		if (particle != null) {
 			Long now;
 			if (useParticleTime) {
-				now = particle.getSequenceNr();
+				now = particle.getTimestamp();
 			} else {
 				now = System.currentTimeMillis();
 			}
@@ -84,7 +87,8 @@ public class TimerChannelSpout extends ChannelSpout {
 			lastKnownNow = lastKnownNow + mainTimerTickFreq;
 			lastKnownNows.put(channelId, lastKnownNow);
 
-			TimerTickParticle timerTickParticle = new TimerTickParticle(channelId, lastKnownNow);
+			TimerTickParticle timerTickParticle = new TimerTickParticle(
+					channelId, lastKnownNow);
 			emitParticle(timerTickParticle);
 		}
 	}
@@ -102,7 +106,8 @@ public class TimerChannelSpout extends ChannelSpout {
 	@Override
 	protected Fields getOutputFields() {
 		Fields fields = super.getOutputFields();
-		fields = ParticleMapper.mergeFields(fields, ParticleMapper.getFields(TimerTickParticle.class));
+		fields = ParticleMapper.mergeFields(fields,
+				ParticleMapper.getFields(TimerTickParticle.class));
 		return fields;
 	}
 

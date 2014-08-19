@@ -45,7 +45,8 @@ public class TestMapping extends TestCase {
 
 		// Test tupleToParticle
 		Tuple tuple = new MockTuple(fields, values);
-		AutoMappedParticle particle = ParticleMapper.tupleToParticle(tuple, AutoMappedParticle.class);
+		AutoMappedParticle particle = ParticleMapper.tupleToParticle(tuple,
+				AutoMappedParticle.class);
 		assertEquals(p, particle);
 		// Test without providing class
 		assertEquals(p, ParticleMapper.tupleToParticle(tuple));
@@ -81,7 +82,8 @@ public class TestMapping extends TestCase {
 
 		// Test tupleToParticle
 		Tuple tuple = new MockTuple(fields, values);
-		SelfMappedParticle particle = ParticleMapper.tupleToParticle(tuple, SelfMappedParticle.class);
+		SelfMappedParticle particle = ParticleMapper.tupleToParticle(tuple,
+				SelfMappedParticle.class);
 		assertEquals(s, particle);
 		// Test without providing class
 		assertEquals(s, ParticleMapper.tupleToParticle(tuple));

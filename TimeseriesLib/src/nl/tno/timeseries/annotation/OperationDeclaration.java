@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import nl.tno.timeseries.interfaces.DataParticle;
-import nl.tno.timeseries.interfaces.MetaParticleHandler;
+import nl.tno.timeseries.particles.MetaParticleHandler;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE })

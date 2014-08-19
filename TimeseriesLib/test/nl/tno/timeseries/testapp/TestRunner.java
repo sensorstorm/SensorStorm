@@ -1,8 +1,8 @@
 package nl.tno.timeseries.testapp;
 
 import nl.tno.timeseries.batchers.NumberOfParticlesBatcher;
-import nl.tno.timeseries.stormcomponents.ChannelBolt;
-import nl.tno.timeseries.stormcomponents.ChannelGrouperBolt;
+import nl.tno.timeseries.channels.ChannelBolt;
+import nl.tno.timeseries.channels.ChannelGrouperBolt;
 import nl.tno.timeseries.timer.TimerChannelSpout;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
