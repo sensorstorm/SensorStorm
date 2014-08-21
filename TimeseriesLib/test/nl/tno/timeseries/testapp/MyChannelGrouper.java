@@ -31,13 +31,21 @@ public class MyChannelGrouper implements ChannelGrouper {
 	}
 
 	@Override
-	public List<String> getChannelGroupId(String channelId) {
+	public List<String> getChannelGroupIds(String channelId) {
 		ArrayList<String> result = new ArrayList<String>();
 		for (Entry<String, Set<String>> channelGroup : channelGroups.entrySet()) {
 			if (channelGroup.getValue().contains(channelId)) {
 				result.add(channelGroup.getKey());
 			}
 		}
+		return result;
+	}
+
+	@Override
+	public List<String> getAllChannelGroupIds() {
+		ArrayList<String> result = new ArrayList<String>();
+		result.addAll(channelGroups.keySet());
+
 		return result;
 	}
 

@@ -5,8 +5,20 @@ import java.util.List;
 
 public interface ChannelGrouper extends Serializable {
 
-	public final static String GROUPED_PARTICLE_FIELD = "GroupedParticle";
+	/**
+	 * Return a list of all channels this channelid (particle) must be send to.
+	 * 
+	 * @param channelId
+	 * @return
+	 */
+	public List<String> getChannelGroupIds(String channelId);
 
-	public List<String> getChannelGroupId(String channelId);
+	/**
+	 * Used to broadcast metaParticles.
+	 * 
+	 * @return Return a list of all possible channelIds this channelGrouper can
+	 *         produce.
+	 */
+	public List<String> getAllChannelGroupIds();
 
 }

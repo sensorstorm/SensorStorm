@@ -1,6 +1,5 @@
 package nl.tno.timeseries.channels;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -24,24 +23,49 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 
+/**
+ * This Bolt can group channels (meaning all particles in that channel) into one
+ * or more new channels. The precise mapping is performed by a ChannelGrouper
+ * object, passed in the constructor. This mapping may contain duplicates: the
+ * same particle can be grouped into several channels.
+ * 
+ * @author waaijbdvd
+ * 
+ */
 public class ChannelGrouperBolt extends BaseRichBolt {
 	private static final long serialVersionUID = -4421389584087020459L;
-	protected Logger logger = LoggerFactory.getLogger(ChannelGrouperBolt.class);
-	protected @SuppressWarnings("rawtypes")
-	Map stormConfig;
-	protected OutputCollector collector;
-	protected String boltName;
-	protected int nrOfOutputFields;
-	protected List<String> channelGroupIds;
-	protected ChannelGrouper channelGrouper;
+	private final Logger logger = LoggerFactory
+			.getLogger(ChannelGrouperBolt.class);
+
+	private OutputCollector collector;
+	private String boltName;
+	private int nrOfOutputFields;
+	private final ChannelGrouper channelGrouper;
 	private final Fields metaParticleFields;
 
+	/**
+	 * A ChannelGrouperBolt groups channels into new channels, , based on the
+	 * given ChannelGrouper.
+	 * 
+	 * @param conf
+	 * @param grouper
+	 */
 	public ChannelGrouperBolt(Config conf, ChannelGrouper grouper) {
 		this.channelGrouper = grouper;
-		channelGroupIds = new ArrayList<String>();
 		this.metaParticleFields = MetaParticleUtil.getMetaParticleFields(conf);
 	}
 
+	@Override
+	public void prepare(@SuppressWarnings("rawtypes") Map conf,
+			TopologyContext context, OutputCollector collector) {
+		this.collector = collector;
+		this.boltName = context.getThisComponentId();
+	}
+
+	/**
+	 * A new tuple has arrived. Convert the tuple into a particle and call
+	 * handleDataParticle or handleMetaParticle.
+	 */
 	@Override
 	public void execute(Tuple tuple) {
 		Particle inputParticle = ParticleMapper.tupleToParticle(tuple);
@@ -53,31 +77,32 @@ public class ChannelGrouperBolt extends BaseRichBolt {
 		}
 	}
 
+	/**
+	 * Handle a dataParticle: ask the channelGrouper for a list of channels this
+	 * particle must be send to.
+	 * 
+	 * @param dataParticle
+	 */
 	protected void handleDataParticle(DataParticle dataParticle) {
 		List<String> channelGroupIds = channelGrouper
-				.getChannelGroupId(dataParticle.getChannelId());
+				.getChannelGroupIds(dataParticle.getChannelId());
 		for (String channelGroupId : channelGroupIds) {
-			if (!channelGroupIds.contains(channelGroupId)) {
-				channelGroupIds.add(channelGroupId);
-			}
 			emitParticle(dataParticle, channelGroupId);
 		}
 	}
 
+	/**
+	 * Handle a metaParticle: send the metaParticle to all possible group
+	 * channels.
+	 * 
+	 * @param metaParticle
+	 */
 	protected void handleMetaParticle(MetaParticle metaParticle) {
-		// copy all metaParticles to the group channels
-		for (String channelGroupId : channelGroupIds) {
-			metaParticle.setChannelId(channelGroupId);
+		List<String> allChannelGroupIds = channelGrouper
+				.getAllChannelGroupIds();
+		for (String channelGroupId : allChannelGroupIds) {
 			emitParticle(metaParticle, channelGroupId);
 		}
-	}
-
-	@Override
-	public void prepare(@SuppressWarnings("rawtypes") Map conf,
-			TopologyContext context, OutputCollector collector) {
-		this.stormConfig = conf;
-		this.collector = collector;
-		this.boltName = context.getThisComponentId();
 	}
 
 	@Override
@@ -95,38 +120,51 @@ public class ChannelGrouperBolt extends BaseRichBolt {
 			}
 		}
 
-		fields = ParticleMapper.mergeFields(fields, new Fields(
-				ChannelGrouper.GROUPED_PARTICLE_FIELD));
 		fields = ParticleMapper.mergeFields(fields, metaParticleFields);
 		nrOfOutputFields = fields.size();
 		declarer.declare(fields);
-
-		// String s = "[";
-		// for (String field : fields) {
-		// s = s + field + ", ";
-		// }
-		// s = s + "]";
-		//
-		// System.out.println("group.declareOutputFields.nrOfOutputFields="+nrOfOutputFields+" fields="+s);
 	}
 
-	public void emitParticle(Particle particle, String channelGroupId) {
-		// convert the particle to values without the channelGroupId field
-		Values values = ParticleMapper.particleToValues(particle,
-				nrOfOutputFields - 1);
-		values.add(channelGroupId);
-		collector.emit(values);
-
-		// String s = "[";
-		// for (Object value : values) {
-		// if (value == null) {
-		// s = s + "null, ";
-		// } else {
-		// s = s + value.toString() + ", ";
-		// }
-		// }
-		// s = s + "]";
-		// System.out.println("group.emitParticle("+values.size()+") values="+s);
+	/**
+	 * Emit a particle to the specified channelGroupId.
+	 * 
+	 * @param particle
+	 * @param channelGroupId
+	 */
+	private void emitParticle(Particle particle, String channelGroupId) {
+		if (particleAllowed(particle)) {
+			// convert the particle to values without the channelGroupId field
+			Values values = ParticleMapper.particleToValues(particle,
+					nrOfOutputFields - 1);
+			values.add(channelGroupId);
+			collector.emit(values);
+		} else {
+			logger.debug(boltName
+					+ ": Unspecified particle ("
+					+ particle.getClass().getName()
+					+ ") is not passed, it is not specified in the ChannelGrouperDeclaration, the annotation belonging to a ChannelGrouper.");
+		}
 	}
 
+	/**
+	 * Cheks if the particle is a metaParticle or a member of the
+	 * ChannelGrouperDeclaration annotation output list.
+	 * 
+	 * @param particle
+	 * @return
+	 */
+	protected boolean particleAllowed(Particle particle) {
+		if (particle instanceof MetaParticle) {
+			return true;
+		}
+		ChannelGrouperDeclaration channelGrouperDeclaration = channelGrouper
+				.getClass().getAnnotation(ChannelGrouperDeclaration.class);
+		for (Class<? extends DataParticle> outputParticleClass : channelGrouperDeclaration
+				.outputs()) {
+			if (particle.getClass().isAssignableFrom(outputParticleClass)) {
+				return true;
+			}
+		}
+		return false;
+	}
 }
