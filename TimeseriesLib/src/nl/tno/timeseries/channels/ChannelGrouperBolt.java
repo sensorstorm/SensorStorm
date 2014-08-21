@@ -27,7 +27,9 @@ import backtype.storm.tuple.Values;
  * This Bolt can group channels (meaning all particles in that channel) into one
  * or more new channels. The precise mapping is performed by a ChannelGrouper
  * object, passed in the constructor. This mapping may contain duplicates: the
- * same particle can be grouped into several channels.
+ * same particle can be grouped into several channels. Grouped channels transmit
+ * Particles with the field ChannelGrouper.GROUPED_PARTICLE_FIELD to indicate
+ * this is a grouped particle.
  * 
  * @author waaijbdvd
  * 
@@ -121,6 +123,11 @@ public class ChannelGrouperBolt extends BaseRichBolt {
 		}
 
 		fields = ParticleMapper.mergeFields(fields, metaParticleFields);
+
+		// be aware that this has to be the last field, otherwise the
+		// emitParticle method can not add the channelGroupId.
+		fields = ParticleMapper.mergeFields(fields, new Fields(
+				ChannelGrouper.GROUPED_PARTICLE_FIELD));
 		nrOfOutputFields = fields.size();
 		declarer.declare(fields);
 	}

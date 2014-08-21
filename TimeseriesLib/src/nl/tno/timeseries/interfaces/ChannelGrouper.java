@@ -5,6 +5,9 @@ import java.util.List;
 
 public interface ChannelGrouper extends Serializable {
 
+	// Reference field to indicate
+	public static String GROUPED_PARTICLE_FIELD = "grouped-particle";
+
 	/**
 	 * Return a list of all channels this channelid (particle) must be send to.
 	 * 

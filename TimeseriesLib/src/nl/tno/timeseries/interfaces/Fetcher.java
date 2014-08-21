@@ -39,7 +39,8 @@ public interface Fetcher extends Serializable {
 	/**
 	 * Main method to return the next particle to be emited by the spout.
 	 * 
-	 * @return
+	 * @return Returns the next particle, or null indicating no particle has to
+	 *         be emited.
 	 */
 	public DataParticle fetchParticle();
 

@@ -1,9 +1,8 @@
 package nl.tno.timeseries.testapp;
 
-import nl.tno.timeseries.batchers.NumberOfParticlesBatcher;
 import nl.tno.timeseries.channels.ChannelBolt;
 import nl.tno.timeseries.channels.ChannelGrouperBolt;
-import nl.tno.timeseries.timer.TimerChannelSpout;
+import nl.tno.timeseries.channels.ChannelSpout;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.topology.TopologyBuilder;
@@ -28,14 +27,19 @@ public class TestRunner {
 		 * ChannelBolt(NumberOfParticlesBatcher.class, MyBatchOperation.class),
 		 * 1).shuffleGrouping("input");
 		 */
-		builder.setSpout("input", new TimerChannelSpout(config, new MyGroupFetcher(), true, 1L));
-		builder.setBolt("grouper", new ChannelGrouperBolt(config, new MyChannelGrouper()), 1).shuffleGrouping("input");
-		builder.setBolt("src", new ChannelBolt(config, NumberOfParticlesBatcher.class, MyBatchOperation.class), 1)
-				.shuffleGrouping("grouper");
-		// builder.setBolt("src", new ChannelBolt(config, MyOperation.class),
-		// 1).shuffleGrouping("input");
 
-		localCluster.submitTopology(topologyName, config, builder.createTopology());
+		builder.setSpout("input",
+				new ChannelSpout(config, new MyGroupFetcher()));
+		// builder.setSpout("input", new TimerChannelSpout(config,
+		// new MyGroupFetcher(), true, 1L));
+		builder.setBolt("grouper",
+				new ChannelGrouperBolt(config, new MyChannelGrouper()), 1)
+				.shuffleGrouping("input");
+		builder.setBolt("src", new ChannelBolt(config, MyOperation.class), 1)
+				.shuffleGrouping("grouper");
+
+		localCluster.submitTopology(topologyName, config,
+				builder.createTopology());
 		System.out.println("Topology " + topologyName + " submitted");
 
 		boolean running = true;
