@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence-diagram version="1.1.5" icons="true" automaticImage="PNG">  
+  <object id="1" language="java" name="nl.tno.timeseries.channels.ChannelBolt" project="TimeseriesLib" 
+    file="/TimeseriesLib/src/nl/tno/timeseries/channels/ChannelBolt.java" binary="false" label="channelBolt" 
+    type="class" autoSize="true">    
+    <position height="-1" width="-1" x="81" y="0"/>    
+    <execution id="2">      
+      <position height="321" width="116" x="5" y="310"/>    
+    </execution>    
+    <execution id="5">      
+      <position height="21" width="7" x="60" y="428"/>    
+    </execution>    
+    <execution id="6">      
+      <position height="21" width="7" x="60" y="526"/>    
+    </execution>  
+  </object>  
+  <object id="7" language="java" name="nl.tno.timeseries.channels.ChannelManager" project="TimeseriesLib" 
+    file="/TimeseriesLib/src/nl/tno/timeseries/channels/ChannelManager.java" binary="false" label="channelManager" 
+    type="class" autoSize="true">    
+    <position height="-1" width="-1" x="193" y="0"/>    
+    <execution id="8">      
+      <position height="200" width="119" x="125" y="99"/>    
+    </execution>  
+  </object>  
+  <object id="13" language="java" name="nl.tno.timeseries.timer.TimerParticleHandler" project="TimeseriesLib" 
+    file="/TimeseriesLib/src/nl/tno/timeseries/timer/TimerParticleHandler.java" binary="false" 
+    label="timerParticleHandler" type="class" autoSize="true">    
+    <position height="-1" width="-1" x="452" y="0"/>    
+    <execution id="10">      
+      <position height="21" width="144" x="248" y="120"/>    
+    </execution>    
+    <execution id="4">      
+      <position height="279" width="144" x="248" y="331"/>    
+    </execution>  
+  </object>  
+  <object id="18" language="java" name="nl.tno.timeseries.timer.SingleTask" project="TimeseriesLib" 
+    file="/TimeseriesLib/src/nl/tno/timeseries/timer/TimerParticleHandler.java" binary="false" label="singleTask" 
+    type="class" autoSize="true">    
+    <position height="-1" width="-1" x="452" y="0"/>    
+    <execution id="15">      
+      <position height="129" width="100" x="396" y="362"/>    
+    </execution>  
+  </object>  
+  <object id="21" language="java" name="nl.tno.timeseries.timer.RecurringTask" project="TimeseriesLib" 
+    file="/TimeseriesLib/src/nl/tno/timeseries/timer/TimerParticleHandler.java" binary="false" label="recurringTask" 
+    type="class" autoSize="true">    
+    <position height="-1" width="-1" x="452" y="0"/>    
+    <execution id="17">      
+      <position height="113" width="106" x="500" y="476"/>    
+    </execution>  
+  </object>  
+  <object id="24" language="java" name="nl.tno.timeseries.timer.TimerTaskInterface" project="TimeseriesLib" 
+    file="/TimeseriesLib/src/nl/tno/timeseries/timer/TimerTaskInterface.java" binary="false" label="timerTaskInterface" 
+    type="interface" autoSize="true">    
+    <position height="-1" width="-1" x="658" y="0"/>    
+    <execution id="12">      
+      <position height="109" width="134" x="610" y="169"/>    
+    </execution>    
+    <execution id="20">      
+      <position height="87" width="134" x="610" y="383"/>    
+    </execution>    
+    <execution id="23">      
+      <position height="71" width="134" x="610" y="497"/>    
+    </execution>  
+  </object>  
+  <object id="31" language="java" name="nl.tno.timeseries.timer.TimerControllerInterface" project="TimeseriesLib" 
+    file="/TimeseriesLib/src/nl/tno/timeseries/timer/TimerControllerInterface.java" binary="false" 
+    label="timerControllerInterface" type="interface" autoSize="true">    
+    <position height="-1" width="-1" x="642" y="0"/>    
+    <execution id="26">      
+      <position height="21" width="163" x="748" y="190"/>    
+    </execution>    
+    <execution id="28">      
+      <position height="21" width="163" x="748" y="236"/>    
+    </execution>  
+  </object>  
+  <message id="3" operation="handleMetaParticle(nl.tno.timeseries.interfaces.MetaParticle):void">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="4"/>  
+  </message>  
+  <message id="9" 
+    operation="init(nl.tno.timeseries.interfaces.Operation,nl.tno.timeseries.particles.EmitParticleInterface):void">    
+    <end type="SOURCE" refId="8"/>    
+    <end type="TARGET" refId="10"/>  
+  </message>  
+  <message id="11" operation="setTimerController(nl.tno.timeseries.timer.TimerControllerInterface):void">    
+    <end type="SOURCE" refId="8"/>    
+    <end type="TARGET" refId="12"/>  
+  </message>  
+  <message id="14" operation="SingleTask(long,nl.tno.timeseries.timer.TimerTaskInterface)">    
+    <end type="SOURCE" refId="4"/>    
+    <end type="TARGET" refId="15"/>  
+  </message>  
+  <message id="16" operation="RecurringTask(long,long,nl.tno.timeseries.timer.TimerTaskInterface)">    
+    <end type="SOURCE" refId="4"/>    
+    <end type="TARGET" refId="17"/>  
+  </message>  
+  <message id="19" operation="doTimerSingleTask(long):java.util.List&lt;DataParticle&gt;">    
+    <end type="SOURCE" refId="15"/>    
+    <end type="TARGET" refId="20"/>  
+  </message>  
+  <message id="22" operation="doTimerRecurringTask(long):java.util.List&lt;DataParticle&gt;">    
+    <end type="SOURCE" refId="17"/>    
+    <end type="TARGET" refId="23"/>  
+  </message>  
+  <message id="25" 
+    operation="registerOperationForSingleTimerTask(java.lang.String,long,nl.tno.timeseries.timer.TimerTaskInterface):void">    
+    <end type="SOURCE" refId="12"/>    
+    <end type="TARGET" refId="26"/>  
+  </message>  
+  <message id="27" 
+    operation="registerOperationForRecurringTimerTask(java.lang.String,long,nl.tno.timeseries.timer.TimerTaskInterface):void">    
+    <end type="SOURCE" refId="12"/>    
+    <end type="TARGET" refId="28"/>  
+  </message>  
+  <message id="29" operation="emitParticle(nl.tno.timeseries.interfaces.Particle):void">    
+    <end type="SOURCE" refId="20"/>    
+    <end type="TARGET" refId="5"/>  
+  </message>  
+  <message id="30" operation="emitParticle(nl.tno.timeseries.interfaces.Particle):void">    
+    <end type="SOURCE" refId="23"/>    
+    <end type="TARGET" refId="6"/>  
+  </message>
+</sequence-diagram>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence-diagram version="1.1.5" icons="true" automaticImage="PNG">  
+  <object id="1" language="java" name="backtype.storm.topology.IRichSpout" project="TimeseriesLib" 
+    file="/TimeseriesLib/lib/storm-core-0.9.2-incubating.jar" binary="true" label="iRichSpout" type="interface" 
+    autoSize="true">    
+    <position height="-1" width="-1" x="298" y="0"/>    
+    <execution id="2">      
+      <position height="105" width="112" x="5" y="78"/>    
+    </execution>    
+    <execution id="5">      
+      <position height="105" width="112" x="5" y="193"/>    
+    </execution>    
+    <execution id="8">      
+      <position height="105" width="112" x="5" y="324"/>    
+    </execution>    
+    <execution id="11">      
+      <position height="105" width="112" x="5" y="473"/>    
+    </execution>  
+  </object>  
+  <object id="14" language="java" name="nl.tno.timeseries.channels.ChannelSpout" project="TimeseriesLib" 
+    file="/TimeseriesLib/src/nl/tno/timeseries/channels/ChannelSpout.java" binary="false" label="channelSpout" 
+    type="class" autoSize="true">    
+    <position height="-1" width="-1" x="143" y="0"/>    
+    <execution id="4">      
+      <position height="63" width="116" x="5" y="99"/>    
+    </execution>    
+    <execution id="7">      
+      <position height="63" width="116" x="121" y="214"/>    
+    </execution>    
+    <execution id="10">      
+      <position height="63" width="116" x="121" y="345"/>    
+    </execution>    
+    <execution id="13">      
+      <position height="63" width="116" x="121" y="494"/>    
+    </execution>  
+  </object>  
+  <object id="23" language="java" name="nl.tno.timeseries.interfaces.Fetcher" project="TimeseriesLib" 
+    file="/TimeseriesLib/src/nl/tno/timeseries/interfaces/Fetcher.java" binary="false" label="fetcher" type="interface" 
+    autoSize="true">    
+    <position height="-1" width="-1" x="232" y="0"/>    
+    <execution id="16">      
+      <position height="21" width="121" x="125" y="120"/>    
+    </execution>    
+    <execution id="18">      
+      <position height="21" width="121" x="241" y="235"/>    
+    </execution>    
+    <execution id="20">      
+      <position height="21" width="121" x="241" y="366"/>    
+    </execution>    
+    <execution id="22">      
+      <position height="21" width="121" x="241" y="515"/>    
+    </execution>  
+  </object>  
+  <message id="3" 
+    operation="open(java.util.Map,backtype.storm.task.TopologyContext,backtype.storm.spout.SpoutOutputCollector):void">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="4"/>  
+  </message>  
+  <message id="6" operation="nextTuple():void">    
+    <end type="SOURCE" refId="5"/>    
+    <end type="TARGET" refId="7"/>  
+  </message>  
+  <message id="9" operation="activate():void">    
+    <end type="SOURCE" refId="8"/>    
+    <end type="TARGET" refId="10"/>  
+  </message>  
+  <message id="12" operation="deactivate():void">    
+    <end type="SOURCE" refId="11"/>    
+    <end type="TARGET" refId="13"/>  
+  </message>  
+  <message id="15" operation="prepare(java.util.Map,backtype.storm.task.TopologyContext):void">    
+    <end type="SOURCE" refId="4"/>    
+    <end type="TARGET" refId="16"/>  
+  </message>  
+  <message id="17" operation="fetchParticle():nl.tno.timeseries.interfaces.DataParticle">    
+    <end type="SOURCE" refId="7"/>    
+    <end type="TARGET" refId="18"/>  
+  </message>  
+  <message id="19" operation="activate():void">    
+    <end type="SOURCE" refId="10"/>    
+    <end type="TARGET" refId="20"/>  
+  </message>  
+  <message id="21" operation="deactivate():void">    
+    <end type="SOURCE" refId="13"/>    
+    <end type="TARGET" refId="22"/>  
+  </message>
+</sequence-diagram>
