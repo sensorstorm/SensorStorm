@@ -13,6 +13,13 @@ import nl.tno.timeseries.particles.MetaParticleHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This handler handles TimerTickParticles and uses them to service single and
+ * recurring requests from the related operation to the handler.
+ * 
+ * @author waaijbdvd
+ * 
+ */
 @MetaParticleHandlerDecleration(metaParticle = TimerTickParticle.class)
 public class TimerParticleHandler implements MetaParticleHandler,
 		TimerControllerInterface, Serializable {

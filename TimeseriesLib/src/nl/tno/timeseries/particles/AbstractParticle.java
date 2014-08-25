@@ -10,9 +10,18 @@ public abstract class AbstractParticle implements Particle {
 	protected String channelId;
 	protected long timestamp;
 
+	/**
+	 * Empty constructor
+	 */
 	public AbstractParticle() {
 	}
 
+	/**
+	 * Create a new AbstractParticle with the given channelId and timestamp.
+	 * 
+	 * @param channelId
+	 * @param timestamp
+	 */
 	public AbstractParticle(String channelId, long timestamp) {
 		this.channelId = channelId;
 		this.timestamp = timestamp;

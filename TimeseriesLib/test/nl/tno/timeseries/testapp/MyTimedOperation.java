@@ -4,15 +4,14 @@ import java.util.List;
 import java.util.Map;
 
 import nl.tno.timeseries.annotation.OperationDeclaration;
-import nl.tno.timeseries.interfaces.BatchOperation;
 import nl.tno.timeseries.interfaces.DataParticle;
-import nl.tno.timeseries.interfaces.DataParticleBatch;
+import nl.tno.timeseries.interfaces.SingleOperation;
 import nl.tno.timeseries.timer.TimerControllerInterface;
 import nl.tno.timeseries.timer.TimerParticleHandler;
 import nl.tno.timeseries.timer.TimerTaskInterface;
 
 @OperationDeclaration(inputs = { MyDataParticle.class }, outputs = {}, metaParticleHandlers = { TimerParticleHandler.class })
-public class MyBatchOperation implements BatchOperation, TimerTaskInterface {
+public class MyTimedOperation implements SingleOperation, TimerTaskInterface {
 	private static final long serialVersionUID = 773649574489299505L;
 	TimerControllerInterface timerController = null;
 	private String channelId;
@@ -21,17 +20,20 @@ public class MyBatchOperation implements BatchOperation, TimerTaskInterface {
 	public void init(String channelID, long startTimestamp,
 			@SuppressWarnings("rawtypes") Map stormConfig) {
 		this.channelId = channelID;
-		System.out.println("init myoperation at " + startTimestamp);
+		System.out.println("init myoperation for channel " + channelID + " at "
+				+ startTimestamp);
 	}
 
 	@Override
-	public List<DataParticle> execute(DataParticleBatch inputParticles) {
-		if (inputParticles != null) {
-			System.out.print("particle batch :[");
-			for (DataParticle inputParticle : inputParticles) {
-				System.out.print(inputParticle + ", ");
+	public List<DataParticle> execute(DataParticle inputParticle) {
+		if (inputParticle != null) {
+			if (inputParticle instanceof MyDataParticle<?>) {
+				System.out.println("Operation channel " + channelId
+						+ " MyDataParticle received " + inputParticle);
+			} else {
+				System.out.println("Operation channel " + channelId
+						+ " Data particle received " + inputParticle);
 			}
-			System.out.println("]");
 		}
 		return null;
 	}
@@ -39,7 +41,6 @@ public class MyBatchOperation implements BatchOperation, TimerTaskInterface {
 	@Override
 	public void setTimerController(TimerControllerInterface timerController) {
 		this.timerController = timerController;
-		System.out.println("MyOperation.initTimer");
 		timerController.registerOperationForRecurringTimerTask(channelId, 3,
 				this);
 		timerController.registerOperationForSingleTimerTask(channelId, 5, this);

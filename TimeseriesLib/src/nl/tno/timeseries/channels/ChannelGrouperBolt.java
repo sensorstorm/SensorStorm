@@ -154,7 +154,7 @@ public class ChannelGrouperBolt extends BaseRichBolt {
 	}
 
 	/**
-	 * Cheks if the particle is a metaParticle or a member of the
+	 * Checks if the particle is a metaParticle or a member of the
 	 * ChannelGrouperDeclaration annotation output list.
 	 * 
 	 * @param particle

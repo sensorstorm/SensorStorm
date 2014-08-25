@@ -10,6 +10,8 @@ import java.util.Map;
  * instance. An operation is created at soon as the ChannelBolt gets a particle
  * with an unknown channelid.
  * 
+ * An operation must also add the annotation OperationDeclaration annotation.
+ * 
  * @author waaijbdvd
  * 
  */

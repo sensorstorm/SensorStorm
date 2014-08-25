@@ -3,6 +3,12 @@ package nl.tno.timeseries.timer;
 import nl.tno.timeseries.interfaces.MetaParticle;
 import nl.tno.timeseries.particles.AbstractParticle;
 
+/**
+ * A specific MetaParticle about time.
+ * 
+ * @author waaijbdvd
+ * 
+ */
 public class TimerTickParticle extends AbstractParticle implements MetaParticle {
 
 	public TimerTickParticle() {

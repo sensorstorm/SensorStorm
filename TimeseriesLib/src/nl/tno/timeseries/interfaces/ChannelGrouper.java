@@ -3,9 +3,20 @@ package nl.tno.timeseries.interfaces;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * This interface must a ChannelGrouper object implement to be accepted as a
+ * ChannelGrouper. In order to produce outputs the object must also add the
+ * annotation ChannelGrouperDecleration and specify in the output parameter the
+ * list of DataParticles this ChannelGrouper produces. This is being enforced by
+ * the ChannelGrouperBolt.
+ * 
+ * @author waaijbdvd
+ * 
+ */
 public interface ChannelGrouper extends Serializable {
 
-	// Reference field to indicate
+	// Reference field that is added in the storm tuple to indicate that the
+	// particle has been grouped.
 	public static String GROUPED_PARTICLE_FIELD = "grouped-particle";
 
 	/**

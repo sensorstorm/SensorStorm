@@ -7,7 +7,7 @@ import nl.tno.timeseries.interfaces.DataParticle;
 import nl.tno.timeseries.interfaces.Fetcher;
 import backtype.storm.task.TopologyContext;
 
-@FetcherDeclaration(outputs = { Measurement.class })
+@FetcherDeclaration(outputs = { MyDataParticle.class })
 public class MyFetcher implements Fetcher {
 	private static final long serialVersionUID = -4783593429530609215L;
 	long time = 0;
@@ -32,7 +32,7 @@ public class MyFetcher implements Fetcher {
 		} catch (InterruptedException e) {
 		}
 		time = time + 1;
-		return new Measurement<Double>("S1", time, 1.0);
+		return new MyDataParticle<Double>("Channel_1", time, 1.0);
 	}
 
 }

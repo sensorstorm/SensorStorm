@@ -8,6 +8,24 @@ import java.lang.annotation.Target;
 import nl.tno.timeseries.interfaces.DataParticle;
 import nl.tno.timeseries.particles.MetaParticleHandler;
 
+/**
+ * Annotation for the Operation. There can be three paramters (inputs, outputs
+ * and metaParticleHandlers). The inputs is mandatory and the other two are
+ * optional.
+ * 
+ * inputs: is an array containing one or more DataParticles specifying the
+ * dataParticles must be passed to the operation as input.
+ * 
+ * outputs: is an array containing zero or more DataParticles specifying the
+ * dataParticles the operation outputs.
+ * 
+ * metaParticleHandlers: is an array containing zero or more
+ * MetaParticleHandlers that must be instantiated and connected to this
+ * operation.
+ * 
+ * @author waaijbdvd
+ * 
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE })
 public @interface OperationDeclaration {

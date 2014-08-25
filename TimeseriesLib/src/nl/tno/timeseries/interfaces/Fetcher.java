@@ -37,7 +37,9 @@ public interface Fetcher extends Serializable {
 	public void deactivate();
 
 	/**
-	 * Main method to return the next particle to be emited by the spout.
+	 * Main method to return the next particle to be emited by the spout. The
+	 * fetcher should declare its DataParticle types using the
+	 * FetcherDeclaration annotation.
 	 * 
 	 * @return Returns the next particle, or null indicating no particle has to
 	 *         be emited.

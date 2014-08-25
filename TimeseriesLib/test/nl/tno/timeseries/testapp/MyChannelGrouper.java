@@ -11,7 +11,7 @@ import java.util.Set;
 import nl.tno.timeseries.annotation.ChannelGrouperDeclaration;
 import nl.tno.timeseries.interfaces.ChannelGrouper;
 
-@ChannelGrouperDeclaration(outputs = { Measurement.class })
+@ChannelGrouperDeclaration(outputs = { MyDataParticle.class })
 public class MyChannelGrouper implements ChannelGrouper {
 	private static final long serialVersionUID = 2698236070436825601L;
 	protected Map<String, Set<String>> channelGroups;

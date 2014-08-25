@@ -7,6 +7,13 @@ import java.lang.annotation.Target;
 
 import nl.tno.timeseries.interfaces.DataParticle;
 
+/**
+ * Annotation for the Fetcher. The parameter outputs is an array containing zero
+ * or more DataParticles which the Fetcher promises to return.
+ * 
+ * @author waaijbdvd
+ * 
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE })
 public @interface FetcherDeclaration {
