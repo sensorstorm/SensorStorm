@@ -31,7 +31,7 @@ public class MyFetcher implements Fetcher {
 			Thread.sleep(100);
 		} catch (InterruptedException e) {
 		}
-		time = time + 1;
+		time = time + 1000;
 		return new MyDataParticle<Double>("Channel_1", time, 1.0);
 	}
 

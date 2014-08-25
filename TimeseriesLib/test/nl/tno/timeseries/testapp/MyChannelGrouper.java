@@ -19,15 +19,16 @@ public class MyChannelGrouper implements ChannelGrouper {
 	public MyChannelGrouper() {
 		channelGroups = new HashMap<String, Set<String>>();
 		Set<String> group1 = new HashSet<String>();
-		group1.add("S1");
-		group1.add("S2");
+		group1.add("Channel_1");
+		group1.add("Channel_2");
 		Set<String> group2 = new HashSet<String>();
-		group2.add("S2");
-		group2.add("S3");
+		group2.add("Channel_2");
+		group2.add("Channel_3");
 
 		channelGroups.put("G1", group1);
 		channelGroups.put("G2", group2);
 
+		System.out.println("ChannelGrouper created.");
 	}
 
 	@Override

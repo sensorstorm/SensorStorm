@@ -4,14 +4,16 @@ import java.util.List;
 import java.util.Map;
 
 import nl.tno.timeseries.annotation.OperationDeclaration;
+import nl.tno.timeseries.interfaces.BatchOperation;
 import nl.tno.timeseries.interfaces.DataParticle;
-import nl.tno.timeseries.interfaces.SingleOperation;
+import nl.tno.timeseries.interfaces.DataParticleBatch;
 import nl.tno.timeseries.timer.TimerControllerInterface;
 import nl.tno.timeseries.timer.TimerParticleHandler;
 import nl.tno.timeseries.timer.TimerTaskInterface;
 
 @OperationDeclaration(inputs = { MyDataParticle.class }, outputs = {}, metaParticleHandlers = { TimerParticleHandler.class })
-public class MyTimedOperation implements SingleOperation, TimerTaskInterface {
+public class MyTimedBatchOperation implements BatchOperation,
+		TimerTaskInterface {
 	private static final long serialVersionUID = 773649574489299505L;
 	TimerControllerInterface timerController = null;
 	private String channelId;
@@ -20,20 +22,18 @@ public class MyTimedOperation implements SingleOperation, TimerTaskInterface {
 	public void init(String channelID, long startTimestamp,
 			@SuppressWarnings("rawtypes") Map stormConfig) {
 		this.channelId = channelID;
-		System.out.println("init myTimedOperation for channel " + channelID
-				+ " at " + startTimestamp);
+		System.out.println("init myTimedBatchOperation at " + startTimestamp);
 	}
 
 	@Override
-	public List<DataParticle> execute(DataParticle inputParticle) {
-		if (inputParticle != null) {
-			if (inputParticle instanceof MyDataParticle<?>) {
-				System.out.println("Timed Operation channel " + channelId
-						+ " MyDataParticle received " + inputParticle);
-			} else {
-				System.out.println("Timed Operation channel " + channelId
-						+ " Data particle received " + inputParticle);
+	public List<DataParticle> execute(DataParticleBatch inputParticles) {
+		if (inputParticles != null) {
+			System.out.print("Timed Batch Operation channel " + channelId
+					+ " batch received :[");
+			for (DataParticle inputParticle : inputParticles) {
+				System.out.print(inputParticle + ", ");
 			}
+			System.out.println("]");
 		}
 		return null;
 	}

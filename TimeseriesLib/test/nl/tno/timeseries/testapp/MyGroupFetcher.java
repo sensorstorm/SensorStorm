@@ -11,7 +11,7 @@ import backtype.storm.task.TopologyContext;
 public class MyGroupFetcher implements Fetcher {
 	private static final long serialVersionUID = -4783593429530609215L;
 	long time = 0;
-	private final String[] channels = { "S1", "S2", "S3" };
+	private final String[] channels = { "Channel_1", "Channel_2", "Channel_3" };
 	private int channelIndex = 0;
 
 	@Override
@@ -33,14 +33,14 @@ public class MyGroupFetcher implements Fetcher {
 			Thread.sleep(100);
 		} catch (InterruptedException e) {
 		}
-		time = time + 1;
+		time = time + 1000;
 		return new MyDataParticle<Double>(getChannel(), time, 1.0);
 	}
 
 	private String getChannel() {
 		String channel = channels[channelIndex];
 		channelIndex++;
-		if (channelIndex == channels.length) {
+		if (channelIndex >= channels.length) {
 			channelIndex = 0;
 		}
 		return channel;
