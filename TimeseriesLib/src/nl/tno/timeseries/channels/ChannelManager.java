@@ -202,13 +202,16 @@ public class ChannelManager implements Serializable {
 
 		// create new operation and initialize it
 		operation = operationClass.newInstance();
-		if (operationClass.isAssignableFrom(BatchOperation.class)) {
+		// is it a BatchOperation?
+		if (BatchOperation.class.isInstance(operation)) {
 			((BatchOperation) operation).init(firstParticle.getChannelId(),
 					firstParticle.getTimestamp(), stormConfig);
-		} else if (operationClass.isAssignableFrom(SingleOperation.class)) {
+		} // or is it a SingleOperation?
+		else if (SingleOperation.class.isInstance(operation)) {
 			operation.init(firstParticle.getChannelId(),
 					firstParticle.getTimestamp(), stormConfig);
-		} else {
+		} // unknown operation type
+		else {
 			logger.error("OperationClass of unknown type "
 					+ operationClass.getName() + ", expected: "
 					+ SingleOperation.class.getName() + " or "

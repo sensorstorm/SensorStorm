@@ -34,6 +34,7 @@ public class MetaParticleUtil {
 			res = getMetaParticleOutputFields(operationClass);
 		}
 		conf.put(METADATA_FIELDS, res.toList());
+
 		return res;
 	}
 
@@ -49,6 +50,7 @@ public class MetaParticleUtil {
 			res = ParticleMapper.getFields(metaParticleClass);
 		}
 		conf.put(METADATA_FIELDS, res.toList());
+
 		return res;
 	}
 
