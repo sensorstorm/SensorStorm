@@ -33,7 +33,9 @@ public class ChannelManager implements Serializable {
 
 	private static final long serialVersionUID = 3141072548366321818L;
 
-	private String channelId;
+	private String channelId; // The channel id this manager works for. Mostly
+								// the channelId of the Particle, in case of a
+								// ChannelGrouper the channelGroupId
 	private Operation operation;
 	private Batcher batcher;
 	private List<MetaParticleHandler> metaParticleHandlers;
@@ -49,7 +51,9 @@ public class ChannelManager implements Serializable {
 	 * operation.
 	 * 
 	 * @param channelId
-	 *            The id of the channel this channelManager works for.
+	 *            The id of the channel this channelManager works for. In case
+	 *            of a ChannelGrouperBolt infront of this bolt, the
+	 *            channelGroupId will be used as set by the ChannelGrouper.
 	 * @param batcherClass
 	 *            The class of the batcher to be used.
 	 * @param batchOperationClass
@@ -74,7 +78,9 @@ public class ChannelManager implements Serializable {
 	 * operation.
 	 * 
 	 * @param channelId
-	 *            The id of the channel this channelManager works for.
+	 *            The id of the channel this channelManager works for. In case
+	 *            of a ChannelGrouperBolt infront of this bolt, the
+	 *            channelGroupId will be used as set by the ChannelGrouper.
 	 * @param batchOperationClass
 	 *            The class of the single operation to be used.
 	 * @param conf
@@ -196,20 +202,19 @@ public class ChannelManager implements Serializable {
 		// create optional batcher
 		if (batcherClass != null) {
 			batcher = batcherClass.newInstance();
-			batcher.init(firstParticle.getChannelId(),
-					firstParticle.getTimestamp(), stormConfig);
+			batcher.init(channelId, firstParticle.getTimestamp(), stormConfig);
 		}
 
 		// create new operation and initialize it
 		operation = operationClass.newInstance();
 		// is it a BatchOperation?
 		if (BatchOperation.class.isInstance(operation)) {
-			((BatchOperation) operation).init(firstParticle.getChannelId(),
+			((BatchOperation) operation).init(channelId,
 					firstParticle.getTimestamp(), stormConfig);
 		} // or is it a SingleOperation?
 		else if (SingleOperation.class.isInstance(operation)) {
-			operation.init(firstParticle.getChannelId(),
-					firstParticle.getTimestamp(), stormConfig);
+			operation
+					.init(channelId, firstParticle.getTimestamp(), stormConfig);
 		} // unknown operation type
 		else {
 			logger.error("OperationClass of unknown type "

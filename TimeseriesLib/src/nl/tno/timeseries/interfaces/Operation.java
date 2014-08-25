@@ -21,7 +21,11 @@ public abstract interface Operation extends Serializable {
 	 * Init this operation.
 	 * 
 	 * @param channelID
-	 *            The id of the channel this operation is connected to
+	 *            The id of the channel this operation is connected to. Mostly
+	 *            the same channelid as the dataParticles that will be delivered
+	 *            to this operation. In case of a ChannelGrouperBolt infront of
+	 *            the ChannelBolt managing this operation, the channelGroupId
+	 *            will be used.
 	 * @param startTimestamp
 	 *            The timestamp of the first particle, this is the first
 	 *            particle this operation instance have to process

@@ -70,7 +70,8 @@ public class ChannelBolt extends BaseRichBolt implements EmitParticleInterface {
 	 * @param operationClass
 	 *            {@link Class} of the {@link Operation} implementation
 	 */
-	public ChannelBolt(Config conf, Class<? extends Operation> operationClass) {
+	public ChannelBolt(Config conf,
+			Class<? extends SingleOperation> operationClass) {
 		// Set fields
 		this.operationClass = operationClass;
 		this.batcherClass = EmptyBatcher.class;

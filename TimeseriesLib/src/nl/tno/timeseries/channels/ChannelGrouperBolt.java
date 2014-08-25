@@ -31,6 +31,10 @@ import backtype.storm.tuple.Values;
  * Particles with the field ChannelGrouper.GROUPED_PARTICLE_FIELD to indicate
  * this is a grouped particle.
  * 
+ * The ChannelBolt after this bolt will use the channelGroupIds as specified by
+ * the ChannelGrouper, as the channelid for its operation. The DataPatricles
+ * this operation gets still have the original channelIds.
+ * 
  * @author waaijbdvd
  * 
  */
