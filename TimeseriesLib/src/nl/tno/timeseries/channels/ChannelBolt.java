@@ -124,11 +124,11 @@ public class ChannelBolt extends BaseRichBolt implements EmitParticleInterface {
 			if (SingleOperation.class.isAssignableFrom(operationClass)) {
 				channelManager = new ChannelManager(channelId,
 						(Class<? extends SingleOperation>) operationClass,
-						stormConfig, this);
+						stormConfig);
 			} else if (BatchOperation.class.isAssignableFrom(operationClass)) {
 				channelManager = new ChannelManager(channelId, batcherClass,
 						(Class<? extends BatchOperation>) operationClass,
-						stormConfig, this);
+						stormConfig);
 			} else {
 				logger.error("Unknown operation " + operationClass.getName());
 			}

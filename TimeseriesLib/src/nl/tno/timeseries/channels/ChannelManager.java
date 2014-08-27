@@ -15,7 +15,6 @@ import nl.tno.timeseries.interfaces.MetaParticle;
 import nl.tno.timeseries.interfaces.Operation;
 import nl.tno.timeseries.interfaces.Particle;
 import nl.tno.timeseries.interfaces.SingleOperation;
-import nl.tno.timeseries.particles.EmitParticleInterface;
 import nl.tno.timeseries.particles.MetaParticleHandler;
 
 import org.slf4j.Logger;
@@ -41,7 +40,6 @@ public class ChannelManager implements Serializable {
 	private List<MetaParticleHandler> metaParticleHandlers;
 	private Class<? extends Operation> operationClass;
 	private Class<? extends Batcher> batcherClass;
-	private EmitParticleInterface emitParticleHandler;
 
 	@SuppressWarnings("rawtypes")
 	private Map stormConfig;
@@ -60,17 +58,12 @@ public class ChannelManager implements Serializable {
 	 *            The class of the batched operation to be used.
 	 * @param conf
 	 *            A reference to the storm config
-	 * @param emitParticleHandler
-	 *            A reference to emit particles, to be used by
-	 *            metaParticlehandlers.
 	 */
 	public ChannelManager(String channelId,
 			Class<? extends Batcher> batcherClass,
 			Class<? extends BatchOperation> batchOperationClass,
-			@SuppressWarnings("rawtypes") Map conf,
-			EmitParticleInterface emitParticleHandler) {
-		channelManager(channelId, batcherClass, batchOperationClass, conf,
-				emitParticleHandler);
+			@SuppressWarnings("rawtypes") Map conf) {
+		channelManager(channelId, batcherClass, batchOperationClass, conf);
 	}
 
 	/**
@@ -85,16 +78,11 @@ public class ChannelManager implements Serializable {
 	 *            The class of the single operation to be used.
 	 * @param conf
 	 *            A reference to the storm config
-	 * @param emitParticleHandler
-	 *            A reference to emit particles, to be used by
-	 *            metaParticlehandlers.
 	 */
 	public ChannelManager(String channelId,
 			Class<? extends SingleOperation> operationClass,
-			@SuppressWarnings("rawtypes") Map conf,
-			EmitParticleInterface emitParticleHandler) {
-		channelManager(channelId, null, operationClass, conf,
-				emitParticleHandler);
+			@SuppressWarnings("rawtypes") Map conf) {
+		channelManager(channelId, null, operationClass, conf);
 	}
 
 	/**
@@ -104,19 +92,16 @@ public class ChannelManager implements Serializable {
 	 * @param batcherClass
 	 * @param operationClass
 	 * @param conf
-	 * @param emitParticleHandler
 	 */
 	private void channelManager(String channelId,
 			Class<? extends Batcher> batcherClass,
 			Class<? extends Operation> operationClass,
-			@SuppressWarnings("rawtypes") Map conf,
-			EmitParticleInterface emitParticleHandler) {
+			@SuppressWarnings("rawtypes") Map conf) {
 		this.channelId = channelId;
 		this.operationClass = operationClass;
 		this.batcherClass = batcherClass;
 		this.operationClass = operationClass;
 		this.stormConfig = conf;
-		this.emitParticleHandler = emitParticleHandler;
 
 		metaParticleHandlers = new ArrayList<MetaParticleHandler>();
 		logger.debug("Channel manager for channel " + channelId + " created");
@@ -154,11 +139,14 @@ public class ChannelManager implements Serializable {
 		List<Particle> result = new ArrayList<Particle>();
 
 		if (particle instanceof MetaParticle) { // metaParticle
-			handleMetaParticle((MetaParticle) particle);
+			List<Particle> outputParticles = handleMetaParticle((MetaParticle) particle);
 			// add metaParticle to output list in order to be resent further in
 			// the topology
 			result.add(particle);
-
+			// add optional output particles
+			if (outputParticles != null) {
+				result.addAll(outputParticles);
+			}
 		} else if (particle instanceof DataParticle) { // dataParticle
 			List<DataParticle> outputDataParticles = null;
 			if (batcher != null) { // batch dataParticle and give it to
@@ -241,7 +229,7 @@ public class ChannelManager implements Serializable {
 		for (Class<? extends MetaParticleHandler> mph : operationDeclaration
 				.metaParticleHandlers()) {
 			MetaParticleHandler newInstance = mph.newInstance();
-			newInstance.init(operation, emitParticleHandler);
+			newInstance.init(operation);
 			metaParticleHandlers.add(newInstance);
 		}
 	}
@@ -251,14 +239,16 @@ public class ChannelManager implements Serializable {
 	 * 
 	 * @param metaParticle
 	 */
-	private void handleMetaParticle(MetaParticle metaParticle) {
+	private List<Particle> handleMetaParticle(MetaParticle metaParticle) {
+		List<Particle> result = null;
 		for (MetaParticleHandler mph : metaParticleHandlers) {
 			MetaParticleHandlerDecleration mphd = mph.getClass().getAnnotation(
 					MetaParticleHandlerDecleration.class);
 			if (metaParticle.getClass().isAssignableFrom(mphd.metaParticle())) {
-				mph.handleMetaParticle(metaParticle);
+				result = mph.handleMetaParticle(metaParticle);
 			}
 		}
+		return result;
 	}
 
 	/**

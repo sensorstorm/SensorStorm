@@ -1,11 +1,12 @@
 package nl.tno.timeseries.gracefullshutdown;
 
 import java.io.Serializable;
+import java.util.List;
 
 import nl.tno.timeseries.annotation.MetaParticleHandlerDecleration;
 import nl.tno.timeseries.interfaces.MetaParticle;
 import nl.tno.timeseries.interfaces.Operation;
-import nl.tno.timeseries.particles.EmitParticleInterface;
+import nl.tno.timeseries.interfaces.Particle;
 import nl.tno.timeseries.particles.MetaParticleHandler;
 
 import org.slf4j.Logger;
@@ -28,8 +29,7 @@ public class GracefulShutdownParticleHandler implements MetaParticleHandler,
 	private GracefullShutdownInterface graceFullShutdownOperation;
 
 	@Override
-	public void init(Operation operation,
-			EmitParticleInterface emitParticleHandler) {
+	public void init(Operation operation) {
 
 		if (operation instanceof GracefullShutdownInterface) {
 			graceFullShutdownOperation = (GracefullShutdownInterface) operation;
@@ -42,9 +42,10 @@ public class GracefulShutdownParticleHandler implements MetaParticleHandler,
 	}
 
 	@Override
-	public void handleMetaParticle(MetaParticle metaParticle) {
+	public List<Particle> handleMetaParticle(MetaParticle metaParticle) {
 		if (metaParticle instanceof GracefullShutdownParticle) {
 			graceFullShutdownOperation.gracefullShutdown();
 		}
+		return null;
 	}
 }

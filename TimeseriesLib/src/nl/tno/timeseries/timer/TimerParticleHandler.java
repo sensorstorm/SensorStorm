@@ -1,13 +1,14 @@
 package nl.tno.timeseries.timer;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import nl.tno.timeseries.annotation.MetaParticleHandlerDecleration;
 import nl.tno.timeseries.interfaces.DataParticle;
 import nl.tno.timeseries.interfaces.MetaParticle;
 import nl.tno.timeseries.interfaces.Operation;
-import nl.tno.timeseries.particles.EmitParticleInterface;
+import nl.tno.timeseries.interfaces.Particle;
 import nl.tno.timeseries.particles.MetaParticleHandler;
 
 import org.slf4j.Logger;
@@ -29,16 +30,12 @@ public class TimerParticleHandler implements MetaParticleHandler,
 	private static final long serialVersionUID = 8622533504407023168L;
 	private RecurringTask recurringTask = null;
 	private SingleTask singleTask = null;
-	private EmitParticleInterface emitParticleHandler;
 
 	/**
 	 * Connect the operation to this Timer
 	 */
 	@Override
-	public void init(Operation operation,
-			EmitParticleInterface emitParticleHandler) {
-		this.emitParticleHandler = emitParticleHandler;
-
+	public void init(Operation operation) {
 		if (operation instanceof TimerTaskInterface) {
 			((TimerTaskInterface) operation).setTimerController(this);
 		} else {
@@ -49,16 +46,26 @@ public class TimerParticleHandler implements MetaParticleHandler,
 	}
 
 	@Override
-	public void handleMetaParticle(MetaParticle metaParticle) {
+	public List<Particle> handleMetaParticle(MetaParticle metaParticle) {
+		List<Particle> result = new ArrayList<Particle>();
 		if (metaParticle instanceof TimerTickParticle) {
 			TimerTickParticle timerParticle = (TimerTickParticle) metaParticle;
 			long timestamp = timerParticle.getTimestamp();
-			executeRecurringTasks(timestamp);
-			executeSingleTasks(timestamp);
+			result.addAll(executeRecurringTasks(timestamp));
+			result.addAll(executeSingleTasks(timestamp));
 		}
+		return result;
 	}
 
-	protected void executeRecurringTasks(long timestamp) {
+	/**
+	 * Executes all recurring tasks pending before timestamp.
+	 * 
+	 * @param timestamp
+	 * @return Returns an empty list or a list with one or more particles to be
+	 *         outputed.
+	 */
+	protected List<Particle> executeRecurringTasks(long timestamp) {
+		List<Particle> result = new ArrayList<Particle>();
 		if (recurringTask != null) {
 			if (recurringTask.timerFreq != 0) {
 				if (recurringTask.lastTimestamp == 0) {
@@ -69,18 +76,25 @@ public class TimerParticleHandler implements MetaParticleHandler,
 							+ recurringTask.timerFreq;
 					List<DataParticle> outputParticles = recurringTask.recurringTimerTaskHandler
 							.doTimerRecurringTask(recurringTask.lastTimestamp);
-					// emit all output particles
 					if (outputParticles != null) {
-						for (DataParticle outputParticle : outputParticles) {
-							emitParticleHandler.emitParticle(outputParticle);
-						}
+						result.addAll(outputParticles);
 					}
 				}
 			}
 		}
+
+		return result;
 	}
 
-	protected void executeSingleTasks(long timestamp) {
+	/**
+	 * Executes all single tasks pending before timestamp.
+	 * 
+	 * @param timestamp
+	 * @return Returns an empty list or a list with one or more particles to be
+	 *         outputed.
+	 */
+	protected List<Particle> executeSingleTasks(long timestamp) {
+		List<Particle> result = new ArrayList<Particle>();
 		if (singleTask != null) {
 			if (singleTask.wakeupTime != 0) {
 				while ((singleTask.wakeupTime != 0)
@@ -93,15 +107,14 @@ public class TimerParticleHandler implements MetaParticleHandler,
 					singleTask.wakeupTime = 0;
 					List<DataParticle> outputParticles = singleTask.singleTimerTaskHandler
 							.doTimerSingleTask(timerTaskTimestamp);
-					// emit all output particles
 					if (outputParticles != null) {
-						for (DataParticle outputParticle : outputParticles) {
-							emitParticleHandler.emitParticle(outputParticle);
-						}
+						result.addAll(outputParticles);
 					}
 				}
 			}
 		}
+
+		return result;
 	}
 
 	@Override
