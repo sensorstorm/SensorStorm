@@ -4,6 +4,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -185,10 +186,17 @@ public class ParticleMapper {
 	}
 
 	public static Fields mergeFields(Fields one, Fields two) {
-		List<String> copy = one.toList();
-		for (String s : two.toList()) {
-			if (!copy.contains(s)) {
-				copy.add(s);
+		List<String> copy;
+		if (one == null) {
+			copy = new ArrayList<String>();
+		} else {
+			copy = one.toList();
+		}
+		if (two != null) {
+			for (String s : two.toList()) {
+				if (!copy.contains(s)) {
+					copy.add(s);
+				}
 			}
 		}
 		return new Fields(copy);

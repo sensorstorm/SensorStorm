@@ -6,9 +6,8 @@ import nl.tno.storm.configuration.api.StormConfiguration;
 import nl.tno.timeseries.annotation.OperationDeclaration;
 import nl.tno.timeseries.interfaces.DataParticle;
 import nl.tno.timeseries.interfaces.SingleOperation;
-import nl.tno.timeseries.timer.TimerParticleHandler;
 
-@OperationDeclaration(inputs = { MyDataParticle.class }, outputs = {}, metaParticleHandlers = { TimerParticleHandler.class })
+@OperationDeclaration(inputs = { MyDataParticle.class }, outputs = {})
 public class MyOperation implements SingleOperation {
 	private static final long serialVersionUID = 773649574489299505L;
 	private String channelId;

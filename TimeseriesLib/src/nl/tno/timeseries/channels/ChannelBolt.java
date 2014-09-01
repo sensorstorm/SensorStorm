@@ -62,7 +62,7 @@ public class ChannelBolt extends BaseRichBolt implements EmitParticleInterface {
 		this.operationClass = batchOperationClass;
 		this.batcherClass = batcherClass;
 		this.channelManagers = new HashMap<String, ChannelManager>();
-		this.metaParticleFields = MetaParticleUtil.setMetaParticleFields(
+		this.metaParticleFields = MetaParticleUtil.registerMetaParticleFieldsWithOperationClass(
 				config, operationClass);
 		setupConfig(config);
 	}
@@ -81,7 +81,7 @@ public class ChannelBolt extends BaseRichBolt implements EmitParticleInterface {
 		this.operationClass = operationClass;
 		this.batcherClass = EmptyBatcher.class;
 		this.channelManagers = new HashMap<String, ChannelManager>();
-		this.metaParticleFields = MetaParticleUtil.setMetaParticleFields(
+		this.metaParticleFields = MetaParticleUtil.registerMetaParticleFieldsWithOperationClass(
 				config, operationClass);
 	}
 

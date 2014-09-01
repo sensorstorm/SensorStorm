@@ -22,36 +22,40 @@ public class MetaParticleUtil {
 		}
 	}
 
-	public static Fields setMetaParticleFields(Config conf,
-			Class<? extends Operation> operationClass) {
-		Fields res = null;
+	/**
+	 * This one is for the bolts
+	 */
+	@SuppressWarnings("unchecked")
+	public static Fields registerMetaParticleFieldsWithOperationClass(
+			Config conf, Class<? extends Operation> operationClass) {
+		Fields metaParticleFields = null;
 		if (conf.containsKey(METADATA_FIELDS)) {
-			@SuppressWarnings("unchecked")
-			Fields old = new Fields((List<String>) conf.get(METADATA_FIELDS));
-			Fields toAdd = getMetaParticleOutputFields(operationClass);
-			res = ParticleMapper.mergeFields(old, toAdd);
-		} else {
-			res = getMetaParticleOutputFields(operationClass);
+			metaParticleFields = new Fields(
+					(List<String>) conf.get(METADATA_FIELDS));
 		}
-		conf.put(METADATA_FIELDS, res.toList());
+		Fields fields = ParticleMapper.mergeFields(metaParticleFields,
+				getMetaParticleOutputFields(operationClass));
+		conf.put(METADATA_FIELDS, fields.toList());
 
-		return res;
+		return fields;
 	}
 
-	public static Fields setMetaParticleFieldsWithParticle(Config conf,
-			Class<? extends MetaParticle> metaParticleClass) {
-		Fields res = null;
+	/**
+	 * This one is for the spout
+	 */
+	@SuppressWarnings("unchecked")
+	public static Fields registerMetaParticleFieldsWithMetaParticleClass(
+			Config conf, Class<? extends MetaParticle> metaParticleClass) {
+		Fields metaParticleFields = null;
 		if (conf.containsKey(METADATA_FIELDS)) {
-			@SuppressWarnings("unchecked")
-			Fields old = new Fields((List<String>) conf.get(METADATA_FIELDS));
-			Fields toAdd = ParticleMapper.getFields(metaParticleClass);
-			res = ParticleMapper.mergeFields(old, toAdd);
-		} else {
-			res = ParticleMapper.getFields(metaParticleClass);
+			metaParticleFields = new Fields(
+					(List<String>) conf.get(METADATA_FIELDS));
 		}
-		conf.put(METADATA_FIELDS, res.toList());
+		Fields fields = ParticleMapper.mergeFields(metaParticleFields,
+				ParticleMapper.getFields(metaParticleClass));
+		conf.put(METADATA_FIELDS, fields.toList());
 
-		return res;
+		return fields;
 	}
 
 	public static Fields getMetaParticleOutputFields(

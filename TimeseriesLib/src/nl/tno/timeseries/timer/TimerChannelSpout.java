@@ -52,7 +52,7 @@ public class TimerChannelSpout extends ChannelSpout {
 		mainTimerTickFreq = 60000L; // 1 minute
 		useParticleTime = true;
 
-		MetaParticleUtil.setMetaParticleFieldsWithParticle(config,
+		MetaParticleUtil.registerMetaParticleFieldsWithMetaParticleClass(config,
 				TimerTickParticle.class);
 	}
 
@@ -79,7 +79,7 @@ public class TimerChannelSpout extends ChannelSpout {
 		this.mainTimerTickFreq = mainTimerTickFreq;
 		this.useParticleTime = useParticleTime;
 
-		MetaParticleUtil.setMetaParticleFieldsWithParticle(config,
+		MetaParticleUtil.registerMetaParticleFieldsWithMetaParticleClass(config,
 				TimerTickParticle.class);
 	}
 
