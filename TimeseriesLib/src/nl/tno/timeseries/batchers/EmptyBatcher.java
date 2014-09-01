@@ -2,8 +2,8 @@ package nl.tno.timeseries.batchers;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 
+import nl.tno.storm.configuration.api.StormConfiguration;
 import nl.tno.timeseries.interfaces.Batcher;
 import nl.tno.timeseries.interfaces.DataParticle;
 import nl.tno.timeseries.interfaces.DataParticleBatch;
@@ -21,7 +21,7 @@ public class EmptyBatcher implements Batcher, Serializable {
 
 	@Override
 	public void init(String channelID, long startSequenceNr,
-			@SuppressWarnings("rawtypes") Map stormConfig) {
+			StormConfiguration stormConfiguration) {
 	}
 
 	/**

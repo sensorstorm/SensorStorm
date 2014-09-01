@@ -3,8 +3,8 @@ package nl.tno.timeseries.channels;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
+import nl.tno.storm.configuration.api.StormConfiguration;
 import nl.tno.timeseries.annotation.MetaParticleHandlerDecleration;
 import nl.tno.timeseries.annotation.OperationDeclaration;
 import nl.tno.timeseries.interfaces.BatchOperation;
@@ -40,9 +40,7 @@ public class ChannelManager implements Serializable {
 	private List<MetaParticleHandler> metaParticleHandlers;
 	private Class<? extends Operation> operationClass;
 	private Class<? extends Batcher> batcherClass;
-
-	@SuppressWarnings("rawtypes")
-	private Map stormConfig;
+	private StormConfiguration stormConfiguration;
 
 	/**
 	 * Creates a new ChannelManager for a specific channel with a batcher
@@ -62,8 +60,9 @@ public class ChannelManager implements Serializable {
 	public ChannelManager(String channelId,
 			Class<? extends Batcher> batcherClass,
 			Class<? extends BatchOperation> batchOperationClass,
-			@SuppressWarnings("rawtypes") Map conf) {
-		channelManager(channelId, batcherClass, batchOperationClass, conf);
+			StormConfiguration stormConfiguration) {
+		channelManager(channelId, batcherClass, batchOperationClass,
+				stormConfiguration);
 	}
 
 	/**
@@ -81,8 +80,8 @@ public class ChannelManager implements Serializable {
 	 */
 	public ChannelManager(String channelId,
 			Class<? extends SingleOperation> operationClass,
-			@SuppressWarnings("rawtypes") Map conf) {
-		channelManager(channelId, null, operationClass, conf);
+			StormConfiguration stormConfiguration) {
+		channelManager(channelId, null, operationClass, stormConfiguration);
 	}
 
 	/**
@@ -96,12 +95,12 @@ public class ChannelManager implements Serializable {
 	private void channelManager(String channelId,
 			Class<? extends Batcher> batcherClass,
 			Class<? extends Operation> operationClass,
-			@SuppressWarnings("rawtypes") Map conf) {
+			StormConfiguration stormConfiguration) {
 		this.channelId = channelId;
 		this.operationClass = operationClass;
 		this.batcherClass = batcherClass;
 		this.operationClass = operationClass;
-		this.stormConfig = conf;
+		this.stormConfiguration = stormConfiguration;
 
 		metaParticleHandlers = new ArrayList<MetaParticleHandler>();
 		logger.debug("Channel manager for channel " + channelId + " created");
@@ -190,7 +189,8 @@ public class ChannelManager implements Serializable {
 		// create optional batcher
 		if (batcherClass != null) {
 			batcher = batcherClass.newInstance();
-			batcher.init(channelId, firstParticle.getTimestamp(), stormConfig);
+			batcher.init(channelId, firstParticle.getTimestamp(),
+					stormConfiguration);
 		}
 
 		// create new operation and initialize it
@@ -198,11 +198,11 @@ public class ChannelManager implements Serializable {
 		// is it a BatchOperation?
 		if (BatchOperation.class.isInstance(operation)) {
 			((BatchOperation) operation).init(channelId,
-					firstParticle.getTimestamp(), stormConfig);
+					firstParticle.getTimestamp(), stormConfiguration);
 		} // or is it a SingleOperation?
 		else if (SingleOperation.class.isInstance(operation)) {
-			operation
-					.init(channelId, firstParticle.getTimestamp(), stormConfig);
+			operation.init(channelId, firstParticle.getTimestamp(),
+					stormConfiguration);
 		} // unknown operation type
 		else {
 			logger.error("OperationClass of unknown type "

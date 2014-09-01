@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="bigdavids-stormconfiguration" basedir="." default="jar">
+
+	<property name="dir.build" value="bin" />
+	<property name="dir.dist" value="dist" />
+	<property name="dir.dist.storm" value="../Storm/etc" />
+	<property name="dir.src" value="src" />
+	<property name="file.jar" value="StormConfiguration.jar" />
+	<tstamp>
+		<format property="buildnumber" pattern="yyyyMMdd.HHmmss"/>
+	</tstamp>
+
+	<path id="compile.classpath">
+		<fileset dir=".">
+			<include name="lib/*.jar" />
+		</fileset>
+	</path>
+
+	<target name="clean" description="Clean project">
+		<delete dir="${dir.build}" />
+	</target>
+
+	<target name="prepare" description="Prepare project">
+		<mkdir dir="${dir.build}" />
+	</target>
+
+	<target name="compile" description="Compile project" depends="prepare">
+		<javac destdir="${dir.build}" classpathref="compile.classpath" includeantruntime="false" debug="true">
+			<src path="${dir.src}" />
+		</javac>
+	</target>
+
+	<target name="jar" description="Build jar file" depends="compile">
+		<mkdir dir="${dir.dist.storm}" />
+		<jar destfile="${dir.dist}/${file.jar}" basedir="${dir.build}">
+		</jar>
+	</target>
+
+	<target name="storm" description="Copy to Storm project" depends="jar">
+		<mkdir dir="${dir.dist.storm}" />
+		<copy file="${dir.dist}/${file.jar}" tofile="${dir.dist.storm}/${file.jar}"/>
+	</target>
+
+</project>
+

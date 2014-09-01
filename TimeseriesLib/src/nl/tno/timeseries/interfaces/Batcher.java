@@ -1,7 +1,8 @@
 package nl.tno.timeseries.interfaces;
 
 import java.util.List;
-import java.util.Map;
+
+import nl.tno.storm.configuration.api.StormConfiguration;
 
 /**
  * An interface describing the batch functionality: to collect one or more
@@ -13,7 +14,7 @@ import java.util.Map;
 public interface Batcher {
 
 	public void init(String channelID, long startTimestamp,
-			@SuppressWarnings("rawtypes") Map stormConfig);
+			StormConfiguration stormConfiguration);
 
 	/**
 	 * A method to add a new data particle to the inner batch. If the batch(es)

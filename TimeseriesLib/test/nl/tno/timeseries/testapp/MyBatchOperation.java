@@ -1,8 +1,8 @@
 package nl.tno.timeseries.testapp;
 
 import java.util.List;
-import java.util.Map;
 
+import nl.tno.storm.configuration.api.StormConfiguration;
 import nl.tno.timeseries.annotation.OperationDeclaration;
 import nl.tno.timeseries.interfaces.BatchOperation;
 import nl.tno.timeseries.interfaces.DataParticle;
@@ -16,7 +16,7 @@ public class MyBatchOperation implements BatchOperation {
 
 	@Override
 	public void init(String channelID, long startTimestamp,
-			@SuppressWarnings("rawtypes") Map stormConfig) {
+			StormConfiguration stormConfiguration) {
 		this.channelId = channelID;
 		System.out.println("init myBatchOperation at " + startTimestamp);
 	}

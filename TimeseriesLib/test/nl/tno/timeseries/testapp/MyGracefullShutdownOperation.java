@@ -4,21 +4,24 @@ import java.util.List;
 
 import nl.tno.storm.configuration.api.StormConfiguration;
 import nl.tno.timeseries.annotation.OperationDeclaration;
+import nl.tno.timeseries.gracefullshutdown.GracefulShutdownParticleHandler;
+import nl.tno.timeseries.gracefullshutdown.GracefullShutdownInterface;
 import nl.tno.timeseries.interfaces.DataParticle;
 import nl.tno.timeseries.interfaces.SingleOperation;
-import nl.tno.timeseries.timer.TimerParticleHandler;
+import nl.tno.timeseries.timer.TimerControllerInterface;
 
-@OperationDeclaration(inputs = { MyDataParticle.class }, outputs = {}, metaParticleHandlers = { TimerParticleHandler.class })
-public class MyOperation implements SingleOperation {
+@OperationDeclaration(inputs = { MyDataParticle.class }, outputs = {}, metaParticleHandlers = { GracefulShutdownParticleHandler.class })
+public class MyGracefullShutdownOperation implements SingleOperation,
+		GracefullShutdownInterface {
 	private static final long serialVersionUID = 773649574489299505L;
+	TimerControllerInterface timerController = null;
 	private String channelId;
 
 	@Override
 	public void init(String channelID, long startTimestamp,
 			StormConfiguration stormConfiguration) {
 		this.channelId = channelID;
-		System.out.println("init myoperation for channel " + channelID + " at "
-				+ startTimestamp);
+		System.out.println("init myTimedBatchOperation at " + startTimestamp);
 	}
 
 	@Override
@@ -33,6 +36,11 @@ public class MyOperation implements SingleOperation {
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public void gracefullShutdown() {
+		System.out.println("Channel " + channelId + " Gracefull shutdown!");
 	}
 
 }

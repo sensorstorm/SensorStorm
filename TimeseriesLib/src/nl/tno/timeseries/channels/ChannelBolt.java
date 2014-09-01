@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import nl.tno.storm.configuration.api.StormConfiguration;
+import nl.tno.storm.configuration.api.StormConfigurationException;
+import nl.tno.storm.configuration.impl.ZookeeperStormConfigurationFactory;
 import nl.tno.timeseries.batchers.EmptyBatcher;
 import nl.tno.timeseries.interfaces.BatchOperation;
 import nl.tno.timeseries.interfaces.Batcher;
@@ -41,6 +44,7 @@ public class ChannelBolt extends BaseRichBolt implements EmitParticleInterface {
 	protected Class<? extends Batcher> batcherClass;
 	protected Map<String, ChannelManager> channelManagers;
 	protected Fields metaParticleFields;
+	protected StormConfiguration stormConfiguration;
 
 	/**
 	 * Construct a {@link ChannelBolt} with a {@link Batcher}
@@ -52,14 +56,15 @@ public class ChannelBolt extends BaseRichBolt implements EmitParticleInterface {
 	 * @param batchOperationClass
 	 *            {@link Class} of the {@link BatchOperation} implementation
 	 */
-	public ChannelBolt(Config conf, Class<? extends Batcher> batcherClass,
+	public ChannelBolt(Config config, Class<? extends Batcher> batcherClass,
 			Class<? extends BatchOperation> batchOperationClass) {
 		// Set fields
 		this.operationClass = batchOperationClass;
 		this.batcherClass = batcherClass;
 		this.channelManagers = new HashMap<String, ChannelManager>();
-		this.metaParticleFields = MetaParticleUtil.setMetaParticleFields(conf,
-				operationClass);
+		this.metaParticleFields = MetaParticleUtil.setMetaParticleFields(
+				config, operationClass);
+		setupConfig(config);
 	}
 
 	/**
@@ -70,14 +75,14 @@ public class ChannelBolt extends BaseRichBolt implements EmitParticleInterface {
 	 * @param operationClass
 	 *            {@link Class} of the {@link Operation} implementation
 	 */
-	public ChannelBolt(Config conf,
+	public ChannelBolt(Config config,
 			Class<? extends SingleOperation> operationClass) {
 		// Set fields
 		this.operationClass = operationClass;
 		this.batcherClass = EmptyBatcher.class;
 		this.channelManagers = new HashMap<String, ChannelManager>();
-		this.metaParticleFields = MetaParticleUtil.setMetaParticleFields(conf,
-				operationClass);
+		this.metaParticleFields = MetaParticleUtil.setMetaParticleFields(
+				config, operationClass);
 	}
 
 	@Override
@@ -86,6 +91,23 @@ public class ChannelBolt extends BaseRichBolt implements EmitParticleInterface {
 		this.stormConfig = conf;
 		this.collector = collector;
 		this.boltName = context.getThisComponentId();
+		setupConfig(conf);
+	}
+
+	private void setupConfig(@SuppressWarnings("rawtypes") Map config) {
+		String connectionString = (String) config
+				.get("config.zookeeper.connectionstring");
+		String topologyName = (String) config
+				.get("config.zookeeper.topologyname");
+
+		try {
+			stormConfiguration = ZookeeperStormConfigurationFactory
+					.getInstance().getStormConfiguration(topologyName,
+							connectionString);
+		} catch (StormConfigurationException e) {
+			logger.error("Can not connect to zookeeper for configuration. Reason: "
+					+ e.getMessage());
+		}
 	}
 
 	@Override
@@ -124,11 +146,11 @@ public class ChannelBolt extends BaseRichBolt implements EmitParticleInterface {
 			if (SingleOperation.class.isAssignableFrom(operationClass)) {
 				channelManager = new ChannelManager(channelId,
 						(Class<? extends SingleOperation>) operationClass,
-						stormConfig);
+						stormConfiguration);
 			} else if (BatchOperation.class.isAssignableFrom(operationClass)) {
 				channelManager = new ChannelManager(channelId, batcherClass,
 						(Class<? extends BatchOperation>) operationClass,
-						stormConfig);
+						stormConfiguration);
 			} else {
 				logger.error("Unknown operation " + operationClass.getName());
 			}

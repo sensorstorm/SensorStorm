@@ -15,14 +15,16 @@ public class TestRunner {
 
 	public void run() {
 		LocalCluster localCluster = new LocalCluster();
-		Config config = new Config();
 		TopologyBuilder builder = new TopologyBuilder();
+		Config config = new Config();
+		config.put("config.zookeeper.connectionstring", "134.221.210.122:2181");
+		config.put("config.zookeeper.topologyname", "test");
 
-		// basicTopolgyTest(builder, config);
+		basicTopolgyTest(builder, config);
 		// timerTopolgyTest(builder, config);
 		// batchTopolgyTest(builder, config);
 		// timedBatchTopolgyTest(builder, config);
-		groupedTopolgyTest(builder, config);
+		// groupedTopolgyTest(builder, config);
 
 		localCluster.submitTopology(topologyName, config,
 				builder.createTopology());
@@ -88,6 +90,16 @@ public class TestRunner {
 				.shuffleGrouping("input");
 		builder.setBolt("src", new ChannelBolt(config, MyOperation.class), 1)
 				.shuffleGrouping("grouper");
+	}
+
+	private void gracefullShutdownTopolgyTest(TopologyBuilder builder,
+			Config config) {
+		System.out.println("GracefullShutdown topology test");
+		builder.setSpout("input", new ChannelSpout(config,
+				new MyGracefullShutdownFetcher()));
+		builder.setBolt("src",
+				new ChannelBolt(config, MyGracefullShutdownOperation.class), 1)
+				.shuffleGrouping("input");
 	}
 
 	public static void main(String[] args) throws Exception {

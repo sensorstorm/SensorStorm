@@ -1,8 +1,8 @@
 package nl.tno.timeseries.testapp;
 
 import java.util.List;
-import java.util.Map;
 
+import nl.tno.storm.configuration.api.StormConfiguration;
 import nl.tno.timeseries.annotation.OperationDeclaration;
 import nl.tno.timeseries.interfaces.DataParticle;
 import nl.tno.timeseries.interfaces.SingleOperation;
@@ -18,7 +18,7 @@ public class MyTimedOperation implements SingleOperation, TimerTaskInterface {
 
 	@Override
 	public void init(String channelID, long startTimestamp,
-			@SuppressWarnings("rawtypes") Map stormConfig) {
+			StormConfiguration stormConfiguration) {
 		this.channelId = channelID;
 		System.out.println("init myTimedOperation for channel " + channelID
 				+ " at " + startTimestamp);
