@@ -63,7 +63,21 @@ public class ZookeeperStormConfiguration implements StormConfiguration {
 		return PREFIX + "/" + topologyId + "/conf/operations/" + operationId;
 	}
 
+
+	@Override
+	public Map<String, String> getFetcherConfiguration(String fetcherId) throws StormConfigurationException {
+		try {
+			return pathToMap(getFetcherPath(fetcherId));
+		} catch (Exception e) {
+			throw new StormConfigurationException("ZooKeeper Exception", e);
+		}
+	}
 	
+	private String getFetcherPath(String fetcherId) {
+		return PREFIX + "/" + topologyId + "/conf/fetchers/" + fetcherId;
+	}
+
+
 	
 	@Override
 	public Map<String, String> getTaskConfiguration(String taskId) throws StormConfigurationException {
@@ -143,6 +157,16 @@ public class ZookeeperStormConfiguration implements StormConfiguration {
 		}
 	}
 
+	@Override
+	public void registerFetcherConfigurationListener(String fetcherId, ConfigurationListener listener)
+			throws StormConfigurationException {
+		try {
+			getWatcherHelper(getFetcherPath(fetcherId)).addListener(listener);
+		} catch (Exception e) {
+			throw new StormConfigurationException(e);
+		}
+	}
+
 		
 	@Override
 	public void registerTaskConfigurationListener(String taskId, ConfigurationListener listener)
@@ -189,6 +213,16 @@ public class ZookeeperStormConfiguration implements StormConfiguration {
 			throws StormConfigurationException {
 		try {
 			getWatcherHelper(getOperationPath(operationId)).removeListener(listener);
+		} catch (Exception e) {
+			throw new StormConfigurationException(e);
+		}
+	}
+
+	@Override
+	public void unregisterFetcherConfigurationListener(String fetcherId, ConfigurationListener listener)
+			throws StormConfigurationException {
+		try {
+			getWatcherHelper(getFetcherPath(fetcherId)).removeListener(listener);
 		} catch (Exception e) {
 			throw new StormConfigurationException(e);
 		}

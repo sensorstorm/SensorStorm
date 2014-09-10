@@ -11,8 +11,13 @@ import nl.tno.storm.configuration.api.StormConfigurationFactory;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.ExponentialBackoffRetry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ZookeeperStormConfigurationFactory implements StormConfigurationFactory {
+	public static String CONNECTING_STRING = "config.zookeeper.connectionstring";
+	public static String TOPOLOGY_NAME = "config.zookeeper.topologyname";
+	private static Logger logger = LoggerFactory.getLogger(ZookeeperStormConfigurationFactory.class);
 
 	private static ZookeeperStormConfigurationFactory instance = new ZookeeperStormConfigurationFactory();
 
@@ -45,11 +50,16 @@ public class ZookeeperStormConfigurationFactory implements StormConfigurationFac
 	}
 
 	@Override
-	public synchronized StormConfiguration getStormConfiguration(@SuppressWarnings("rawtypes") Map config)
+	public synchronized StormConfiguration getStormConfiguration(@SuppressWarnings("rawtypes") Map stormNativeConfig)
 			throws StormConfigurationException {
-		// TODO zookeeper connection string uit map halen
-		System.out.println(config);
-		throw new UnsupportedOperationException();
+		String connectionString = (String) stormNativeConfig
+				.get(CONNECTING_STRING);
+		String topologyName = (String) stormNativeConfig.get(TOPOLOGY_NAME);
+
+		return ZookeeperStormConfigurationFactory
+				.getInstance().getStormConfiguration(topologyName,
+						connectionString);
+
 	}
 
 	@Override

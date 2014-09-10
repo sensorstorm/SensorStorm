@@ -11,20 +11,23 @@ import backtype.storm.topology.TopologyBuilder;
 
 public class TestRunner {
 	private static final String topologyName = "timeserieslib-tester";
-	private final long sleeptime = 5000;
+	private final long sleeptime = 50000000;
 
 	public void run() {
 		LocalCluster localCluster = new LocalCluster();
 		TopologyBuilder builder = new TopologyBuilder();
 		Config config = new Config();
+		// om zookeeper in te stellen browse naar:
+		// http://134.221.210.122:8080/exhibitor/v1/ui/index.html
 		config.put("config.zookeeper.connectionstring", "134.221.210.122:2181");
 		config.put("config.zookeeper.topologyname", "test");
 
-		basicTopolgyTest(builder, config);
+		// basicTopolgyTest(builder, config);
 		// timerTopolgyTest(builder, config);
 		// batchTopolgyTest(builder, config);
 		// timedBatchTopolgyTest(builder, config);
 		// groupedTopolgyTest(builder, config);
+		basicConfigTopolgyTest(builder, config);
 
 		localCluster.submitTopology(topologyName, config,
 				builder.createTopology());
@@ -99,6 +102,15 @@ public class TestRunner {
 				new MyGracefullShutdownFetcher()));
 		builder.setBolt("src",
 				new ChannelBolt(config, MyGracefullShutdownOperation.class), 1)
+				.shuffleGrouping("input");
+	}
+
+	private void basicConfigTopolgyTest(TopologyBuilder builder, Config config) {
+		System.out.println("Basic config topology test");
+		builder.setSpout("input", new ChannelSpout(config,
+				new MyConfigFetcher()));
+		builder.setBolt("src",
+				new ChannelBolt(config, MyConfigOperation.class), 1)
 				.shuffleGrouping("input");
 	}
 

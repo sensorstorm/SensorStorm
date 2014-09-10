@@ -1,8 +1,8 @@
 package nl.tno.timeseries.interfaces;
 
 import java.io.Serializable;
-import java.util.Map;
 
+import nl.tno.storm.configuration.api.StormConfiguration;
 import backtype.storm.task.TopologyContext;
 
 /**
@@ -19,11 +19,11 @@ public interface Fetcher extends Serializable {
 	 * Prepare method for this fetcher. Init streams, open connections, files,
 	 * etc. It is called from the spout.open method
 	 * 
-	 * @param stormConf
+	 * @param stormConfiguration
 	 * @param context
 	 * @throws Exception
 	 */
-	public void prepare(@SuppressWarnings("rawtypes") Map stormConf,
+	public void prepare(StormConfiguration stormConfiguration,
 			TopologyContext context) throws Exception;
 
 	/**

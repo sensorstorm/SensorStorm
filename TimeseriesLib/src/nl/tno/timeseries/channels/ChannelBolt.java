@@ -8,6 +8,7 @@ import nl.tno.storm.configuration.api.StormConfiguration;
 import nl.tno.storm.configuration.api.StormConfigurationException;
 import nl.tno.storm.configuration.impl.ZookeeperStormConfigurationFactory;
 import nl.tno.timeseries.batchers.EmptyBatcher;
+import nl.tno.timeseries.config.EmptyStormConfiguration;
 import nl.tno.timeseries.interfaces.BatchOperation;
 import nl.tno.timeseries.interfaces.Batcher;
 import nl.tno.timeseries.interfaces.ChannelGrouper;
@@ -35,8 +36,7 @@ public class ChannelBolt extends BaseRichBolt implements EmitParticleInterface {
 	private static final long serialVersionUID = -5109656134961759532L;
 
 	protected Logger logger = LoggerFactory.getLogger(ChannelBolt.class);
-	protected @SuppressWarnings("rawtypes")
-	Map stormConfig;
+	protected StormConfiguration stormConfiguration;
 	protected OutputCollector collector;
 	protected String boltName;
 	protected Class<? extends Operation> operationClass;
@@ -44,7 +44,6 @@ public class ChannelBolt extends BaseRichBolt implements EmitParticleInterface {
 	protected Class<? extends Batcher> batcherClass;
 	protected Map<String, ChannelManager> channelManagers;
 	protected Fields metaParticleFields;
-	protected StormConfiguration stormConfiguration;
 
 	/**
 	 * Construct a {@link ChannelBolt} with a {@link Batcher}
@@ -62,9 +61,9 @@ public class ChannelBolt extends BaseRichBolt implements EmitParticleInterface {
 		this.operationClass = batchOperationClass;
 		this.batcherClass = batcherClass;
 		this.channelManagers = new HashMap<String, ChannelManager>();
-		this.metaParticleFields = MetaParticleUtil.registerMetaParticleFieldsWithOperationClass(
-				config, operationClass);
-		setupConfig(config);
+		this.metaParticleFields = MetaParticleUtil
+				.registerMetaParticleFieldsWithOperationClass(config,
+						operationClass);
 	}
 
 	/**
@@ -81,32 +80,24 @@ public class ChannelBolt extends BaseRichBolt implements EmitParticleInterface {
 		this.operationClass = operationClass;
 		this.batcherClass = EmptyBatcher.class;
 		this.channelManagers = new HashMap<String, ChannelManager>();
-		this.metaParticleFields = MetaParticleUtil.registerMetaParticleFieldsWithOperationClass(
-				config, operationClass);
+		this.metaParticleFields = MetaParticleUtil
+				.registerMetaParticleFieldsWithOperationClass(config,
+						operationClass);
 	}
 
 	@Override
-	public void prepare(@SuppressWarnings("rawtypes") Map conf,
+	public void prepare(@SuppressWarnings("rawtypes") Map stormNativeConfig,
 			TopologyContext context, OutputCollector collector) {
-		this.stormConfig = conf;
 		this.collector = collector;
 		this.boltName = context.getThisComponentId();
-		setupConfig(conf);
-	}
-
-	private void setupConfig(@SuppressWarnings("rawtypes") Map config) {
-		String connectionString = (String) config
-				.get("config.zookeeper.connectionstring");
-		String topologyName = (String) config
-				.get("config.zookeeper.topologyname");
 
 		try {
 			stormConfiguration = ZookeeperStormConfigurationFactory
-					.getInstance().getStormConfiguration(topologyName,
-							connectionString);
+					.getInstance().getStormConfiguration(stormNativeConfig);
 		} catch (StormConfigurationException e) {
-			logger.error("Can not connect to zookeeper for configuration. Reason: "
+			logger.error("Can not connect to zookeeper for get Storm configuration. Reason: "
 					+ e.getMessage());
+			stormConfiguration = new EmptyStormConfiguration();
 		}
 	}
 

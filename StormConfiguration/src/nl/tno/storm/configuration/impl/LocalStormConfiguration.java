@@ -104,4 +104,25 @@ public class LocalStormConfiguration implements StormConfiguration {
 		
 	}
 
+	@Override
+	public Map<String, String> getFetcherConfiguration(String fetcherId)
+			throws StormConfigurationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void registerFetcherConfigurationListener(String fetcherId,
+			ConfigurationListener listener) throws StormConfigurationException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void unregisterFetcherConfigurationListener(String fetcherId,
+			ConfigurationListener listener) throws StormConfigurationException {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

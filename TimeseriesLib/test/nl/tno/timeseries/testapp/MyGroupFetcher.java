@@ -1,7 +1,6 @@
 package nl.tno.timeseries.testapp;
 
-import java.util.Map;
-
+import nl.tno.storm.configuration.api.StormConfiguration;
 import nl.tno.timeseries.annotation.FetcherDeclaration;
 import nl.tno.timeseries.interfaces.DataParticle;
 import nl.tno.timeseries.interfaces.Fetcher;
@@ -15,7 +14,7 @@ public class MyGroupFetcher implements Fetcher {
 	private int channelIndex = 0;
 
 	@Override
-	public void prepare(@SuppressWarnings("rawtypes") Map conf,
+	public void prepare(StormConfiguration stormConfiguration,
 			TopologyContext context) throws Exception {
 	}
 

@@ -50,5 +50,14 @@ public interface StormConfiguration {
 
 	public void unregisterOperationConfigurationListener(String operationId, ConfigurationListener listener)
 			throws StormConfigurationException;
+
 	
+	public Map<String, String> getFetcherConfiguration(String fetcherId) throws StormConfigurationException;
+
+	public void registerFetcherConfigurationListener(String fetcherId, ConfigurationListener listener)
+			throws StormConfigurationException;
+
+	public void unregisterFetcherConfigurationListener(String fetcherId, ConfigurationListener listener)
+			throws StormConfigurationException;
+
 }
