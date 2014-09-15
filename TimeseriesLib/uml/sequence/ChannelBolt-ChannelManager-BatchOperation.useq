@@ -11,9 +11,9 @@
       <position height="115" width="134" x="5" y="99"/>    
     </execution>  
   </object>  
-  <object id="10" language="java" name="nl.tno.timeseries.channels.ChannelBolt" project="TimeseriesLib" 
-    file="/TimeseriesLib/src/nl/tno/timeseries/channels/ChannelBolt.java" binary="false" label="channelBolt" 
-    type="class" autoSize="true">    
+  <object id="10" language="java" name="nl.tno.timeseries.channels.MultipleOperationChannelBolt" project="TimeseriesLib" 
+    file="/TimeseriesLib/src/nl/tno/timeseries/channels/MultipleOperationChannelBolt.java" binary="false" 
+    label="channelBolt" type="class" autoSize="true">    
     <position height="-1" width="-1" x="96" y="0"/>    
     <execution id="4">      
       <position height="388" width="116" x="143" y="245"/>    
@@ -100,11 +100,11 @@
     <end type="SOURCE" refId="12"/>    
     <end type="TARGET" refId="21"/>  
   </message>  
-  <message id="22" operation="init(java.lang.String,long,java.util.Map):void">    
+  <message id="22">    
     <end type="SOURCE" refId="17"/>    
     <end type="TARGET" refId="23"/>  
   </message>  
-  <message id="24" operation="init(java.lang.String,long,java.util.Map):void">    
+  <message id="24">    
     <end type="SOURCE" refId="17"/>    
     <end type="TARGET" refId="25"/>  
   </message>

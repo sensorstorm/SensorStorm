@@ -1,9 +1,10 @@
 package nl.tno.timeseries.testapp;
 
 import nl.tno.timeseries.batchers.NumberOfParticlesBatcher;
-import nl.tno.timeseries.channels.ChannelBolt;
 import nl.tno.timeseries.channels.ChannelGrouperBolt;
 import nl.tno.timeseries.channels.ChannelSpout;
+import nl.tno.timeseries.channels.MultipleOperationChannelBolt;
+import nl.tno.timeseries.channels.SingleOperationChannelBolt;
 import nl.tno.timeseries.timer.TimerChannelSpout;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
@@ -22,12 +23,13 @@ public class TestRunner {
 		config.put("config.zookeeper.connectionstring", "134.221.210.122:2181");
 		config.put("config.zookeeper.topologyname", "test");
 
-		// basicTopolgyTest(builder, config);
+		// multipleOperationTopolgyTest(builder, config);
 		// timerTopolgyTest(builder, config);
 		// batchTopolgyTest(builder, config);
 		// timedBatchTopolgyTest(builder, config);
 		// groupedTopolgyTest(builder, config);
-		basicConfigTopolgyTest(builder, config);
+		// basicConfigTopolgyTest(builder, config);
+		singleOperationTopolgyTest(builder, config);
 
 		localCluster.submitTopology(topologyName, config,
 				builder.createTopology());
@@ -49,10 +51,12 @@ public class TestRunner {
 
 	}
 
-	private void basicTopolgyTest(TopologyBuilder builder, Config config) {
-		System.out.println("Basic topology test");
+	private void multipleOperationTopolgyTest(TopologyBuilder builder,
+			Config config) {
+		System.out.println("Multiple operation topology test");
 		builder.setSpout("input", new ChannelSpout(config, new MyFetcher()));
-		builder.setBolt("src", new ChannelBolt(config, MyOperation.class), 1)
+		builder.setBolt("src",
+				new MultipleOperationChannelBolt(config, MyOperation.class), 1)
 				.shuffleGrouping("input");
 	}
 
@@ -60,7 +64,9 @@ public class TestRunner {
 		System.out.println("timer topology test");
 		builder.setSpout("input", new TimerChannelSpout(config,
 				new MyFetcher(), true, 1000L));
-		builder.setBolt("src", new ChannelBolt(config, MyTimedOperation.class),
+		builder.setBolt(
+				"src",
+				new MultipleOperationChannelBolt(config, MyTimedOperation.class),
 				1).shuffleGrouping("input");
 	}
 
@@ -69,8 +75,9 @@ public class TestRunner {
 		builder.setSpout("input", new ChannelSpout(config, new MyFetcher()));
 		builder.setBolt(
 				"src",
-				new ChannelBolt(config, NumberOfParticlesBatcher.class,
-						MyBatchOperation.class), 1).shuffleGrouping("input");
+				new MultipleOperationChannelBolt(config,
+						NumberOfParticlesBatcher.class, MyBatchOperation.class),
+				1).shuffleGrouping("input");
 	}
 
 	private void timedBatchTopolgyTest(TopologyBuilder builder, Config config) {
@@ -79,7 +86,8 @@ public class TestRunner {
 				new MyFetcher(), true, 1000L));
 		builder.setBolt(
 				"src",
-				new ChannelBolt(config, NumberOfParticlesBatcher.class,
+				new MultipleOperationChannelBolt(config,
+						NumberOfParticlesBatcher.class,
 						MyTimedBatchOperation.class), 1).shuffleGrouping(
 				"input");
 	}
@@ -91,7 +99,8 @@ public class TestRunner {
 		builder.setBolt("grouper",
 				new ChannelGrouperBolt(config, new MyChannelGrouper()), 1)
 				.shuffleGrouping("input");
-		builder.setBolt("src", new ChannelBolt(config, MyOperation.class), 1)
+		builder.setBolt("src",
+				new MultipleOperationChannelBolt(config, MyOperation.class), 1)
 				.shuffleGrouping("grouper");
 	}
 
@@ -100,8 +109,10 @@ public class TestRunner {
 		System.out.println("GracefullShutdown topology test");
 		builder.setSpout("input", new ChannelSpout(config,
 				new MyGracefullShutdownFetcher()));
-		builder.setBolt("src",
-				new ChannelBolt(config, MyGracefullShutdownOperation.class), 1)
+		builder.setBolt(
+				"src",
+				new MultipleOperationChannelBolt(config,
+						MyGracefullShutdownOperation.class), 1)
 				.shuffleGrouping("input");
 	}
 
@@ -109,8 +120,18 @@ public class TestRunner {
 		System.out.println("Basic config topology test");
 		builder.setSpout("input", new ChannelSpout(config,
 				new MyConfigFetcher()));
+		builder.setBolt(
+				"src",
+				new MultipleOperationChannelBolt(config,
+						MyConfigOperation.class), 1).shuffleGrouping("input");
+	}
+
+	private void singleOperationTopolgyTest(TopologyBuilder builder,
+			Config config) {
+		System.out.println("Single operation topology test");
+		builder.setSpout("input", new ChannelSpout(config, new MyFetcher()));
 		builder.setBolt("src",
-				new ChannelBolt(config, MyConfigOperation.class), 1)
+				new SingleOperationChannelBolt(config, MyOperation.class), 1)
 				.shuffleGrouping("input");
 	}
 

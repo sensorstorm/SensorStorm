@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sequence-diagram version="1.1.5" icons="true" automaticImage="PNG">  
-  <object id="1" language="java" name="nl.tno.timeseries.channels.ChannelBolt" project="TimeseriesLib" 
-    file="/TimeseriesLib/src/nl/tno/timeseries/channels/ChannelBolt.java" binary="false" label="channelBolt" 
-    type="class" autoSize="true">    
+  <object id="1" language="java" name="nl.tno.timeseries.channels.MultipleOperationChannelBolt" project="TimeseriesLib" 
+    file="/TimeseriesLib/src/nl/tno/timeseries/channels/MultipleOperationChannelBolt.java" binary="false" 
+    label="channelBolt" type="class" autoSize="true">    
     <position height="-1" width="-1" x="96" y="0"/>    
     <execution id="2">      
       <position height="283" width="116" x="143" y="109"/>    
@@ -37,7 +37,8 @@
     <end type="SOURCE" refId="2"/>    
     <end type="TARGET" refId="4"/>  
   </message>  
-  <message id="5" operation="handleMetaParticle(nl.tno.timeseries.interfaces.MetaParticle):void">    
+  <message id="5" 
+    operation="handleMetaParticle(nl.tno.timeseries.interfaces.MetaParticle):java.util.List&lt;Particle&gt;">    
     <end type="SOURCE" refId="2"/>    
     <end type="TARGET" refId="6"/>  
   </message>  
@@ -45,8 +46,7 @@
     <end type="SOURCE" refId="4"/>    
     <end type="TARGET" refId="10"/>  
   </message>  
-  <message id="11" 
-    operation="init(nl.tno.timeseries.interfaces.Operation,nl.tno.timeseries.particles.EmitParticleInterface):void">    
+  <message id="11">    
     <end type="SOURCE" refId="10"/>    
     <end type="TARGET" refId="12"/>  
   </message>  
