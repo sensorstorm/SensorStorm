@@ -131,7 +131,7 @@ public class TestRunner {
 		System.out.println("Single operation topology test");
 		builder.setSpout("input", new ChannelSpout(config, new MyFetcher()));
 		builder.setBolt("src",
-				new SingleOperationChannelBolt(config, MyOperation.class), 1)
+				new SingleOperationChannelBolt(config, new MyOperation()), 1)
 				.shuffleGrouping("input");
 	}
 

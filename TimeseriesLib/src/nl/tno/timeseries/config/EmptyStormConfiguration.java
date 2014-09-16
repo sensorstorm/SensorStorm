@@ -133,4 +133,15 @@ public class EmptyStormConfiguration implements StormConfiguration {
 		logger.error("No connection made to zookeeper, can not unregister the configuration for fetcher.");
 	}
 
+	@Override
+	public void setNativeStormConfig(
+			@SuppressWarnings("rawtypes") Map nativeStormConfig) {
+	}
+
+	@SuppressWarnings("rawtypes")
+	@Override
+	public Map getNativeStormConfig() {
+		return null;
+	}
+
 }

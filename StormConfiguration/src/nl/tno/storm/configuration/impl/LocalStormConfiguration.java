@@ -125,4 +125,18 @@ public class LocalStormConfiguration implements StormConfiguration {
 		
 	}
 
+	@SuppressWarnings("rawtypes")
+	@Override
+	public void setNativeStormConfig(Map nativeStormConfig) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@SuppressWarnings("rawtypes")
+	@Override
+	public Map getNativeStormConfig() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

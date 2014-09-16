@@ -16,12 +16,14 @@ public class ZookeeperStormConfiguration implements StormConfiguration {
 	private final String topologyId;
 	private final Map<String, WatcherHelper> watchers = new HashMap<String, WatcherHelper>();
 	final CuratorFramework zkClient;
+	@SuppressWarnings("rawtypes")
+	private Map nativeSConfig = null;
 
 	public ZookeeperStormConfiguration(String topologyId, CuratorFramework zkClient) {
 		this.topologyId = topologyId;
 		this.zkClient = zkClient;
 	}
-
+	
 	@Override
 	public Map<String, String> getStreamConfiguration(String streamId) throws StormConfigurationException {
 		try {
@@ -246,6 +248,17 @@ public class ZookeeperStormConfiguration implements StormConfiguration {
 		} catch (Exception e) {
 			throw new StormConfigurationException(e);
 		}
+	}
+
+	@Override
+	public void setNativeStormConfig(@SuppressWarnings("rawtypes") Map nativeStormConfig) {
+		this.nativeSConfig = nativeStormConfig;
+	}
+
+	@SuppressWarnings("rawtypes")
+	@Override
+	public Map getNativeStormConfig() {
+		return this.nativeSConfig;
 	}
 
 }

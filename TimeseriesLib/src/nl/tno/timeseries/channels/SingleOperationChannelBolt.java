@@ -45,11 +45,9 @@ public class SingleOperationChannelBolt extends BaseRichBolt implements
 	protected StormConfiguration stormConfiguration;
 	protected OutputCollector collector;
 	protected String boltName;
-	protected Class<? extends Operation> operationClass;
 	protected int nrOfOutputFields;
-	protected Class<? extends Batcher> batcherClass;
 	protected Fields metaParticleFields;
-	private Operation operation;
+	private final Operation operation;
 	private Batcher batcher;
 	private List<MetaParticleHandler> metaParticleHandlers;
 
@@ -63,15 +61,14 @@ public class SingleOperationChannelBolt extends BaseRichBolt implements
 	 * @param batchOperationClass
 	 *            {@link Class} of the {@link BatchOperation} implementation
 	 */
-	public SingleOperationChannelBolt(Config config,
-			Class<? extends Batcher> batcherClass,
-			Class<? extends BatchOperation> batchOperationClass) {
+	public SingleOperationChannelBolt(Config config, Batcher batcher,
+			BatchOperation batchOperation) {
 		// Set fields
-		this.operationClass = batchOperationClass;
-		this.batcherClass = batcherClass;
+		this.operation = batchOperation;
+		this.batcher = batcher;
 		this.metaParticleFields = MetaParticleUtil
 				.registerMetaParticleFieldsWithOperationClass(config,
-						operationClass);
+						batchOperation.getClass());
 	}
 
 	/**
@@ -82,14 +79,12 @@ public class SingleOperationChannelBolt extends BaseRichBolt implements
 	 * @param operationClass
 	 *            {@link Class} of the {@link Operation} implementation
 	 */
-	public SingleOperationChannelBolt(Config config,
-			Class<? extends SingleOperation> operationClass) {
+	public SingleOperationChannelBolt(Config config, SingleOperation operation) {
 		// Set fields
-		this.operationClass = operationClass;
-		this.batcherClass = null;
+		this.operation = operation;
 		this.metaParticleFields = MetaParticleUtil
 				.registerMetaParticleFieldsWithOperationClass(config,
-						operationClass);
+						operation.getClass());
 	}
 
 	@Override
@@ -107,13 +102,21 @@ public class SingleOperationChannelBolt extends BaseRichBolt implements
 			stormConfiguration = new EmptyStormConfiguration();
 		}
 
-		// create operation
 		try {
-			createOperation();
+			if (batcher != null) {
+				batcher.init(EMPTY_CHANNELID, EMPTY_STARTTIMESTAMP,
+						stormConfiguration);
+			}
+			if (operation != null) {
+				operation.init(EMPTY_CHANNELID, EMPTY_STARTTIMESTAMP,
+						stormConfiguration);
+				createMetaParticleHandlers(operation);
+			}
 		} catch (InstantiationException | IllegalAccessException e) {
-			logger.error("can not create the operation ("
-					+ operationClass.getName() + ") msg=" + e);
+			logger.error("Unable to instantiate batcher and/or operation due to: "
+					+ e.getMessage());
 		}
+
 	}
 
 	@Override
@@ -183,43 +186,6 @@ public class SingleOperationChannelBolt extends BaseRichBolt implements
 		}
 
 		return result;
-	}
-
-	/**
-	 * Create an operation with Batcher and metaParticleHandlers
-	 * 
-	 * @param firstParticle
-	 * @throws InstantiationException
-	 * @throws IllegalAccessException
-	 */
-	private void createOperation() throws InstantiationException,
-			IllegalAccessException {
-		// create optional batcher
-		if (batcherClass != null) {
-			batcher = batcherClass.newInstance();
-			batcher.init(EMPTY_CHANNELID, EMPTY_STARTTIMESTAMP,
-					stormConfiguration);
-		}
-
-		// create new operation and initialize it
-		operation = operationClass.newInstance();
-		// is it a BatchOperation?
-		if (BatchOperation.class.isInstance(operation)) {
-			((BatchOperation) operation).init(EMPTY_CHANNELID,
-					EMPTY_STARTTIMESTAMP, stormConfiguration);
-		} // or is it a SingleOperation?
-		else if (SingleOperation.class.isInstance(operation)) {
-			operation.init(EMPTY_CHANNELID, EMPTY_STARTTIMESTAMP,
-					stormConfiguration);
-		} // unknown operation type
-		else {
-			logger.error("OperationClass of unknown type "
-					+ operationClass.getName() + ", expected: "
-					+ SingleOperation.class.getName() + " or "
-					+ BatchOperation.class.getName());
-		}
-
-		createMetaParticleHandlers(operation);
 	}
 
 	/**
@@ -330,7 +296,7 @@ public class SingleOperationChannelBolt extends BaseRichBolt implements
 		// merge all output particle fields for DataParticles
 		Fields fields = null;
 		List<Class<? extends DataParticle>> outputParticles = ChannelManager
-				.getOutputDataParticles(operationClass);
+				.getOutputDataParticles(operation.getClass());
 		for (Class<? extends DataParticle> outputParticleClass : outputParticles) {
 			if (fields == null) {
 				fields = ParticleMapper.getFields(outputParticleClass);

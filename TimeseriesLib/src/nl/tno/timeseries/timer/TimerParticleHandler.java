@@ -137,10 +137,10 @@ class RecurringTask {
 	public TimerTaskInterface recurringTimerTaskHandler;
 
 	public RecurringTask(long recurringTimerFreq, long lastRecurringTimestamp,
-			TimerTaskInterface recurringTimerTaskÌnterface) {
+			TimerTaskInterface recurringTimerTaskInterface) {
 		this.timerFreq = recurringTimerFreq;
 		this.lastTimestamp = lastRecurringTimestamp;
-		this.recurringTimerTaskHandler = recurringTimerTaskÌnterface;
+		this.recurringTimerTaskHandler = recurringTimerTaskInterface;
 	}
 }
 
@@ -149,8 +149,8 @@ class SingleTask {
 	public TimerTaskInterface singleTimerTaskHandler;
 
 	public SingleTask(long sleepTimeSingleWakeup,
-			TimerTaskInterface singleTimerTaskÌnterface) {
+			TimerTaskInterface recurringTimerTaskInterface) {
 		this.wakeupTime = sleepTimeSingleWakeup;
-		this.singleTimerTaskHandler = singleTimerTaskÌnterface;
+		this.singleTimerTaskHandler = recurringTimerTaskInterface;
 	}
 }

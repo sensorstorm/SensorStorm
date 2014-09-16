@@ -56,9 +56,11 @@ public class ZookeeperStormConfigurationFactory implements StormConfigurationFac
 				.get(CONNECTING_STRING);
 		String topologyName = (String) stormNativeConfig.get(TOPOLOGY_NAME);
 
-		return ZookeeperStormConfigurationFactory
+		StormConfiguration stormConfig =  ZookeeperStormConfigurationFactory
 				.getInstance().getStormConfiguration(topologyName,
 						connectionString);
+		stormConfig.setNativeStormConfig(stormNativeConfig);
+		return stormConfig;
 
 	}
 

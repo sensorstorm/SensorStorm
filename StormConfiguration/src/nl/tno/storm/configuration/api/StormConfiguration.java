@@ -59,5 +59,11 @@ public interface StormConfiguration {
 
 	public void unregisterFetcherConfigurationListener(String fetcherId, ConfigurationListener listener)
 			throws StormConfigurationException;
+	
+	@SuppressWarnings("rawtypes")
+	public void setNativeStormConfig(Map nativeStormConfig);
+	
+	@SuppressWarnings("rawtypes")
+	public Map getNativeStormConfig();
 
 }
