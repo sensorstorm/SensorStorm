@@ -2,7 +2,7 @@ package nl.tno.timeseries.config;
 
 import java.util.Map;
 
-import nl.tno.storm.configuration.api.StormConfiguration;
+import nl.tno.storm.configuration.api.ZookeeperStormConfigurationAPI;
 import nl.tno.storm.configuration.api.StormConfigurationException;
 
 import org.slf4j.Logger;
@@ -12,7 +12,7 @@ public class OperationConfigManager extends ConfigManager {
 	private final Logger logger = LoggerFactory
 			.getLogger(OperationConfigManager.class);
 
-	private final StormConfiguration stormConfiguration;
+	private final ZookeeperStormConfigurationAPI stormConfiguration;
 	private final String operationName;
 
 	/**
@@ -24,7 +24,7 @@ public class OperationConfigManager extends ConfigManager {
 	 * @param stormConfiguration
 	 * @param operationName
 	 */
-	public OperationConfigManager(StormConfiguration stormConfiguration,
+	public OperationConfigManager(ZookeeperStormConfigurationAPI stormConfiguration,
 			String operationName) {
 		this.stormConfiguration = stormConfiguration;
 		this.operationName = operationName;

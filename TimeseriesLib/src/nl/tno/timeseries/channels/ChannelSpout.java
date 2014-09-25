@@ -3,8 +3,8 @@ package nl.tno.timeseries.channels;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import nl.tno.storm.configuration.api.StormConfiguration;
 import nl.tno.storm.configuration.api.StormConfigurationException;
+import nl.tno.storm.configuration.api.ZookeeperStormConfigurationAPI;
 import nl.tno.storm.configuration.impl.ZookeeperStormConfigurationFactory;
 import nl.tno.timeseries.annotation.FetcherDeclaration;
 import nl.tno.timeseries.config.EmptyStormConfiguration;
@@ -36,7 +36,7 @@ public class ChannelSpout implements IRichSpout {
 
 	protected Logger logger = LoggerFactory.getLogger(ChannelSpout.class);
 	protected Cache<Object, Object> tupleCache;
-	protected StormConfiguration stormConfiguration;
+	protected ZookeeperStormConfigurationAPI zookeeperStormConfiguration;
 	protected SpoutOutputCollector collector;
 	protected Fetcher fetcher;
 	protected int nrOfOutputFields;
@@ -59,16 +59,17 @@ public class ChannelSpout implements IRichSpout {
 		this.collector = collector;
 
 		try {
-			stormConfiguration = ZookeeperStormConfigurationFactory
+			zookeeperStormConfiguration = ZookeeperStormConfigurationFactory
 					.getInstance().getStormConfiguration(stormNativeConfig);
 		} catch (StormConfigurationException e) {
 			logger.error("Can not connect to zookeeper for get Storm configuration. Reason: "
 					+ e.getMessage());
-			stormConfiguration = new EmptyStormConfiguration();
+			zookeeperStormConfiguration = new EmptyStormConfiguration();
 		}
 
 		try {
-			fetcher.prepare(stormConfiguration, context);
+			fetcher.prepare(stormNativeConfig, zookeeperStormConfiguration,
+					context);
 		} catch (Exception e) {
 			logger.warn("Unable to configure channelSpout "
 					+ this.getClass().getName() + " due to ", e);

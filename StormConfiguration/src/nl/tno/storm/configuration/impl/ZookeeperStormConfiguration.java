@@ -4,12 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import nl.tno.storm.configuration.api.ConfigurationListener;
-import nl.tno.storm.configuration.api.StormConfiguration;
+import nl.tno.storm.configuration.api.ZookeeperStormConfigurationAPI;
 import nl.tno.storm.configuration.api.StormConfigurationException;
 
 import org.apache.curator.framework.CuratorFramework;
 
-public class ZookeeperStormConfiguration implements StormConfiguration {
+public class ZookeeperStormConfiguration implements ZookeeperStormConfigurationAPI {
 
 	public static final String PREFIX = "/topologies";
 

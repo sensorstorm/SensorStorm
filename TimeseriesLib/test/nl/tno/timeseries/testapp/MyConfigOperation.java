@@ -1,10 +1,11 @@
 package nl.tno.timeseries.testapp;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
-import nl.tno.storm.configuration.api.StormConfiguration;
 import nl.tno.storm.configuration.api.StormConfigurationException;
+import nl.tno.storm.configuration.api.ZookeeperStormConfigurationAPI;
 import nl.tno.timeseries.annotation.OperationDeclaration;
 import nl.tno.timeseries.config.OperationConfigManager;
 import nl.tno.timeseries.interfaces.DataParticle;
@@ -23,7 +24,8 @@ public class MyConfigOperation implements SingleOperation {
 
 	@Override
 	public void init(String channelID, long startTimestamp,
-			StormConfiguration stormConfiguration) {
+			@SuppressWarnings("rawtypes") Map stormNativeConfig,
+			ZookeeperStormConfigurationAPI stormConfiguration) {
 		this.channelId = channelID;
 		System.out.println("init myConfigOperation for channel " + channelID
 				+ " at " + startTimestamp);

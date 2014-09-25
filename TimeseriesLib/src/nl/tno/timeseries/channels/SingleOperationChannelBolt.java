@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import nl.tno.storm.configuration.api.StormConfiguration;
 import nl.tno.storm.configuration.api.StormConfigurationException;
+import nl.tno.storm.configuration.api.ZookeeperStormConfigurationAPI;
 import nl.tno.storm.configuration.impl.ZookeeperStormConfigurationFactory;
 import nl.tno.timeseries.annotation.MetaParticleHandlerDecleration;
 import nl.tno.timeseries.annotation.OperationDeclaration;
@@ -42,7 +42,7 @@ public class SingleOperationChannelBolt extends BaseRichBolt implements
 
 	protected Logger logger = LoggerFactory
 			.getLogger(SingleOperationChannelBolt.class);
-	protected StormConfiguration stormConfiguration;
+	protected ZookeeperStormConfigurationAPI zookeeperStormConfiguration;
 	protected OutputCollector collector;
 	protected String boltName;
 	protected int nrOfOutputFields;
@@ -94,22 +94,22 @@ public class SingleOperationChannelBolt extends BaseRichBolt implements
 		this.boltName = context.getThisComponentId();
 
 		try {
-			stormConfiguration = ZookeeperStormConfigurationFactory
+			zookeeperStormConfiguration = ZookeeperStormConfigurationFactory
 					.getInstance().getStormConfiguration(stormNativeConfig);
 		} catch (StormConfigurationException e) {
 			logger.error("Can not connect to zookeeper for get Storm configuration. Reason: "
 					+ e.getMessage());
-			stormConfiguration = new EmptyStormConfiguration();
+			zookeeperStormConfiguration = new EmptyStormConfiguration();
 		}
 
 		try {
 			if (batcher != null) {
 				batcher.init(EMPTY_CHANNELID, EMPTY_STARTTIMESTAMP,
-						stormConfiguration);
+						stormNativeConfig, zookeeperStormConfiguration);
 			}
 			if (operation != null) {
 				operation.init(EMPTY_CHANNELID, EMPTY_STARTTIMESTAMP,
-						stormConfiguration);
+						stormNativeConfig, zookeeperStormConfiguration);
 				createMetaParticleHandlers(operation);
 			}
 		} catch (InstantiationException | IllegalAccessException e) {

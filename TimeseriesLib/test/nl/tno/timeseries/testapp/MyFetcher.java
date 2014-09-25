@@ -1,6 +1,8 @@
 package nl.tno.timeseries.testapp;
 
-import nl.tno.storm.configuration.api.StormConfiguration;
+import java.util.Map;
+
+import nl.tno.storm.configuration.api.ZookeeperStormConfigurationAPI;
 import nl.tno.timeseries.annotation.FetcherDeclaration;
 import nl.tno.timeseries.interfaces.DataParticle;
 import nl.tno.timeseries.interfaces.Fetcher;
@@ -12,7 +14,8 @@ public class MyFetcher implements Fetcher {
 	long time = 0;
 
 	@Override
-	public void prepare(StormConfiguration stormConfiguration,
+	public void prepare(@SuppressWarnings("rawtypes") Map stormNativeConfig,
+			ZookeeperStormConfigurationAPI stormConfiguration,
 			TopologyContext context) throws Exception {
 	}
 

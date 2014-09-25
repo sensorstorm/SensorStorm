@@ -1,8 +1,9 @@
 package nl.tno.timeseries.interfaces;
 
 import java.io.Serializable;
+import java.util.Map;
 
-import nl.tno.storm.configuration.api.StormConfiguration;
+import nl.tno.storm.configuration.api.ZookeeperStormConfigurationAPI;
 
 /**
  * An operation performs the processing of particles in a channel. This is the
@@ -30,10 +31,13 @@ public abstract interface Operation extends Serializable {
 	 * @param startTimestamp
 	 *            The timestamp of the first particle, this is the first
 	 *            particle this operation instance have to process
-	 * @param stormConfig
+	 * @param stormNativeConfig
 	 *            A reference to the storm config object
+	 * @param zookeeperStormConfiguration
+	 *            A reference to the zookeeper storm config api
 	 */
 	public void init(String channelID, long startTimestamp,
-			StormConfiguration stormConfiguration);
+			@SuppressWarnings("rawtypes") Map stormNativeConfig,
+			ZookeeperStormConfigurationAPI zookeeperStormConfiguration);
 
 }

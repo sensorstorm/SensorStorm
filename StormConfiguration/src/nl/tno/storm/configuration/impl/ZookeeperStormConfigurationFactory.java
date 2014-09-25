@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.tno.storm.configuration.api.StormConfiguration;
+import nl.tno.storm.configuration.api.ZookeeperStormConfigurationAPI;
 import nl.tno.storm.configuration.api.StormConfigurationException;
 import nl.tno.storm.configuration.api.StormConfigurationFactory;
 
@@ -30,10 +30,10 @@ public class ZookeeperStormConfigurationFactory implements StormConfigurationFac
 	}
 
 	private CuratorFramework zkClient;
-	private final Map<String, StormConfiguration> stormConfigurations = new HashMap<String, StormConfiguration>();
+	private final Map<String, ZookeeperStormConfigurationAPI> stormConfigurations = new HashMap<String, ZookeeperStormConfigurationAPI>();
 
 	@Override
-	public synchronized StormConfiguration getStormConfiguration(String topologyId, String connectionString)
+	public synchronized ZookeeperStormConfigurationAPI getStormConfiguration(String topologyId, String connectionString)
 			throws StormConfigurationException {
 		try {
 			if (zkClient == null) {
@@ -50,13 +50,13 @@ public class ZookeeperStormConfigurationFactory implements StormConfigurationFac
 	}
 
 	@Override
-	public synchronized StormConfiguration getStormConfiguration(@SuppressWarnings("rawtypes") Map stormNativeConfig)
+	public synchronized ZookeeperStormConfigurationAPI getStormConfiguration(@SuppressWarnings("rawtypes") Map stormNativeConfig)
 			throws StormConfigurationException {
 		String connectionString = (String) stormNativeConfig
 				.get(CONNECTING_STRING);
 		String topologyName = (String) stormNativeConfig.get(TOPOLOGY_NAME);
 
-		StormConfiguration stormConfig =  ZookeeperStormConfigurationFactory
+		ZookeeperStormConfigurationAPI stormConfig =  ZookeeperStormConfigurationFactory
 				.getInstance().getStormConfiguration(topologyName,
 						connectionString);
 		stormConfig.setNativeStormConfig(stormNativeConfig);

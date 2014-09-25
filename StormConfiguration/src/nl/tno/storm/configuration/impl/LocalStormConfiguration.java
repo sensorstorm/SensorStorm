@@ -3,10 +3,10 @@ package nl.tno.storm.configuration.impl;
 import java.util.Map;
 
 import nl.tno.storm.configuration.api.ConfigurationListener;
-import nl.tno.storm.configuration.api.StormConfiguration;
+import nl.tno.storm.configuration.api.ZookeeperStormConfigurationAPI;
 import nl.tno.storm.configuration.api.StormConfigurationException;
 
-public class LocalStormConfiguration implements StormConfiguration {
+public class LocalStormConfiguration implements ZookeeperStormConfigurationAPI {
 
 	@Override
 	public Map<String, String> getTopologyConfiguration() throws StormConfigurationException {

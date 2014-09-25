@@ -1,8 +1,9 @@
 package nl.tno.timeseries.interfaces;
 
 import java.io.Serializable;
+import java.util.Map;
 
-import nl.tno.storm.configuration.api.StormConfiguration;
+import nl.tno.storm.configuration.api.ZookeeperStormConfigurationAPI;
 import backtype.storm.task.TopologyContext;
 
 /**
@@ -23,7 +24,8 @@ public interface Fetcher extends Serializable {
 	 * @param context
 	 * @throws Exception
 	 */
-	public void prepare(StormConfiguration stormConfiguration,
+	public void prepare(@SuppressWarnings("rawtypes") Map stormNativeConfig,
+			ZookeeperStormConfigurationAPI stormConfiguration,
 			TopologyContext context) throws Exception;
 
 	/**

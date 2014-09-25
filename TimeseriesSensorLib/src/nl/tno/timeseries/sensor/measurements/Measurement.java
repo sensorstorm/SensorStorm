@@ -4,7 +4,7 @@ import nl.tno.timeseries.interfaces.DataParticle;
 import nl.tno.timeseries.mapper.annotation.TupleField;
 import nl.tno.timeseries.particles.AbstractParticle;
 
-public class Measurement<T> extends AbstractParticle implements DataParticle {
+public class Measurement<T> extends AbstractParticle implements DataParticle, Comparable<Measurement<?>> {
 
 	@TupleField
 	T value;
@@ -17,7 +17,12 @@ public class Measurement<T> extends AbstractParticle implements DataParticle {
 		setTimestamp(timestamp);
 		this.value = value;
 	}
-	
+
+	@Override
+	public int compareTo(Measurement<?> o) {
+		return Long.signum(timestamp - o.timestamp);
+	}
+
 	public T getValue() {
 		return value;
 	}

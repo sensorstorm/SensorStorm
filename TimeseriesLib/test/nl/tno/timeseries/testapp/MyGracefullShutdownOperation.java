@@ -1,8 +1,9 @@
 package nl.tno.timeseries.testapp;
 
 import java.util.List;
+import java.util.Map;
 
-import nl.tno.storm.configuration.api.StormConfiguration;
+import nl.tno.storm.configuration.api.ZookeeperStormConfigurationAPI;
 import nl.tno.timeseries.annotation.OperationDeclaration;
 import nl.tno.timeseries.gracefullshutdown.GracefulShutdownParticleHandler;
 import nl.tno.timeseries.gracefullshutdown.GracefullShutdownInterface;
@@ -19,7 +20,8 @@ public class MyGracefullShutdownOperation implements SingleOperation,
 
 	@Override
 	public void init(String channelID, long startTimestamp,
-			StormConfiguration stormConfiguration) {
+			@SuppressWarnings("rawtypes") Map stormNativeConfig,
+			ZookeeperStormConfigurationAPI stormConfiguration) {
 		this.channelId = channelID;
 		System.out.println("init myTimedBatchOperation at " + startTimestamp);
 	}

@@ -17,7 +17,7 @@ public interface StormConfigurationFactory extends Closeable {
 	 * @throws StormConfigurationException
 	 *             Probably something is wrong with Zookeeper
 	 */
-	public StormConfiguration getStormConfiguration(String topologyId, String connectionString)
+	public ZookeeperStormConfigurationAPI getStormConfiguration(String topologyId, String connectionString)
 			throws StormConfigurationException;
 
 	/**
@@ -33,7 +33,7 @@ public interface StormConfigurationFactory extends Closeable {
 	 * @throws StormConfigurationException
 	 *             Probably something is wrong with Zookeeper
 	 */
-	public StormConfiguration getStormConfiguration(@SuppressWarnings("rawtypes") Map config)
+	public ZookeeperStormConfigurationAPI getStormConfiguration(@SuppressWarnings("rawtypes") Map config)
 			throws StormConfigurationException;
 
 }

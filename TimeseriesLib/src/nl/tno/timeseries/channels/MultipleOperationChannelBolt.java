@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import nl.tno.storm.configuration.api.StormConfiguration;
 import nl.tno.storm.configuration.api.StormConfigurationException;
+import nl.tno.storm.configuration.api.ZookeeperStormConfigurationAPI;
 import nl.tno.storm.configuration.impl.ZookeeperStormConfigurationFactory;
 import nl.tno.timeseries.batchers.EmptyBatcher;
 import nl.tno.timeseries.config.EmptyStormConfiguration;
@@ -31,12 +31,16 @@ import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
-public class MultipleOperationChannelBolt extends BaseRichBolt implements EmitParticleInterface {
+public class MultipleOperationChannelBolt extends BaseRichBolt implements
+		EmitParticleInterface {
 
 	private static final long serialVersionUID = -5109656134961759532L;
 
-	protected Logger logger = LoggerFactory.getLogger(MultipleOperationChannelBolt.class);
-	protected StormConfiguration stormConfiguration;
+	protected Logger logger = LoggerFactory
+			.getLogger(MultipleOperationChannelBolt.class);
+	protected ZookeeperStormConfigurationAPI zookeeperStormConfiguration;
+	protected @SuppressWarnings("rawtypes")
+	Map stormNativeConfig;
 	protected OutputCollector collector;
 	protected String boltName;
 	protected Class<? extends Operation> operationClass;
@@ -55,7 +59,8 @@ public class MultipleOperationChannelBolt extends BaseRichBolt implements EmitPa
 	 * @param batchOperationClass
 	 *            {@link Class} of the {@link BatchOperation} implementation
 	 */
-	public MultipleOperationChannelBolt(Config config, Class<? extends Batcher> batcherClass,
+	public MultipleOperationChannelBolt(Config config,
+			Class<? extends Batcher> batcherClass,
 			Class<? extends BatchOperation> batchOperationClass) {
 		// Set fields
 		this.operationClass = batchOperationClass;
@@ -67,7 +72,8 @@ public class MultipleOperationChannelBolt extends BaseRichBolt implements EmitPa
 	}
 
 	/**
-	 * Construct a {@link MultipleOperationChannelBolt} without a {@link Batcher}
+	 * Construct a {@link MultipleOperationChannelBolt} without a
+	 * {@link Batcher}
 	 * 
 	 * @param conf
 	 *            Storm configuration map
@@ -90,14 +96,15 @@ public class MultipleOperationChannelBolt extends BaseRichBolt implements EmitPa
 			TopologyContext context, OutputCollector collector) {
 		this.collector = collector;
 		this.boltName = context.getThisComponentId();
+		this.stormNativeConfig = stormNativeConfig;
 
 		try {
-			stormConfiguration = ZookeeperStormConfigurationFactory
+			zookeeperStormConfiguration = ZookeeperStormConfigurationFactory
 					.getInstance().getStormConfiguration(stormNativeConfig);
 		} catch (StormConfigurationException e) {
 			logger.error("Can not connect to zookeeper for get Storm configuration. Reason: "
 					+ e.getMessage());
-			stormConfiguration = new EmptyStormConfiguration();
+			zookeeperStormConfiguration = new EmptyStormConfiguration();
 		}
 	}
 
@@ -137,11 +144,11 @@ public class MultipleOperationChannelBolt extends BaseRichBolt implements EmitPa
 			if (SingleOperation.class.isAssignableFrom(operationClass)) {
 				channelManager = new ChannelManager(channelId,
 						(Class<? extends SingleOperation>) operationClass,
-						stormConfiguration);
+						stormNativeConfig, zookeeperStormConfiguration);
 			} else if (BatchOperation.class.isAssignableFrom(operationClass)) {
 				channelManager = new ChannelManager(channelId, batcherClass,
 						(Class<? extends BatchOperation>) operationClass,
-						stormConfiguration);
+						stormNativeConfig, zookeeperStormConfiguration);
 			} else {
 				logger.error("Unknown operation " + operationClass.getName());
 			}

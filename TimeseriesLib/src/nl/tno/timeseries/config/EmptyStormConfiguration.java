@@ -4,13 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import nl.tno.storm.configuration.api.ConfigurationListener;
-import nl.tno.storm.configuration.api.StormConfiguration;
+import nl.tno.storm.configuration.api.ZookeeperStormConfigurationAPI;
 import nl.tno.storm.configuration.api.StormConfigurationException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class EmptyStormConfiguration implements StormConfiguration {
+public class EmptyStormConfiguration implements ZookeeperStormConfigurationAPI {
 	private final Logger logger = LoggerFactory
 			.getLogger(EmptyStormConfiguration.class);
 
