@@ -31,8 +31,8 @@ public class ChannelSpout implements IRichSpout {
 
 	private static final long serialVersionUID = -3199538353837853899L;
 
-	public static final String SPOUT_TUPLECACHE_TIMEOUT_SEC = "spout.tuplecache.timeout";
-	public static final String SPOUT_TUPLECACHE_MAX_SIZE = "spout.tuplecache.maxsize";
+	public static final String TOPOLOGY_TUPLECACHE_MAX_SIZE = "spout.tuplecache.maxsize";
+	public static final String TOPOLOGY_FAULT_TOLERANT = "topology.fault-tolerant";
 
 	protected Logger logger = LoggerFactory.getLogger(ChannelSpout.class);
 	protected Cache<Object, Object> tupleCache;
@@ -40,6 +40,8 @@ public class ChannelSpout implements IRichSpout {
 	protected SpoutOutputCollector collector;
 	protected Fetcher fetcher;
 	protected int nrOfOutputFields;
+	protected boolean replay = false;
+	protected boolean anchor = false;
 
 	/**
 	 * Construct ChannelSpout. Subclasses are responsible for adding
@@ -75,14 +77,25 @@ public class ChannelSpout implements IRichSpout {
 					+ this.getClass().getName() + " due to ", e);
 		}
 
+		replay = stormNativeConfig
+				.containsKey(ChannelSpout.TOPOLOGY_FAULT_TOLERANT)
+				&& (boolean) stormNativeConfig
+						.get(ChannelSpout.TOPOLOGY_FAULT_TOLERANT);
+		anchor = stormNativeConfig.get(Config.TOPOLOGY_MAX_SPOUT_PENDING) != null
+				&& (long) stormNativeConfig
+						.get(Config.TOPOLOGY_MAX_SPOUT_PENDING) > 0;
+
 		// initiate tuple cache if timeout is set
-		if (stormNativeConfig.containsKey(SPOUT_TUPLECACHE_TIMEOUT_SEC)) {
+		if (replay) {
 			long timeout = ((Long) stormNativeConfig
-					.get(SPOUT_TUPLECACHE_TIMEOUT_SEC)).intValue();
+					.get(Config.TOPOLOGY_MESSAGE_TIMEOUT_SECS)).intValue();
 			int maxSize = ((Long) stormNativeConfig
-					.get(SPOUT_TUPLECACHE_MAX_SIZE)).intValue();
+					.get(TOPOLOGY_TUPLECACHE_MAX_SIZE)).intValue();
 			tupleCache = CacheBuilder.newBuilder().maximumSize(maxSize)
 					.expireAfterAccess(timeout, TimeUnit.SECONDS).build();
+
+			logger.info("Spout replay enabled with timeout = " + timeout
+					+ " sec, and maxSize = " + maxSize);
 		}
 	}
 
@@ -100,7 +113,6 @@ public class ChannelSpout implements IRichSpout {
 						ParticleMapper.getFields(outputParticleClass));
 			}
 		}
-
 		return fields;
 	}
 
@@ -115,18 +127,26 @@ public class ChannelSpout implements IRichSpout {
 	public void nextTuple() {
 		DataParticle particle = fetcher.fetchParticle();
 		if (particle != null) {
-			if (tupleCache != null) { // put particle in cache
-				String msgId = particle.getChannelId() + "_"
-						+ particle.getTimestamp();
+			String msgId = particle.getChannelId() + "_"
+					+ particle.getTimestamp();
+			if (tupleCache != null) {
 				tupleCache.put(msgId, particle);
 			}
-			emitParticle(particle);
+			if (anchor || replay)
+				emitParticle(msgId, particle);
+			else
+				emitParticle(null, particle);
 		}
 	}
 
-	protected void emitParticle(Particle particle) {
-		collector.emit(ParticleMapper.particleToValues(particle,
-				nrOfOutputFields));
+	protected void emitParticle(Object id, Particle particle) {
+		if (id != null)
+			collector
+					.emit(ParticleMapper.particleToValues(particle,
+							nrOfOutputFields), id);
+		else
+			collector.emit(ParticleMapper.particleToValues(particle,
+					nrOfOutputFields));
 	}
 
 	@Override
@@ -147,7 +167,7 @@ public class ChannelSpout implements IRichSpout {
 	@Override
 	public void fail(Object msgId) {
 		if (tupleCache != null && tupleCache.getIfPresent(msgId) != null) {
-			emitParticle((Particle) tupleCache.getIfPresent(msgId));
+			emitParticle(msgId, (Particle) tupleCache.getIfPresent(msgId));
 		}
 	}
 

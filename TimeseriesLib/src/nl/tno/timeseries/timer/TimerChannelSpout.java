@@ -52,8 +52,8 @@ public class TimerChannelSpout extends ChannelSpout {
 		mainTimerTickFreq = 60000L; // 1 minute
 		useParticleTime = true;
 
-		MetaParticleUtil.registerMetaParticleFieldsWithMetaParticleClass(config,
-				TimerTickParticle.class);
+		MetaParticleUtil.registerMetaParticleFieldsWithMetaParticleClass(
+				config, TimerTickParticle.class);
 	}
 
 	/**
@@ -79,8 +79,8 @@ public class TimerChannelSpout extends ChannelSpout {
 		this.mainTimerTickFreq = mainTimerTickFreq;
 		this.useParticleTime = useParticleTime;
 
-		MetaParticleUtil.registerMetaParticleFieldsWithMetaParticleClass(config,
-				TimerTickParticle.class);
+		MetaParticleUtil.registerMetaParticleFieldsWithMetaParticleClass(
+				config, TimerTickParticle.class);
 	}
 
 	/**
@@ -118,7 +118,7 @@ public class TimerChannelSpout extends ChannelSpout {
 		// first check to see if there are timerTicks to be emitted
 		if (mainTimerTickFreq != 0) {
 			emitTimerTicksInChannel(particle.getChannelId(), now);
-			emitParticle(particle);
+			emitParticle(null, particle);
 		}
 	}
 
@@ -142,7 +142,7 @@ public class TimerChannelSpout extends ChannelSpout {
 
 			TimerTickParticle timerTickParticle = new TimerTickParticle(
 					channelId, lastKnownNow);
-			emitParticle(timerTickParticle);
+			emitParticle(null, timerTickParticle);
 		}
 	}
 

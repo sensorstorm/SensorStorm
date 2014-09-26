@@ -38,6 +38,7 @@ public abstract interface Operation extends Serializable {
 	 */
 	public void init(String channelID, long startTimestamp,
 			@SuppressWarnings("rawtypes") Map stormNativeConfig,
-			ZookeeperStormConfigurationAPI zookeeperStormConfiguration);
+			ZookeeperStormConfigurationAPI zookeeperStormConfiguration)
+			throws OperationException;
 
 }

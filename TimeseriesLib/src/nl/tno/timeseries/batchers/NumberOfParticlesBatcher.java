@@ -9,6 +9,7 @@ import nl.tno.storm.configuration.api.ZookeeperStormConfigurationAPI;
 import nl.tno.timeseries.interfaces.Batcher;
 import nl.tno.timeseries.interfaces.DataParticle;
 import nl.tno.timeseries.interfaces.DataParticleBatch;
+import nl.tno.timeseries.interfaces.FaultTolerant;
 
 public class NumberOfParticlesBatcher implements Batcher, Serializable {
 
@@ -19,7 +20,8 @@ public class NumberOfParticlesBatcher implements Batcher, Serializable {
 	@Override
 	public void init(String channelID, long startSequenceNr,
 			@SuppressWarnings("rawtypes") Map stormNativeConfig,
-			ZookeeperStormConfigurationAPI stormConfiguration) {
+			ZookeeperStormConfigurationAPI stormConfiguration,
+			FaultTolerant delegator) {
 		// TODO haal dit uit de stormConfig
 		nrOfParticlesToBatch = 2;
 

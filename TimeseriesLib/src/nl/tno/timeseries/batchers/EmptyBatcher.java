@@ -8,6 +8,7 @@ import nl.tno.storm.configuration.api.ZookeeperStormConfigurationAPI;
 import nl.tno.timeseries.interfaces.Batcher;
 import nl.tno.timeseries.interfaces.DataParticle;
 import nl.tno.timeseries.interfaces.DataParticleBatch;
+import nl.tno.timeseries.interfaces.FaultTolerant;
 
 /**
  * This batcher is empty, it is just passes each particle directly into a batch
@@ -23,7 +24,8 @@ public class EmptyBatcher implements Batcher, Serializable {
 	@Override
 	public void init(String channelID, long startSequenceNr,
 			@SuppressWarnings("rawtypes") Map stormNativeConfig,
-			ZookeeperStormConfigurationAPI stormConfiguration) {
+			ZookeeperStormConfigurationAPI stormConfiguration,
+			FaultTolerant delegator) {
 	}
 
 	/**

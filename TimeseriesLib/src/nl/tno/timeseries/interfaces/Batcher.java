@@ -16,7 +16,8 @@ public interface Batcher {
 
 	public void init(String channelID, long startTimestamp,
 			@SuppressWarnings("rawtypes") Map stormNativeConfig,
-			ZookeeperStormConfigurationAPI zookeeperStormConfiguration);
+			ZookeeperStormConfigurationAPI zookeeperStormConfiguration,
+			FaultTolerant delegator) throws BatcherException;
 
 	/**
 	 * A method to add a new data particle to the inner batch. If the batch(es)
@@ -28,6 +29,7 @@ public interface Batcher {
 	 * @return Returns null to indicate the batch is not ready yet, or a list
 	 *         with one or more DataPatricleBatches
 	 */
-	public List<DataParticleBatch> batch(DataParticle inputParticle);
+	public List<DataParticleBatch> batch(DataParticle inputParticle)
+			throws BatcherException;
 
 }

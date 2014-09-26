@@ -14,6 +14,7 @@ import nl.tno.timeseries.interfaces.DataParticle;
 import nl.tno.timeseries.interfaces.DataParticleBatch;
 import nl.tno.timeseries.interfaces.MetaParticle;
 import nl.tno.timeseries.interfaces.Operation;
+import nl.tno.timeseries.interfaces.OperationException;
 import nl.tno.timeseries.interfaces.Particle;
 import nl.tno.timeseries.interfaces.SingleOperation;
 import nl.tno.timeseries.particles.MetaParticleHandler;
@@ -42,8 +43,7 @@ public class ChannelManager implements Serializable {
 	private Class<? extends Operation> operationClass;
 	private Class<? extends Batcher> batcherClass;
 	private ZookeeperStormConfigurationAPI zookeeperStormConfiguration;
-	private @SuppressWarnings("rawtypes")
-	Map stormNativeConfig;
+	private @SuppressWarnings("rawtypes") Map stormNativeConfig;
 
 	/**
 	 * Creates a new ChannelManager for a specific channel with a batcher
@@ -197,26 +197,33 @@ public class ChannelManager implements Serializable {
 		if (batcherClass != null) {
 			batcher = batcherClass.newInstance();
 			batcher.init(channelId, firstParticle.getTimestamp(),
-					stormNativeConfig, zookeeperStormConfiguration);
+					stormNativeConfig, zookeeperStormConfiguration, null);
 		}
 
 		// create new operation and initialize it
 		operation = operationClass.newInstance();
-		// is it a BatchOperation?
-		if (BatchOperation.class.isInstance(operation)) {
-			((BatchOperation) operation).init(channelId,
-					firstParticle.getTimestamp(), stormNativeConfig,
-					zookeeperStormConfiguration);
-		} // or is it a SingleOperation?
-		else if (SingleOperation.class.isInstance(operation)) {
-			operation.init(channelId, firstParticle.getTimestamp(),
-					stormNativeConfig, zookeeperStormConfiguration);
-		} // unknown operation type
-		else {
-			logger.error("OperationClass of unknown type "
-					+ operationClass.getName() + ", expected: "
-					+ SingleOperation.class.getName() + " or "
-					+ BatchOperation.class.getName());
+		try {
+			// is it a BatchOperation?
+
+			if (BatchOperation.class.isInstance(operation)) {
+				((BatchOperation) operation).init(channelId,
+						firstParticle.getTimestamp(), stormNativeConfig,
+						zookeeperStormConfiguration);
+			} // or is it a SingleOperation?
+			else if (SingleOperation.class.isInstance(operation)) {
+				operation.init(channelId, firstParticle.getTimestamp(),
+						stormNativeConfig, zookeeperStormConfiguration);
+			} // unknown operation type
+			else {
+				logger.error("OperationClass of unknown type "
+						+ operationClass.getName() + ", expected: "
+						+ SingleOperation.class.getName() + " or "
+						+ BatchOperation.class.getName());
+			}
+		} catch (OperationException oe) {
+			logger.error(
+					"Unable to initialize resources due to: " + oe.getMessage(),
+					oe);
 		}
 
 		createMetaParticleHandlers(operation);
