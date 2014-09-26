@@ -1,0 +1,162 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>nl.tno</groupId>
+  <artifactId>stormcv_v2</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>StormCV_v2</name>
+  <description>A Strom contribution to ease the development of computer vision topologies</description>
+	<packaging>jar</packaging>
+
+	<repositories>
+		<repository>
+			<id>xuggle repo</id>
+			<url>http://xuggle.googlecode.com/svn/trunk/repo/share/java/</url>
+		</repository>
+		<repository>
+			<id>github-releases</id>
+			<url>http://oss.sonatype.org/content/repositories/github-releases/</url>
+		</repository>
+		<repository>
+			<id>clojars.org</id>
+			<url>http://clojars.org/repo</url>
+		</repository>
+	</repositories>
+
+	<dependencies>
+<!--
+		<dependency>
+			<groupId>nl.tno</groupId>
+			<artifactId>TimeseriesLib_v2</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+-->	
+		<dependency>
+			<groupId>nl.tno</groupId>
+			<artifactId>timeseries-storm</artifactId>
+			<version>0.0.1</version>
+			<scope>system</scope>
+    		<systemPath>${project.basedir}/src/main/resources/locallib/timeseries-storm.jar</systemPath>
+		</dependency>
+		
+		<dependency>
+			<groupId>nl.tno</groupId>
+			<artifactId>storm-config</artifactId>
+			<version>0.0.1</version>
+			<scope>system</scope>
+    		<systemPath>${project.basedir}/src/main/resources/locallib/storm-config.jar</systemPath>
+		</dependency>
+		
+		<!-- <dependency>
+			<groupId>org.apache.storm</groupId>
+			<artifactId>storm-core</artifactId>
+			<version>0.9.1-incubating</version>
+			<scope>provided</scope>
+		</dependency>  -->
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>1.1.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.opencv</groupId>
+			<artifactId>opencv</artifactId>
+			<version>2.4.8</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/resources/locallib/opencv-248.jar</systemPath>
+			<!-- Added unpacked jar file to resources dir in order to force maven 
+				to include it in the build (dirty trick but works... ) -->
+		</dependency>
+		<dependency>
+			<groupId>xuggle</groupId>
+			<artifactId>xuggle-xuggler</artifactId>
+			<version>5.4</version>
+		</dependency>
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk</artifactId>
+			<version>1.4.7</version> <!-- 1.7.2 is latest version but httpclient version conflicts with storm 
+				(4.1 <> 4.2) -->
+		</dependency>
+		<dependency>
+			<groupId>commons-net</groupId>
+			<artifactId>commons-net</artifactId>
+			<version>3.3</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-server</artifactId>
+			<version>1.18</version>
+		</dependency>
+				
+	</dependencies>
+
+	<build>
+		<finalName>StormCV-${project.version}</finalName>
+		<plugins>
+			<!-- Bind the maven-assembly-plugin to the package phase this will create 
+				a jar file without the storm dependencies suitable for deployment to a cluster. -->
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+					<archive>
+						<manifest>
+							<mainClass><!-- nl.tno.stormcv.topology.LocalFacesTopology -->
+							</mainClass>
+						</manifest>
+					</archive>
+					<!-- <appendAssemblyId>false</appendAssemblyId> -->
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-assembly</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.2.1</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<executable>java</executable>
+					<includeProjectDependencies>true</includeProjectDependencies>
+					<includePluginDependencies>false</includePluginDependencies>
+					<classpathScope>compile</classpathScope>
+					<!-- <mainClass>${storm.topology}</mainClass> -->
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.9.1</version>
+				<configuration>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
