@@ -3,6 +3,8 @@ package nl.tno.stormcv.test;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.BasicConfigurator;
+
 import nl.tno.stormcv.StormCVConfig;
 import nl.tno.stormcv.fetcher.VideoStreamFetcher;
 import nl.tno.stormcv.operation.CascadeClassifierOperation;
@@ -17,6 +19,7 @@ import backtype.storm.utils.Utils;
 public class SimpleCarDetection {
 
 	public static void main(String[] args) {
+		//BasicConfigurator.configure(); // used to enable log4j
 		StormCVConfig conf = new StormCVConfig();
 		
 		conf.setNumWorkers(6); // typically set to the number of this topology requires

@@ -1,0 +1,35 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>nl.tno</groupId>
+  <artifactId>timeseries</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>Timeseries</name>
+  <dependencies>
+	  <dependency>
+		<groupId>org.apache.storm</groupId>
+		<artifactId>storm-core</artifactId>
+		<version>0.9.2-incubating</version>
+		<!-- keep storm out of the jar-with-dependencies -->
+		<scope>provided</scope>
+	</dependency>
+	<dependency>
+		<groupId>nl.tno</groupId>
+		<artifactId>storm-config</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</dependency>
+  </dependencies>
+  <build>
+    <sourceDirectory>src</sourceDirectory>
+    <testSourceDirectory>test</testSourceDirectory>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.1</version>
+        <configuration>
+          <source>1.7</source>
+          <target>1.7</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

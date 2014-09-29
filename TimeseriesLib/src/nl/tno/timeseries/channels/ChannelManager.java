@@ -10,6 +10,7 @@ import nl.tno.timeseries.annotation.MetaParticleHandlerDecleration;
 import nl.tno.timeseries.annotation.OperationDeclaration;
 import nl.tno.timeseries.interfaces.BatchOperation;
 import nl.tno.timeseries.interfaces.Batcher;
+import nl.tno.timeseries.interfaces.BatcherException;
 import nl.tno.timeseries.interfaces.DataParticle;
 import nl.tno.timeseries.interfaces.DataParticleBatch;
 import nl.tno.timeseries.interfaces.MetaParticle;
@@ -154,25 +155,31 @@ public class ChannelManager implements Serializable {
 				result.addAll(outputParticles);
 			}
 		} else if (particle instanceof DataParticle) { // dataParticle
-			List<DataParticle> outputDataParticles = null;
-			if (batcher != null) { // batch dataParticle and give it to
-									// batcherOperation
-				List<DataParticleBatch> batchedParticles = batcher
-						.batch((DataParticle) particle);
-				// are there one or more batches to be sent?
-				if (batchedParticles != null) {
-					for (DataParticleBatch batchedParticle : batchedParticles) {
-						outputDataParticles = ((BatchOperation) operation)
-								.execute(batchedParticle);
+			try {
+				List<DataParticle> outputDataParticles = null;
+				if (batcher != null) { // batch dataParticle and give it to
+										// batcherOperation
+					List<DataParticleBatch> batchedParticles = batcher
+							.batch((DataParticle) particle);
+					// are there one or more batches to be sent?
+					if (batchedParticles != null) {
+						for (DataParticleBatch batchedParticle : batchedParticles) {
+							outputDataParticles = ((BatchOperation) operation)
+									.execute(batchedParticle);
+						}
 					}
+				} else { // single operation
+					outputDataParticles = ((SingleOperation) operation)
+							.execute((DataParticle) particle);
 				}
-			} else { // single operation
-				outputDataParticles = ((SingleOperation) operation)
-						.execute((DataParticle) particle);
-			}
 
-			if (outputDataParticles != null) {
-				result.addAll(outputDataParticles);
+				if (outputDataParticles != null) {
+					result.addAll(outputDataParticles);
+				}
+			} catch (BatcherException | OperationException e) {
+				logger.error(
+						"Unable to execugte operation due to: "
+								+ e.getMessage(), e);
 			}
 		} else {
 			logger.warn("For channel " + channelId
@@ -194,11 +201,14 @@ public class ChannelManager implements Serializable {
 	private void createOperation(Particle firstParticle)
 			throws InstantiationException, IllegalAccessException {
 		// create optional batcher
-		if (batcherClass != null) {
-			batcher = batcherClass.newInstance();
-			batcher.init(channelId, firstParticle.getTimestamp(),
-					stormNativeConfig, zookeeperStormConfiguration, null);
-		}
+		if (batcherClass != null)
+			try {
+				batcher = batcherClass.newInstance();
+				batcher.init(channelId, firstParticle.getTimestamp(),
+						stormNativeConfig, zookeeperStormConfiguration, null);
+			} catch (BatcherException e) {
+				throw new InstantiationException(e.getMessage());
+			}
 
 		// create new operation and initialize it
 		operation = operationClass.newInstance();

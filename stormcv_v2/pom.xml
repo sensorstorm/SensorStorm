@@ -23,41 +23,20 @@
 	</repositories>
 
 	<dependencies>
-<!--
 		<dependency>
 			<groupId>nl.tno</groupId>
-			<artifactId>TimeseriesLib_v2</artifactId>
+			<artifactId>timeseries</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
--->	
-		<dependency>
-			<groupId>nl.tno</groupId>
-			<artifactId>timeseries-storm</artifactId>
-			<version>0.0.1</version>
-			<scope>system</scope>
-    		<systemPath>${project.basedir}/src/main/resources/locallib/timeseries-storm.jar</systemPath>
-		</dependency>
 		
-		<dependency>
-			<groupId>nl.tno</groupId>
-			<artifactId>storm-config</artifactId>
-			<version>0.0.1</version>
-			<scope>system</scope>
-    		<systemPath>${project.basedir}/src/main/resources/locallib/storm-config.jar</systemPath>
-		</dependency>
-		
-		<!-- <dependency>
+		 <dependency>
 			<groupId>org.apache.storm</groupId>
 			<artifactId>storm-core</artifactId>
-			<version>0.9.1-incubating</version>
+			<version>0.9.2-incubating</version>
+			<!-- keep storm out of the jar-with-dependencies -->
 			<scope>provided</scope>
-		</dependency>  -->
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<version>1.1.1</version>
 		</dependency>
-
+ 		
 		<dependency>
 			<groupId>org.opencv</groupId>
 			<artifactId>opencv</artifactId>
