@@ -8,11 +8,11 @@ import java.util.List;
 import java.util.Map;
 
 import nl.tno.storm.configuration.api.ZookeeperStormConfigurationAPI;
+import nl.tno.timeseries.channels.ParticleCache;
 import nl.tno.timeseries.interfaces.Batcher;
 import nl.tno.timeseries.interfaces.BatcherException;
 import nl.tno.timeseries.interfaces.DataParticle;
 import nl.tno.timeseries.interfaces.DataParticleBatch;
-import nl.tno.timeseries.interfaces.FaultTolerant;
 import nl.tno.timeseries.mapper.annotation.TupleField;
 import backtype.storm.tuple.Fields;
 
@@ -20,7 +20,6 @@ public abstract class DefaultBatcher implements Batcher {
 
 	private HashMap<String, List<DataParticle>> particleSets;
 	private final ArrayList<Field> fields;
-	private FaultTolerant delegator;
 
 	public DefaultBatcher(Fields groupBy, Class<? extends DataParticle> clazz) {
 		this.fields = new ArrayList<Field>();
@@ -42,9 +41,8 @@ public abstract class DefaultBatcher implements Batcher {
 	@Override
 	public void init(String channelID, long startTimestamp,
 			Map stormNativeConfig,
-			ZookeeperStormConfigurationAPI zookeeperStormConfiguration,
-			FaultTolerant delegator) throws BatcherException {
-		this.delegator = delegator;
+			ZookeeperStormConfigurationAPI zookeeperStormConfiguration)
+			throws BatcherException {
 		this.init(channelID, startTimestamp, stormNativeConfig,
 				zookeeperStormConfiguration);
 	}
@@ -69,26 +67,9 @@ public abstract class DefaultBatcher implements Batcher {
 	}
 
 	@Override
-	public List<DataParticleBatch> batch(DataParticle particle)
-			throws BatcherException {
-
-		String group;
-		try {
-			group = generateGroup(particle);
-			if (!particleSets.containsKey(group)) {
-				particleSets.put(group, new ArrayList<DataParticle>());
-			}
-			particleSets.get(group).add(particle);
-			return batch(particleSets.get(group));
-		} catch (IllegalArgumentException | IllegalAccessException e) {
-			throw new BatcherException(e);
-		}
+	public List<DataParticleBatch> batch(ParticleCache cache,
+			DataParticle particle) throws BatcherException {
+		return null;
 	}
-
-	public abstract void init(String channelID, long startTimestamp,
-			Map stormNativeConfig,
-			ZookeeperStormConfigurationAPI zookeeperStormConfiguration);
-
-	public abstract List<DataParticleBatch> batch(List<DataParticle> currentSet);
 
 }

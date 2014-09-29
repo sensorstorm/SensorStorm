@@ -1,21 +1,20 @@
 package nl.tno.stormcv.batcher;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import nl.tno.storm.configuration.api.ZookeeperStormConfigurationAPI;
+import nl.tno.timeseries.channels.ParticleCache;
 import nl.tno.timeseries.interfaces.Batcher;
+import nl.tno.timeseries.interfaces.BatcherException;
 import nl.tno.timeseries.interfaces.DataParticle;
 import nl.tno.timeseries.interfaces.DataParticleBatch;
-import nl.tno.timeseries.interfaces.FaultTolerant;
 
 public class SlidingWindowBatcher implements Batcher{
 
 	private int windowSize;
 	private int sequenceDelta;
 	private int maxSize = Integer.MAX_VALUE;
-	private FaultTolerant faultTolerantDelegator;
 	
 	public SlidingWindowBatcher(int windowSize, int sequenceDelta){
 		this.windowSize = windowSize;
@@ -25,11 +24,6 @@ public class SlidingWindowBatcher implements Batcher{
 	public SlidingWindowBatcher maxSize(int size){
 		this.maxSize = size;
 		return this;
-	}
-
-	@Override
-	public List<DataParticleBatch> batch(DataParticle particle) {
-		return null;
 	}
 
 	/**
@@ -48,10 +42,19 @@ public class SlidingWindowBatcher implements Batcher{
 	}
 
 	@Override
-	public void init(String channelId, long sequenceNr, Map conf,
-			ZookeeperStormConfigurationAPI arg3, FaultTolerant delegator) {
-		this.faultTolerantDelegator = delegator;
+	public void init(String channelID, long startTimestamp,
+			Map stormNativeConfig,
+			ZookeeperStormConfigurationAPI zookeeperStormConfiguration)
+			throws BatcherException {
+		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public List<DataParticleBatch> batch(ParticleCache cache,
+			DataParticle inputParticle) throws BatcherException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

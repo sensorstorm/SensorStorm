@@ -24,7 +24,6 @@ public class SimpleCarDetection {
 		
 		conf.setNumWorkers(6); // typically set to the number of this topology requires
 		//conf.setMaxSpoutPending(0); // maximum un-acked/un-failed tuples per spout (spout blocks if this number is reached)
-		//conf.put(StormCVConfig., value)
 		conf.put(Config.TOPOLOGY_ENABLE_MESSAGE_TIMEOUTS, true); // True if Storm should timeout messages or not.
 		conf.put(Config.TOPOLOGY_MESSAGE_TIMEOUT_SECS , 60); // The maximum amount of time given to the topology to fully process a message emitted by a spout (default = 30)
 		conf.put(ChannelSpout.TOPOLOGY_FAULT_TOLERANT, false); // TTL (seconds) for all elements in all caches throughout the topology 

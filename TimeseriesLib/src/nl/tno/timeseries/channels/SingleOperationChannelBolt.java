@@ -3,7 +3,6 @@ package nl.tno.timeseries.channels;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import nl.tno.storm.configuration.api.StormConfigurationException;
 import nl.tno.storm.configuration.api.ZookeeperStormConfigurationAPI;
@@ -38,14 +37,8 @@ import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.RemovalCause;
-import com.google.common.cache.RemovalListener;
-import com.google.common.cache.RemovalNotification;
-
 public class SingleOperationChannelBolt extends BaseRichBolt implements
-		EmitParticleInterface, FaultTolerant, RemovalListener<Tuple, Particle> {
+		EmitParticleInterface, FaultTolerant {
 
 	private static final long serialVersionUID = -7628008145368347247L;
 	private final static String EMPTY_CHANNELID = "";
@@ -58,7 +51,7 @@ public class SingleOperationChannelBolt extends BaseRichBolt implements
 	protected String boltName;
 	protected int nrOfOutputFields;
 	protected Fields metaParticleFields;
-	protected Cache<Tuple, Particle> tupleCache;
+	protected ParticleCache cache;
 	private final Operation operation;
 	private Batcher batcher;
 	protected boolean ackFailAndAnchor = false;
@@ -118,7 +111,7 @@ public class SingleOperationChannelBolt extends BaseRichBolt implements
 		try {
 			if (batcher != null) {
 				batcher.init(EMPTY_CHANNELID, EMPTY_STARTTIMESTAMP,
-						stormNativeConfig, zookeeperStormConfiguration, this);
+						stormNativeConfig, zookeeperStormConfiguration);
 			}
 			if (operation != null) {
 				operation.init(EMPTY_CHANNELID, EMPTY_STARTTIMESTAMP,
@@ -142,12 +135,11 @@ public class SingleOperationChannelBolt extends BaseRichBolt implements
 
 		// initiate tuple cache
 		if (ackFailAndAnchor) {
-			long timeout = ((Long) stormNativeConfig
+			int timeout = ((Long) stormNativeConfig
 					.get(Config.TOPOLOGY_MESSAGE_TIMEOUT_SECS)).intValue();
 			int maxSize = ((Long) stormNativeConfig
 					.get(ChannelSpout.TOPOLOGY_TUPLECACHE_MAX_SIZE)).intValue();
-			tupleCache = CacheBuilder.newBuilder().maximumSize(maxSize)
-					.expireAfterWrite(timeout, TimeUnit.SECONDS).build();
+			cache = new ParticleCache(maxSize, timeout, this);
 		}
 
 	}
@@ -166,9 +158,9 @@ public class SingleOperationChannelBolt extends BaseRichBolt implements
 				// perform batchoperation
 				if (batcher != null) {
 					try {
-						tupleCache.put(tuple, inputParticle);
+						cache.put((DataParticle) inputParticle, tuple);
 						List<DataParticleBatch> batchedParticles = batcher
-								.batch((DataParticle) inputParticle);
+								.batch(cache, (DataParticle) inputParticle);
 						// are there one or more batches to be sent?
 						if (batchedParticles != null) {
 							List<DataParticle> batchResult = new ArrayList<DataParticle>();
@@ -341,9 +333,7 @@ public class SingleOperationChannelBolt extends BaseRichBolt implements
 
 	@Override
 	public void ack(Tuple tuple) {
-		if (tupleCache != null)
-			tupleCache.invalidate(tuple);
-		else if (ackFailAndAnchor)
+		if (ackFailAndAnchor)
 			collector.ack(tuple);
 	}
 
@@ -366,16 +356,6 @@ public class SingleOperationChannelBolt extends BaseRichBolt implements
 	public void emitParticle(Particle particle) {
 		collector.emit(ParticleMapper.particleToValues(particle,
 				nrOfOutputFields));
-	}
-
-	@Override
-	public void onRemoval(RemovalNotification<Tuple, Particle> notification) {
-		if (notification.getCause() == RemovalCause.EXPIRED
-				|| notification.getCause() == RemovalCause.SIZE) {
-			fail(notification.getKey());
-		} else {
-			collector.ack(notification.getKey());
-		}
 	}
 
 }
