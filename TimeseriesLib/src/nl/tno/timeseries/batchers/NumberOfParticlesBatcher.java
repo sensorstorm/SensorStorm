@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import nl.tno.storm.configuration.api.ZookeeperStormConfigurationAPI;
+import nl.tno.timeseries.channels.ParticleCache;
 import nl.tno.timeseries.interfaces.Batcher;
 import nl.tno.timeseries.interfaces.DataParticle;
 import nl.tno.timeseries.interfaces.DataParticleBatch;
@@ -27,7 +28,8 @@ public class NumberOfParticlesBatcher implements Batcher, Serializable {
 	}
 
 	@Override
-	public List<DataParticleBatch> batch(DataParticle inputParticle) {
+	public List<DataParticleBatch> batch(ParticleCache cache,
+			DataParticle inputParticle) {
 		ArrayList<DataParticleBatch> result = new ArrayList<DataParticleBatch>();
 
 		buffer.add(inputParticle);
@@ -35,6 +37,8 @@ public class NumberOfParticlesBatcher implements Batcher, Serializable {
 			DataParticleBatch batchedParticles = new DataParticleBatch(
 					buffer.subList(0, nrOfParticlesToBatch));
 			buffer.removeAll(batchedParticles);
+			for (DataParticle particle : batchedParticles)
+				cache.remove(particle);
 			result.add(batchedParticles);
 		}
 

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import nl.tno.storm.configuration.api.ZookeeperStormConfigurationAPI;
+import nl.tno.timeseries.channels.ParticleCache;
 
 /**
  * An interface describing the batch functionality: to collect one or more
@@ -16,7 +17,8 @@ public interface Batcher {
 
 	public void init(String channelID, long startTimestamp,
 			@SuppressWarnings("rawtypes") Map stormNativeConfig,
-			ZookeeperStormConfigurationAPI zookeeperStormConfiguration);
+			ZookeeperStormConfigurationAPI zookeeperStormConfiguration)
+			throws BatcherException;
 
 	/**
 	 * A method to add a new data particle to the inner batch. If the batch(es)
@@ -25,9 +27,13 @@ public interface Batcher {
 	 * 
 	 * @param inputParticle
 	 *            The new data particle to be added to the inner batch.
+	 * @param cache
+	 *            The cache containing all {@link DataParticle} objects present
+	 *            within the bolt
 	 * @return Returns null to indicate the batch is not ready yet, or a list
 	 *         with one or more DataPatricleBatches
 	 */
-	public List<DataParticleBatch> batch(DataParticle inputParticle);
+	public List<DataParticleBatch> batch(ParticleCache cache,
+			DataParticle inputParticle) throws BatcherException;
 
 }

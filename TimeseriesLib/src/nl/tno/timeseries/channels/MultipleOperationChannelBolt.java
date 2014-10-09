@@ -3,6 +3,7 @@ package nl.tno.timeseries.channels;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import nl.tno.storm.configuration.api.StormConfigurationException;
 import nl.tno.storm.configuration.api.ZookeeperStormConfigurationAPI;
@@ -31,6 +32,9 @@ import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+
 public class MultipleOperationChannelBolt extends BaseRichBolt implements
 		EmitParticleInterface {
 
@@ -39,8 +43,7 @@ public class MultipleOperationChannelBolt extends BaseRichBolt implements
 	protected Logger logger = LoggerFactory
 			.getLogger(MultipleOperationChannelBolt.class);
 	protected ZookeeperStormConfigurationAPI zookeeperStormConfiguration;
-	protected @SuppressWarnings("rawtypes")
-	Map stormNativeConfig;
+	protected @SuppressWarnings("rawtypes") Map stormNativeConfig;
 	protected OutputCollector collector;
 	protected String boltName;
 	protected Class<? extends Operation> operationClass;
@@ -48,6 +51,7 @@ public class MultipleOperationChannelBolt extends BaseRichBolt implements
 	protected Class<? extends Batcher> batcherClass;
 	protected Map<String, ChannelManager> channelManagers;
 	protected Fields metaParticleFields;
+	protected Cache<Object, Object> tupleCache;
 
 	/**
 	 * Construct a {@link MultipleOperationChannelBolt} with a {@link Batcher}
@@ -106,6 +110,20 @@ public class MultipleOperationChannelBolt extends BaseRichBolt implements
 					+ e.getMessage());
 			zookeeperStormConfiguration = new EmptyStormConfiguration();
 		}
+
+		if ((stormNativeConfig
+				.containsKey(ChannelSpout.TOPOLOGY_FAULT_TOLERANT) && (boolean) stormNativeConfig
+				.get(ChannelSpout.TOPOLOGY_FAULT_TOLERANT))
+				|| (int) stormNativeConfig
+						.get(Config.TOPOLOGY_MAX_SPOUT_PENDING) > 0) {
+			long timeout = ((Long) stormNativeConfig
+					.get(Config.TOPOLOGY_MESSAGE_TIMEOUT_SECS_SCHEMA))
+					.intValue();
+			int maxSize = ((Long) stormNativeConfig
+					.get(ChannelSpout.TOPOLOGY_TUPLECACHE_MAX_SIZE)).intValue();
+			tupleCache = CacheBuilder.newBuilder().maximumSize(maxSize)
+					.expireAfterAccess(timeout, TimeUnit.SECONDS).build();
+		}
 	}
 
 	@Override
@@ -131,7 +149,7 @@ public class MultipleOperationChannelBolt extends BaseRichBolt implements
 					.processParticle(inputParticle);
 			if (outputParticles != null) {
 				for (Particle outputParticle : outputParticles) {
-					emitParticle(outputParticle);
+					emitParticle(tuple, outputParticle);
 				}
 			}
 		}
@@ -185,9 +203,16 @@ public class MultipleOperationChannelBolt extends BaseRichBolt implements
 	}
 
 	@Override
+	public void emitParticle(Tuple anchor, Particle particle) {
+		collector.emit(anchor,
+				ParticleMapper.particleToValues(particle, nrOfOutputFields));
+	}
+
+	@Override
 	public void emitParticle(Particle particle) {
 		collector.emit(ParticleMapper.particleToValues(particle,
 				nrOfOutputFields));
+
 	}
 
 }

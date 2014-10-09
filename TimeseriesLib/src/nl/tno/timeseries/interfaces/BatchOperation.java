@@ -23,6 +23,7 @@ public interface BatchOperation extends Operation {
 	 * @return Returns a list of zero or more data particles to be sent further
 	 *         up to the topology.
 	 */
-	public List<DataParticle> execute(DataParticleBatch inputParticleBatch);
+	public List<DataParticle> execute(DataParticleBatch inputParticleBatch)
+			throws OperationException;
 
 }

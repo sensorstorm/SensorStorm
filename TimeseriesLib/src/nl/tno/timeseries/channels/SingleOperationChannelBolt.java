@@ -12,10 +12,13 @@ import nl.tno.timeseries.annotation.OperationDeclaration;
 import nl.tno.timeseries.config.EmptyStormConfiguration;
 import nl.tno.timeseries.interfaces.BatchOperation;
 import nl.tno.timeseries.interfaces.Batcher;
+import nl.tno.timeseries.interfaces.BatcherException;
 import nl.tno.timeseries.interfaces.DataParticle;
 import nl.tno.timeseries.interfaces.DataParticleBatch;
+import nl.tno.timeseries.interfaces.FaultTolerant;
 import nl.tno.timeseries.interfaces.MetaParticle;
 import nl.tno.timeseries.interfaces.Operation;
+import nl.tno.timeseries.interfaces.OperationException;
 import nl.tno.timeseries.interfaces.Particle;
 import nl.tno.timeseries.interfaces.SingleOperation;
 import nl.tno.timeseries.mapper.ParticleMapper;
@@ -35,7 +38,8 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
 public class SingleOperationChannelBolt extends BaseRichBolt implements
-		EmitParticleInterface {
+		EmitParticleInterface, FaultTolerant {
+
 	private static final long serialVersionUID = -7628008145368347247L;
 	private final static String EMPTY_CHANNELID = "";
 	private final static long EMPTY_STARTTIMESTAMP = 0;
@@ -47,8 +51,10 @@ public class SingleOperationChannelBolt extends BaseRichBolt implements
 	protected String boltName;
 	protected int nrOfOutputFields;
 	protected Fields metaParticleFields;
+	protected ParticleCache cache;
 	private final Operation operation;
 	private Batcher batcher;
+	protected boolean ackFailAndAnchor = false;
 	private List<MetaParticleHandler> metaParticleHandlers;
 
 	/**
@@ -112,9 +118,28 @@ public class SingleOperationChannelBolt extends BaseRichBolt implements
 						stormNativeConfig, zookeeperStormConfiguration);
 				createMetaParticleHandlers(operation);
 			}
-		} catch (InstantiationException | IllegalAccessException e) {
+		} catch (InstantiationException | IllegalAccessException
+				| OperationException | BatcherException e) {
 			logger.error("Unable to instantiate batcher and/or operation due to: "
 					+ e.getMessage());
+		}
+
+		ackFailAndAnchor = (stormNativeConfig
+				.containsKey(ChannelSpout.TOPOLOGY_FAULT_TOLERANT) && (boolean) stormNativeConfig
+				.get(ChannelSpout.TOPOLOGY_FAULT_TOLERANT))
+				|| (stormNativeConfig.get(Config.TOPOLOGY_MAX_SPOUT_PENDING) != null && (long) stormNativeConfig
+						.get(Config.TOPOLOGY_MAX_SPOUT_PENDING) > 0);
+
+		logger.info("Acking, Failing and Anchoring enabled: "
+				+ ackFailAndAnchor);
+
+		// initiate tuple cache
+		if (ackFailAndAnchor) {
+			int timeout = ((Long) stormNativeConfig
+					.get(Config.TOPOLOGY_MESSAGE_TIMEOUT_SECS)).intValue();
+			int maxSize = ((Long) stormNativeConfig
+					.get(ChannelSpout.TOPOLOGY_TUPLECACHE_MAX_SIZE)).intValue();
+			cache = new ParticleCache(maxSize, timeout, this);
 		}
 
 	}
@@ -122,70 +147,52 @@ public class SingleOperationChannelBolt extends BaseRichBolt implements
 	@Override
 	public void execute(Tuple tuple) {
 		Particle inputParticle = ParticleMapper.tupleToParticle(tuple);
+		List<? extends Particle> outputParticles;
 		if (inputParticle != null) {
-			List<Particle> outputParticles = processParticle(inputParticle);
-			if (outputParticles != null) {
-				for (Particle outputParticle : outputParticles) {
-					emitParticle(outputParticle);
-				}
-			}
-		}
-	}
+			// handle metadata particle
+			if (inputParticle instanceof MetaParticle) {
+				outputParticles = handleMetaParticle((MetaParticle) inputParticle);
+				emitParticles(tuple, outputParticles);
+				this.ack(tuple);
+			} else if (inputParticle instanceof DataParticle) {
+				// perform batchoperation
+				if (batcher != null) {
+					try {
+						cache.put((DataParticle) inputParticle, tuple);
+						List<DataParticleBatch> batchedParticles = batcher
+								.batch(cache, (DataParticle) inputParticle);
+						// are there one or more batches to be sent?
+						if (batchedParticles != null) {
+							List<DataParticle> batchResult = new ArrayList<DataParticle>();
+							for (DataParticleBatch batchedParticle : batchedParticles) {
+								batchResult.addAll(((BatchOperation) operation)
+										.execute(batchedParticle));
+							}
+							outputParticles = batchResult;
+							emitParticles(tuple, outputParticles);
+						}
+					} catch (OperationException | BatcherException oe) {
+						this.fail(tuple);
+						logger.error(
+								"Unable to execute BatchOperation due to: "
+										+ oe.getMessage(), oe);
+					}
 
-	/**
-	 * Process a particle (either MetaParticle or DataParticle)
-	 * 
-	 * @param particle
-	 *            Particle to be processed. If the particle == null, null is
-	 *            returned
-	 * @return returns a list with one MetaParticle (to be sent further upto the
-	 *         topology), zero or more DataParticles or null in case of an
-	 *         error. These particles should be emitted by the bolt.
-	 */
-	public List<Particle> processParticle(Particle particle) {
-		if (particle == null)
-			return null;
-
-		// parse particles
-		List<Particle> result = new ArrayList<Particle>();
-
-		if (particle instanceof MetaParticle) { // metaParticle
-			List<Particle> outputParticles = handleMetaParticle((MetaParticle) particle);
-			// add metaParticle to output list in order to be resent further in
-			// the topology
-			result.add(particle);
-			// add optional output particles
-			if (outputParticles != null) {
-				result.addAll(outputParticles);
-			}
-		} else if (particle instanceof DataParticle) { // dataParticle
-			List<DataParticle> outputDataParticles = null;
-			if (batcher != null) { // batch dataParticle and give it to
-									// batcherOperation
-				List<DataParticleBatch> batchedParticles = batcher
-						.batch((DataParticle) particle);
-				// are there one or more batches to be sent?
-				if (batchedParticles != null) {
-					for (DataParticleBatch batchedParticle : batchedParticles) {
-						outputDataParticles = ((BatchOperation) operation)
-								.execute(batchedParticle);
+				} else {
+					try {
+						outputParticles = ((SingleOperation) operation)
+								.execute((DataParticle) inputParticle);
+						emitParticles(tuple, outputParticles);
+						this.ack(tuple);
+					} catch (OperationException e) {
+						this.fail(tuple);
+						logger.error(
+								"Unable to execute SingleInputOperation due to: "
+										+ e.getMessage(), e);
 					}
 				}
-			} else { // single operation
-				outputDataParticles = ((SingleOperation) operation)
-						.execute((DataParticle) particle);
 			}
-
-			if (outputDataParticles != null) {
-				result.addAll(outputDataParticles);
-			}
-		} else {
-			logger.warn("unknown particle type ("
-					+ particle.getClass().getName() + ") to process");
-			return null;
 		}
-
-		return result;
 	}
 
 	/**
@@ -316,6 +323,33 @@ public class SingleOperationChannelBolt extends BaseRichBolt implements
 
 		nrOfOutputFields = fields.size();
 		declarer.declare(fields);
+	}
+
+	@Override
+	public void emitParticle(Tuple anchor, Particle particle) {
+		collector.emit(anchor,
+				ParticleMapper.particleToValues(particle, nrOfOutputFields));
+	}
+
+	@Override
+	public void ack(Tuple tuple) {
+		if (ackFailAndAnchor)
+			collector.ack(tuple);
+	}
+
+	@Override
+	public void fail(Tuple tuple) {
+		if (ackFailAndAnchor)
+			collector.fail(tuple);
+	}
+
+	public void emitParticles(Tuple anchor, List<? extends Particle> particles) {
+		for (Particle particle : particles) {
+			if (ackFailAndAnchor)
+				this.emitParticle(anchor, particle);
+			else
+				this.emitParticle(particle);
+		}
 	}
 
 	@Override
