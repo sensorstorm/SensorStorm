@@ -32,4 +32,16 @@ public class Measurement<T> extends AbstractParticle implements DataParticle, Co
 		return "M["+channelId+","+timestamp+","+value+"]";
 	}
 	
+	public String toJson() {
+		String result = "{\"sensor_id\": \""+channelId+"\", \"utc_epoch_timestamp\": "+timestamp+", \"value\": ";
+		if (value instanceof Number) {
+			result = result + value;
+		} else if (value instanceof String) {
+			result = result + "\"" + value + "\"";
+		}
+		result = result + "}";
+		
+		return result;
+	}
+	
 }
