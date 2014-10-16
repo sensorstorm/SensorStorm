@@ -8,6 +8,7 @@ import nl.tno.timeseries.annotation.OperationDeclaration;
 import nl.tno.timeseries.gracefullshutdown.GracefulShutdownParticleHandler;
 import nl.tno.timeseries.gracefullshutdown.GracefullShutdownInterface;
 import nl.tno.timeseries.interfaces.DataParticle;
+import nl.tno.timeseries.interfaces.OperationException;
 import nl.tno.timeseries.interfaces.SingleOperation;
 import nl.tno.timeseries.timer.TimerControllerInterface;
 
@@ -19,11 +20,17 @@ public class MyGracefullShutdownOperation implements SingleOperation,
 	private String channelId;
 
 	@Override
-	public void init(String channelID, long startTimestamp,
+	public void init(String channelId,
 			@SuppressWarnings("rawtypes") Map stormNativeConfig,
 			ZookeeperStormConfigurationAPI stormConfiguration) {
-		this.channelId = channelID;
-		System.out.println("init myTimedBatchOperation at " + startTimestamp);
+		this.channelId = channelId;
+	}
+
+	@Override
+	public void prepareForFirstParticle(long startTimestamp)
+			throws OperationException {
+		System.out.println("init myoperation for channel " + channelId + " at "
+				+ startTimestamp);
 	}
 
 	@Override

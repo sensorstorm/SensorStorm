@@ -6,6 +6,7 @@ import java.util.Map;
 import nl.tno.storm.configuration.api.ZookeeperStormConfigurationAPI;
 import nl.tno.timeseries.annotation.OperationDeclaration;
 import nl.tno.timeseries.interfaces.DataParticle;
+import nl.tno.timeseries.interfaces.OperationException;
 import nl.tno.timeseries.interfaces.SingleOperation;
 
 @OperationDeclaration(inputs = { MyDataParticle.class }, outputs = {})
@@ -14,11 +15,16 @@ public class MyOperation implements SingleOperation {
 	private String channelId;
 
 	@Override
-	public void init(String channelID, long startTimestamp,
+	public void init(String channelId,
 			@SuppressWarnings("rawtypes") Map stormNativeConfig,
 			ZookeeperStormConfigurationAPI stormConfiguration) {
-		this.channelId = channelID;
-		System.out.println("init myoperation for channel " + channelID + " at "
+		this.channelId = channelId;
+	}
+
+	@Override
+	public void prepareForFirstParticle(long startTimestamp)
+			throws OperationException {
+		System.out.println("init myoperation for channel " + channelId + " at "
 				+ startTimestamp);
 	}
 

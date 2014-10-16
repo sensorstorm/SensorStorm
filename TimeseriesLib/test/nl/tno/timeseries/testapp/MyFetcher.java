@@ -17,6 +17,7 @@ public class MyFetcher implements Fetcher {
 	public void prepare(@SuppressWarnings("rawtypes") Map stormNativeConfig,
 			ZookeeperStormConfigurationAPI stormConfiguration,
 			TopologyContext context) throws Exception {
+		System.out.println("MyFetcher prepaper");
 	}
 
 	@Override

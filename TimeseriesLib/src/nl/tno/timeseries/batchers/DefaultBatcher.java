@@ -5,10 +5,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import nl.tno.storm.configuration.api.ZookeeperStormConfigurationAPI;
-import nl.tno.timeseries.channels.ParticleCache;
 import nl.tno.timeseries.interfaces.Batcher;
 import nl.tno.timeseries.interfaces.BatcherException;
 import nl.tno.timeseries.interfaces.DataParticle;
@@ -38,15 +35,6 @@ public abstract class DefaultBatcher implements Batcher {
 		}
 	}
 
-	@Override
-	public void init(String channelID, long startTimestamp,
-			Map stormNativeConfig,
-			ZookeeperStormConfigurationAPI zookeeperStormConfiguration)
-			throws BatcherException {
-		this.init(channelID, startTimestamp, stormNativeConfig,
-				zookeeperStormConfiguration);
-	}
-
 	/**
 	 * Generates the key for the provided tuple using the fields provided at
 	 * construction time
@@ -67,8 +55,8 @@ public abstract class DefaultBatcher implements Batcher {
 	}
 
 	@Override
-	public List<DataParticleBatch> batch(ParticleCache cache,
-			DataParticle particle) throws BatcherException {
+	public List<DataParticleBatch> batch(DataParticle particle)
+			throws BatcherException {
 		return null;
 	}
 

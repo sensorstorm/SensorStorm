@@ -8,11 +8,13 @@ import java.util.Map;
 import nl.tno.storm.configuration.api.ZookeeperStormConfigurationAPI;
 import nl.tno.timeseries.annotation.MetaParticleHandlerDecleration;
 import nl.tno.timeseries.annotation.OperationDeclaration;
+import nl.tno.timeseries.config.ConfigKeys;
 import nl.tno.timeseries.interfaces.BatchOperation;
 import nl.tno.timeseries.interfaces.Batcher;
 import nl.tno.timeseries.interfaces.BatcherException;
 import nl.tno.timeseries.interfaces.DataParticle;
 import nl.tno.timeseries.interfaces.DataParticleBatch;
+import nl.tno.timeseries.interfaces.FaultTolerant;
 import nl.tno.timeseries.interfaces.MetaParticle;
 import nl.tno.timeseries.interfaces.Operation;
 import nl.tno.timeseries.interfaces.OperationException;
@@ -22,6 +24,8 @@ import nl.tno.timeseries.particles.MetaParticleHandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import backtype.storm.Config;
 
 /**
  * A channelManager manages for a specific channel the operation instance and
@@ -39,12 +43,16 @@ public class ChannelManager implements Serializable {
 								// the channelId of the Particle, in case of a
 								// ChannelGrouper the channelGroupId
 	private Operation operation;
+	protected ParticleCache particleCache;
 	private Batcher batcher;
 	private List<MetaParticleHandler> metaParticleHandlers;
 	private Class<? extends Operation> operationClass;
 	private Class<? extends Batcher> batcherClass;
 	private ZookeeperStormConfigurationAPI zookeeperStormConfiguration;
-	private @SuppressWarnings("rawtypes") Map stormNativeConfig;
+	private @SuppressWarnings("rawtypes")
+	Map stormNativeConfig;
+	private int topologyMsgTimeout;
+	private int topologyTupleCacheMaxsize;
 
 	/**
 	 * Creates a new ChannelManager for a specific channel with a batcher
@@ -65,9 +73,10 @@ public class ChannelManager implements Serializable {
 			Class<? extends Batcher> batcherClass,
 			Class<? extends BatchOperation> batchOperationClass,
 			@SuppressWarnings("rawtypes") Map stormNativeConfig,
-			ZookeeperStormConfigurationAPI stormConfiguration) {
+			ZookeeperStormConfigurationAPI stormConfiguration,
+			FaultTolerant ackFailDelegator) {
 		channelManager(channelId, batcherClass, batchOperationClass,
-				stormNativeConfig, stormConfiguration);
+				stormNativeConfig, stormConfiguration, ackFailDelegator);
 	}
 
 	/**
@@ -86,9 +95,10 @@ public class ChannelManager implements Serializable {
 	public ChannelManager(String channelId,
 			Class<? extends SingleOperation> operationClass,
 			@SuppressWarnings("rawtypes") Map stormNativeConfig,
-			ZookeeperStormConfigurationAPI stormConfiguration) {
+			ZookeeperStormConfigurationAPI stormConfiguration,
+			FaultTolerant ackFailDelegator) {
 		channelManager(channelId, null, operationClass, stormNativeConfig,
-				stormConfiguration);
+				stormConfiguration, ackFailDelegator);
 	}
 
 	/**
@@ -103,12 +113,24 @@ public class ChannelManager implements Serializable {
 			Class<? extends Batcher> batcherClass,
 			Class<? extends Operation> operationClass,
 			@SuppressWarnings("rawtypes") Map stormNativeConfig,
-			ZookeeperStormConfigurationAPI stormConfiguration) {
+			ZookeeperStormConfigurationAPI stormConfiguration,
+			FaultTolerant ackFailDelegator) {
 		this.channelId = channelId;
 		this.operationClass = operationClass;
 		this.batcherClass = batcherClass;
 		this.operationClass = operationClass;
 		this.zookeeperStormConfiguration = stormConfiguration;
+
+		// get particle cache parameters and create a cache
+		topologyMsgTimeout = ConfigKeys.getStormNativeIntegerConfigValue(
+				stormNativeConfig, Config.TOPOLOGY_MESSAGE_TIMEOUT_SECS,
+				ConfigKeys.TOPOLOGY_MESSAGE_TIMEOUT_SECS_DEFAULT);
+		topologyTupleCacheMaxsize = ConfigKeys
+				.getStormNativeIntegerConfigValue(stormNativeConfig,
+						ConfigKeys.SPOUT_TUPLECACHE_MAX_SIZE,
+						ConfigKeys.SPOUT_TUPLECACHE_MAX_SIZE_DEFAULT);
+		particleCache = new ParticleCache(topologyTupleCacheMaxsize,
+				topologyMsgTimeout, ackFailDelegator);
 
 		metaParticleHandlers = new ArrayList<MetaParticleHandler>();
 		logger.debug("Channel manager for channel " + channelId + " created");
@@ -130,8 +152,8 @@ public class ChannelManager implements Serializable {
 
 		// make sure this channel manager has an operation and optional
 		// metaParticleHandlers
-		if (operation == null) { // this is the first particle, no operation has
-									// been instantiated.
+		if (operation == null) {
+			// this is the first particle, no operation has been instantiated.
 			try {
 				createOperation(particle);
 			} catch (InstantiationException | IllegalAccessException e) {
@@ -142,25 +164,36 @@ public class ChannelManager implements Serializable {
 			}
 		}
 
-		// parse particles
-		List<Particle> result = new ArrayList<Particle>();
+		// is the particle a metaParticle?
+		if (particle instanceof MetaParticle) {
+			MetaParticle metaParticle = (MetaParticle) particle;
+			List<Particle> outputParticles = handleMetaParticle(metaParticle);
 
-		if (particle instanceof MetaParticle) { // metaParticle
-			List<Particle> outputParticles = handleMetaParticle((MetaParticle) particle);
 			// add metaParticle to output list in order to be resent further in
-			// the topology
-			result.add(particle);
-			// add optional output particles
+			// the topology, before the optional other output particles
+			List<Particle> result = new ArrayList<Particle>();
+			result.add(metaParticle);
+
+			// add other output particles if available, after the meta particle
 			if (outputParticles != null) {
 				result.addAll(outputParticles);
 			}
-		} else if (particle instanceof DataParticle) { // dataParticle
+
+			return result;
+		}
+
+		// is the particle a dataParticle?
+		else if (particle instanceof DataParticle) {
+			DataParticle dataParticle = (DataParticle) particle;
 			try {
 				List<DataParticle> outputDataParticles = null;
-				if (batcher != null) { // batch dataParticle and give it to
-										// batcherOperation
+
+				// is there a batcher?
+				if (batcher != null) {
+					// batch dataParticle and give it to the batcherOperation
 					List<DataParticleBatch> batchedParticles = batcher
-							.batch((DataParticle) particle);
+							.batch(dataParticle);
+
 					// are there one or more batches to be sent?
 					if (batchedParticles != null) {
 						for (DataParticleBatch batchedParticle : batchedParticles) {
@@ -168,27 +201,34 @@ public class ChannelManager implements Serializable {
 									.execute(batchedParticle);
 						}
 					}
-				} else { // single operation
-					outputDataParticles = ((SingleOperation) operation)
-							.execute((DataParticle) particle);
 				}
 
+				// it is a operation without a batcher
+				else {
+					outputDataParticles = ((SingleOperation) operation)
+							.execute(dataParticle);
+				}
+
+				// are there any particles to be emitted, convert into Particle
+				// list?
+				List<Particle> result = new ArrayList<Particle>();
 				if (outputDataParticles != null) {
 					result.addAll(outputDataParticles);
 				}
+				return result;
 			} catch (BatcherException | OperationException e) {
 				logger.error(
 						"Unable to execugte operation due to: "
 								+ e.getMessage(), e);
+				return null;
 			}
 		} else {
-			logger.warn("For channel " + channelId
+			// Internal error, a new particle type emerges
+			logger.error("Internel error: for channel " + channelId
 					+ ": unknown particle type ("
 					+ particle.getClass().getName() + ") to process");
 			return null;
 		}
-
-		return result;
 	}
 
 	/**
@@ -200,42 +240,50 @@ public class ChannelManager implements Serializable {
 	 */
 	private void createOperation(Particle firstParticle)
 			throws InstantiationException, IllegalAccessException {
-		// create optional batcher
+		// create batcher if needed
 		if (batcherClass != null)
 			try {
 				batcher = batcherClass.newInstance();
-				batcher.init(channelId, firstParticle.getTimestamp(),
-						stormNativeConfig, zookeeperStormConfiguration, null);
+				batcher.init(channelId, particleCache, stormNativeConfig,
+						zookeeperStormConfiguration);
+				batcher.prepareForFirstParticle(firstParticle.getTimestamp());
 			} catch (BatcherException e) {
 				throw new InstantiationException(e.getMessage());
 			}
 
-		// create new operation and initialize it
-		operation = operationClass.newInstance();
 		try {
-			// is it a BatchOperation?
+			// create new operation and initialize it
+			operation = operationClass.newInstance();
 
+			// is it a BatchOperation?
 			if (BatchOperation.class.isInstance(operation)) {
-				((BatchOperation) operation).init(channelId,
-						firstParticle.getTimestamp(), stormNativeConfig,
+				((BatchOperation) operation).init(channelId, stormNativeConfig,
 						zookeeperStormConfiguration);
-			} // or is it a SingleOperation?
+				operation.prepareForFirstParticle(firstParticle.getTimestamp());
+
+			}
+
+			// or is it a SingleOperation?
 			else if (SingleOperation.class.isInstance(operation)) {
-				operation.init(channelId, firstParticle.getTimestamp(),
-						stormNativeConfig, zookeeperStormConfiguration);
-			} // unknown operation type
+				operation.init(channelId, stormNativeConfig,
+						zookeeperStormConfiguration);
+				operation.prepareForFirstParticle(firstParticle.getTimestamp());
+			}
+
+			// unknown operation type
 			else {
-				logger.error("OperationClass of unknown type "
+				logger.error("Internal error: OperationClass of unknown type "
 						+ operationClass.getName() + ", expected: "
 						+ SingleOperation.class.getName() + " or "
 						+ BatchOperation.class.getName());
 			}
 		} catch (OperationException oe) {
-			logger.error(
-					"Unable to initialize resources due to: " + oe.getMessage(),
-					oe);
+			// stop creating an operation, and inform the caller why
+			throw new InstantiationException(
+					"Unable to initialize operation due to: " + oe.getMessage());
 		}
 
+		// create the meta particle handlers related to this operation
 		createMetaParticleHandlers(operation);
 	}
 
@@ -264,13 +312,13 @@ public class ChannelManager implements Serializable {
 	 * 
 	 * @param metaParticle
 	 */
-	private List<Particle> handleMetaParticle(MetaParticle metaParticle) {
-		List<Particle> result = null;
+	protected List<Particle> handleMetaParticle(MetaParticle metaParticle) {
+		List<Particle> result = new ArrayList<Particle>();
 		for (MetaParticleHandler mph : metaParticleHandlers) {
 			MetaParticleHandlerDecleration mphd = mph.getClass().getAnnotation(
 					MetaParticleHandlerDecleration.class);
 			if (metaParticle.getClass().isAssignableFrom(mphd.metaParticle())) {
-				result = mph.handleMetaParticle(metaParticle);
+				result.addAll(mph.handleMetaParticle(metaParticle));
 			}
 		}
 		return result;
@@ -286,7 +334,7 @@ public class ChannelManager implements Serializable {
 	 */
 	public static List<Class<? extends Particle>> getOutputParticles(
 			Class<? extends Operation> operationClass) {
-		List<Class<? extends Particle>> result = new ArrayList<>();
+		List<Class<? extends Particle>> result = new ArrayList<Class<? extends Particle>>();
 		OperationDeclaration od = operationClass
 				.getAnnotation(OperationDeclaration.class);
 		for (Class<? extends DataParticle> cl : od.outputs()) {
@@ -311,7 +359,7 @@ public class ChannelManager implements Serializable {
 	 */
 	public static List<Class<? extends DataParticle>> getOutputDataParticles(
 			Class<? extends Operation> operationClass) {
-		List<Class<? extends DataParticle>> result = new ArrayList<>();
+		List<Class<? extends DataParticle>> result = new ArrayList<Class<? extends DataParticle>>();
 		OperationDeclaration od = operationClass
 				.getAnnotation(OperationDeclaration.class);
 		for (Class<? extends DataParticle> cl : od.outputs()) {
@@ -330,7 +378,7 @@ public class ChannelManager implements Serializable {
 	 */
 	public static List<Class<? extends MetaParticle>> getOutputMetaParticles(
 			Class<? extends Operation> operationClass) {
-		List<Class<? extends MetaParticle>> result = new ArrayList<>();
+		List<Class<? extends MetaParticle>> result = new ArrayList<Class<? extends MetaParticle>>();
 		OperationDeclaration od = operationClass
 				.getAnnotation(OperationDeclaration.class);
 		for (Class<? extends MetaParticleHandler> cl : od

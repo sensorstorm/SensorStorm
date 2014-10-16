@@ -9,6 +9,7 @@ import nl.tno.storm.configuration.api.ZookeeperStormConfigurationAPI;
 import nl.tno.timeseries.annotation.OperationDeclaration;
 import nl.tno.timeseries.config.OperationConfigManager;
 import nl.tno.timeseries.interfaces.DataParticle;
+import nl.tno.timeseries.interfaces.OperationException;
 import nl.tno.timeseries.interfaces.SingleOperation;
 
 @OperationDeclaration(inputs = { MyDataParticle.class }, outputs = {})
@@ -23,12 +24,10 @@ public class MyConfigOperation implements SingleOperation {
 			"");
 
 	@Override
-	public void init(String channelID, long startTimestamp,
+	public void init(String channelId,
 			@SuppressWarnings("rawtypes") Map stormNativeConfig,
 			ZookeeperStormConfigurationAPI stormConfiguration) {
-		this.channelId = channelID;
-		System.out.println("init myConfigOperation for channel " + channelID
-				+ " at " + startTimestamp);
+		this.channelId = channelId;
 		OperationConfigManager operationConfigManager = new OperationConfigManager(
 				stormConfiguration, "myconfigoperation");
 		try {
@@ -39,6 +38,13 @@ public class MyConfigOperation implements SingleOperation {
 		} catch (StormConfigurationException e) {
 			System.out.println("Can not load parameters.");
 		}
+	}
+
+	@Override
+	public void prepareForFirstParticle(long startTimestamp)
+			throws OperationException {
+		System.out.println("init myConfigOperation for channel " + channelId
+				+ " at " + startTimestamp);
 	}
 
 	@Override

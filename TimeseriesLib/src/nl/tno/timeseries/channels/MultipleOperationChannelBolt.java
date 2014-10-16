@@ -3,55 +3,33 @@ package nl.tno.timeseries.channels;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
-import nl.tno.storm.configuration.api.StormConfigurationException;
-import nl.tno.storm.configuration.api.ZookeeperStormConfigurationAPI;
-import nl.tno.storm.configuration.impl.ZookeeperStormConfigurationFactory;
-import nl.tno.timeseries.batchers.EmptyBatcher;
-import nl.tno.timeseries.config.EmptyStormConfiguration;
 import nl.tno.timeseries.interfaces.BatchOperation;
 import nl.tno.timeseries.interfaces.Batcher;
 import nl.tno.timeseries.interfaces.ChannelGrouper;
 import nl.tno.timeseries.interfaces.DataParticle;
 import nl.tno.timeseries.interfaces.Operation;
+import nl.tno.timeseries.interfaces.OperationException;
 import nl.tno.timeseries.interfaces.Particle;
 import nl.tno.timeseries.interfaces.SingleOperation;
 import nl.tno.timeseries.mapper.ParticleMapper;
-import nl.tno.timeseries.particles.EmitParticleInterface;
 import nl.tno.timeseries.particles.MetaParticleUtil;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import backtype.storm.Config;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-
-public class MultipleOperationChannelBolt extends BaseRichBolt implements
-		EmitParticleInterface {
+public class MultipleOperationChannelBolt extends AbstractOperationChannelBolt {
 
 	private static final long serialVersionUID = -5109656134961759532L;
 
-	protected Logger logger = LoggerFactory
-			.getLogger(MultipleOperationChannelBolt.class);
-	protected ZookeeperStormConfigurationAPI zookeeperStormConfiguration;
-	protected @SuppressWarnings("rawtypes") Map stormNativeConfig;
-	protected OutputCollector collector;
-	protected String boltName;
 	protected Class<? extends Operation> operationClass;
 	protected int nrOfOutputFields;
 	protected Class<? extends Batcher> batcherClass;
 	protected Map<String, ChannelManager> channelManagers;
 	protected Fields metaParticleFields;
-	protected Cache<Object, Object> tupleCache;
 
 	/**
 	 * Construct a {@link MultipleOperationChannelBolt} with a {@link Batcher}
@@ -62,10 +40,19 @@ public class MultipleOperationChannelBolt extends BaseRichBolt implements
 	 *            {@link Class} of the {@link Batcher} implementation
 	 * @param batchOperationClass
 	 *            {@link Class} of the {@link BatchOperation} implementation
+	 * @throws OperationException
 	 */
 	public MultipleOperationChannelBolt(Config config,
 			Class<? extends Batcher> batcherClass,
-			Class<? extends BatchOperation> batchOperationClass) {
+			Class<? extends BatchOperation> batchOperationClass)
+			throws OperationException {
+		if (batcherClass == null) {
+			throw new OperationException("batcherClass may not be null");
+		}
+		if (batchOperationClass == null) {
+			throw new OperationException("batchOperationClass may not be null");
+		}
+
 		// Set fields
 		this.operationClass = batchOperationClass;
 		this.batcherClass = batcherClass;
@@ -83,12 +70,18 @@ public class MultipleOperationChannelBolt extends BaseRichBolt implements
 	 *            Storm configuration map
 	 * @param operationClass
 	 *            {@link Class} of the {@link Operation} implementation
+	 * @throws OperationException
 	 */
 	public MultipleOperationChannelBolt(Config config,
-			Class<? extends SingleOperation> operationClass) {
+			Class<? extends SingleOperation> operationClass)
+			throws OperationException {
+		if (operationClass == null) {
+			throw new OperationException("operationClass may not be null");
+		}
+
 		// Set fields
 		this.operationClass = operationClass;
-		this.batcherClass = EmptyBatcher.class;
+		this.batcherClass = null;
 		this.channelManagers = new HashMap<String, ChannelManager>();
 		this.metaParticleFields = MetaParticleUtil
 				.registerMetaParticleFieldsWithOperationClass(config,
@@ -98,42 +91,23 @@ public class MultipleOperationChannelBolt extends BaseRichBolt implements
 	@Override
 	public void prepare(@SuppressWarnings("rawtypes") Map stormNativeConfig,
 			TopologyContext context, OutputCollector collector) {
-		this.collector = collector;
-		this.boltName = context.getThisComponentId();
-		this.stormNativeConfig = stormNativeConfig;
-
-		try {
-			zookeeperStormConfiguration = ZookeeperStormConfigurationFactory
-					.getInstance().getStormConfiguration(stormNativeConfig);
-		} catch (StormConfigurationException e) {
-			logger.error("Can not connect to zookeeper for get Storm configuration. Reason: "
-					+ e.getMessage());
-			zookeeperStormConfiguration = new EmptyStormConfiguration();
-		}
-
-		if ((stormNativeConfig
-				.containsKey(ChannelSpout.TOPOLOGY_FAULT_TOLERANT) && (boolean) stormNativeConfig
-				.get(ChannelSpout.TOPOLOGY_FAULT_TOLERANT))
-				|| (int) stormNativeConfig
-						.get(Config.TOPOLOGY_MAX_SPOUT_PENDING) > 0) {
-			long timeout = ((Long) stormNativeConfig
-					.get(Config.TOPOLOGY_MESSAGE_TIMEOUT_SECS_SCHEMA))
-					.intValue();
-			int maxSize = ((Long) stormNativeConfig
-					.get(ChannelSpout.TOPOLOGY_TUPLECACHE_MAX_SIZE)).intValue();
-			tupleCache = CacheBuilder.newBuilder().maximumSize(maxSize)
-					.expireAfterAccess(timeout, TimeUnit.SECONDS).build();
-		}
+		super.prepare(stormNativeConfig, context, collector);
 	}
 
+	/**
+	 * Handle the new incoming tuple
+	 */
 	@Override
 	public void execute(Tuple tuple) {
 		Particle inputParticle = ParticleMapper.tupleToParticle(tuple);
+
+		// is there a particle to process?
 		if (inputParticle != null) {
 			String selectChannelManagerId = inputParticle.getChannelId();
+
 			// determine if there was a channelGrouper in front of this bolt, if
-			// so use the channelGroup as grouper.
-			String channelGroupId;
+			// so use the channelGroupId as selector for the channelManager
+			String channelGroupId = null;
 			try {
 				channelGroupId = tuple
 						.getStringByField(ChannelGrouper.GROUPED_PARTICLE_FIELD);
@@ -144,34 +118,52 @@ public class MultipleOperationChannelBolt extends BaseRichBolt implements
 				selectChannelManagerId = channelGroupId;
 			}
 
+			// get a channel manager based on the channelId or channelGroupd
 			ChannelManager channelManager = getChannelManager(selectChannelManagerId);
+
+			// process the particle and emit the output
 			List<Particle> outputParticles = channelManager
 					.processParticle(inputParticle);
-			if (outputParticles != null) {
-				for (Particle outputParticle : outputParticles) {
-					emitParticle(tuple, outputParticle);
-				}
-			}
+			emitParticles(tuple, outputParticles);
 		}
 	}
 
+	/**
+	 * Returns the channelmanager related to the channelId, or instantiate one
+	 * if it was not present.
+	 * 
+	 * @param channelId
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
 	private ChannelManager getChannelManager(String channelId) {
 		ChannelManager channelManager = channelManagers.get(channelId);
+
+		// no channel manager present yet for the channelId
 		if (channelManager == null) {
+			// is it a single operation
 			if (SingleOperation.class.isAssignableFrom(operationClass)) {
 				channelManager = new ChannelManager(channelId,
 						(Class<? extends SingleOperation>) operationClass,
-						stormNativeConfig, zookeeperStormConfiguration);
-			} else if (BatchOperation.class.isAssignableFrom(operationClass)) {
+						stormNativeConfig, zookeeperStormConfiguration, this);
+			}
+
+			// is it a batch operation
+			else if (BatchOperation.class.isAssignableFrom(operationClass)) {
 				channelManager = new ChannelManager(channelId, batcherClass,
 						(Class<? extends BatchOperation>) operationClass,
-						stormNativeConfig, zookeeperStormConfiguration);
+						stormNativeConfig, zookeeperStormConfiguration, this);
 			} else {
-				logger.error("Unknown operation " + operationClass.getName());
+				// Apparently a new constructor is added to create a new type of
+				// operation
+				logger.error("Internal error, unknown operation class "
+						+ operationClass.getName());
 			}
+
+			// register the new channel manager for this channelId
 			channelManagers.put(channelId, channelManager);
 		}
+
 		return channelManager;
 	}
 
@@ -204,15 +196,19 @@ public class MultipleOperationChannelBolt extends BaseRichBolt implements
 
 	@Override
 	public void emitParticle(Tuple anchor, Particle particle) {
-		collector.emit(anchor,
-				ParticleMapper.particleToValues(particle, nrOfOutputFields));
+		if (particle != null) {
+			collector
+					.emit(anchor, ParticleMapper.particleToValues(particle,
+							nrOfOutputFields));
+		}
 	}
 
 	@Override
 	public void emitParticle(Particle particle) {
-		collector.emit(ParticleMapper.particleToValues(particle,
-				nrOfOutputFields));
-
+		if (particle != null) {
+			collector.emit(ParticleMapper.particleToValues(particle,
+					nrOfOutputFields));
+		}
 	}
 
 }

@@ -7,6 +7,7 @@ import nl.tno.storm.configuration.api.StormConfigurationException;
 import nl.tno.storm.configuration.api.ZookeeperStormConfigurationAPI;
 import nl.tno.storm.configuration.impl.ZookeeperStormConfigurationFactory;
 import nl.tno.timeseries.annotation.FetcherDeclaration;
+import nl.tno.timeseries.config.ConfigKeys;
 import nl.tno.timeseries.config.EmptyStormConfiguration;
 import nl.tno.timeseries.interfaces.DataParticle;
 import nl.tno.timeseries.interfaces.Fetcher;
@@ -28,11 +29,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
 public class ChannelSpout implements IRichSpout {
-
 	private static final long serialVersionUID = -3199538353837853899L;
-
-	public static final String TOPOLOGY_TUPLECACHE_MAX_SIZE = "spout.tuplecache.maxsize";
-	public static final String TOPOLOGY_FAULT_TOLERANT = "topology.fault-tolerant";
 
 	protected Logger logger = LoggerFactory.getLogger(ChannelSpout.class);
 	protected Cache<Object, Object> tupleCache;
@@ -78,9 +75,9 @@ public class ChannelSpout implements IRichSpout {
 		}
 
 		replay = stormNativeConfig
-				.containsKey(ChannelSpout.TOPOLOGY_FAULT_TOLERANT)
+				.containsKey(ConfigKeys.TOPOLOGY_FAULT_TOLERANT)
 				&& (boolean) stormNativeConfig
-						.get(ChannelSpout.TOPOLOGY_FAULT_TOLERANT);
+						.get(ConfigKeys.TOPOLOGY_FAULT_TOLERANT);
 		anchor = stormNativeConfig.get(Config.TOPOLOGY_MAX_SPOUT_PENDING) != null
 				&& (long) stormNativeConfig
 						.get(Config.TOPOLOGY_MAX_SPOUT_PENDING) > 0;
@@ -90,7 +87,7 @@ public class ChannelSpout implements IRichSpout {
 			long timeout = ((Long) stormNativeConfig
 					.get(Config.TOPOLOGY_MESSAGE_TIMEOUT_SECS)).intValue();
 			int maxSize = ((Long) stormNativeConfig
-					.get(TOPOLOGY_TUPLECACHE_MAX_SIZE)).intValue();
+					.get(ConfigKeys.SPOUT_TUPLECACHE_MAX_SIZE)).intValue();
 			tupleCache = CacheBuilder.newBuilder().maximumSize(maxSize)
 					.expireAfterAccess(timeout, TimeUnit.SECONDS).build();
 
@@ -166,8 +163,10 @@ public class ChannelSpout implements IRichSpout {
 
 	@Override
 	public void fail(Object msgId) {
-		if (tupleCache != null && tupleCache.getIfPresent(msgId) != null) {
-			emitParticle(msgId, (Particle) tupleCache.getIfPresent(msgId));
+		if (replay) {
+			if (tupleCache != null && tupleCache.getIfPresent(msgId) != null) {
+				emitParticle(msgId, (Particle) tupleCache.getIfPresent(msgId));
+			}
 		}
 	}
 

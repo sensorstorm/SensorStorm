@@ -15,9 +15,22 @@ import nl.tno.timeseries.channels.ParticleCache;
  */
 public interface Batcher {
 
-	public void init(String channelID, long startTimestamp,
+	/**
+	 * 
+	 * @param channelID
+	 * @param cache
+	 *            The cache containing all {@link DataParticle} objects present
+	 *            within the bolt
+	 * @param stormNativeConfig
+	 * @param zookeeperStormConfiguration
+	 * @throws BatcherException
+	 */
+	public void init(String channelID, ParticleCache cache,
 			@SuppressWarnings("rawtypes") Map stormNativeConfig,
 			ZookeeperStormConfigurationAPI zookeeperStormConfiguration)
+			throws BatcherException;
+
+	public void prepareForFirstParticle(long startTimestamp)
 			throws BatcherException;
 
 	/**
@@ -27,13 +40,10 @@ public interface Batcher {
 	 * 
 	 * @param inputParticle
 	 *            The new data particle to be added to the inner batch.
-	 * @param cache
-	 *            The cache containing all {@link DataParticle} objects present
-	 *            within the bolt
 	 * @return Returns null to indicate the batch is not ready yet, or a list
 	 *         with one or more DataPatricleBatches
 	 */
-	public List<DataParticleBatch> batch(ParticleCache cache,
-			DataParticle inputParticle) throws BatcherException;
+	public List<DataParticleBatch> batch(DataParticle inputParticle)
+			throws BatcherException;
 
 }

@@ -28,17 +28,24 @@ public abstract interface Operation extends Serializable {
 	 *            to this operation. In case of a ChannelGrouperBolt infront of
 	 *            the ChannelBolt managing this operation, the channelGroupId
 	 *            will be used.
-	 * @param startTimestamp
-	 *            The timestamp of the first particle, this is the first
-	 *            particle this operation instance have to process
 	 * @param stormNativeConfig
 	 *            A reference to the storm config object
 	 * @param zookeeperStormConfiguration
 	 *            A reference to the zookeeper storm config api
 	 */
-	public void init(String channelID, long startTimestamp,
+	public void init(String channelID,
 			@SuppressWarnings("rawtypes") Map stormNativeConfig,
 			ZookeeperStormConfigurationAPI zookeeperStormConfiguration)
+			throws OperationException;
+
+	/**
+	 * @param startTimestamp
+	 *            The timestamp of the first particle, this is the first
+	 *            particle this operation instance have to process
+	 * 
+	 * @param startTimestamp
+	 */
+	public void prepareForFirstParticle(long startTimestamp)
 			throws OperationException;
 
 }

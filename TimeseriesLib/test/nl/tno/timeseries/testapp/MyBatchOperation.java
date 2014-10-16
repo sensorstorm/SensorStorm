@@ -8,6 +8,7 @@ import nl.tno.timeseries.annotation.OperationDeclaration;
 import nl.tno.timeseries.interfaces.BatchOperation;
 import nl.tno.timeseries.interfaces.DataParticle;
 import nl.tno.timeseries.interfaces.DataParticleBatch;
+import nl.tno.timeseries.interfaces.OperationException;
 
 @OperationDeclaration(inputs = { MyDataParticle.class }, outputs = {})
 public class MyBatchOperation implements BatchOperation {
@@ -15,10 +16,15 @@ public class MyBatchOperation implements BatchOperation {
 	private String channelId;
 
 	@Override
-	public void init(String channelID, long startTimestamp,
+	public void init(String channelID,
 			@SuppressWarnings("rawtypes") Map stormNativeConfig,
 			ZookeeperStormConfigurationAPI stormConfiguration) {
 		this.channelId = channelID;
+	}
+
+	@Override
+	public void prepareForFirstParticle(long startTimestamp)
+			throws OperationException {
 		System.out.println("init myBatchOperation at " + startTimestamp);
 	}
 

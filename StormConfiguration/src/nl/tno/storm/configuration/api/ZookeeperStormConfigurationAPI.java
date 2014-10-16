@@ -23,17 +23,6 @@ public interface ZookeeperStormConfigurationAPI {
 			throws StormConfigurationException;
 
 
-	
-	public Map<String, String> getStreamConfiguration(String streamId) throws StormConfigurationException;
-
-	public void registerStreamConfigurationListener(String streamId, ConfigurationListener listener)
-			throws StormConfigurationException;
-
-	public void unregisterStreamConfigurationListener(String streamId, ConfigurationListener listener)
-			throws StormConfigurationException;
-
-	
-	
 	public Map<String, String> getChannelConfiguration(String channelId) throws StormConfigurationException;
 
 	public void registerChannelConfigurationListener(String channelId, ConfigurationListener listener)
@@ -42,6 +31,8 @@ public interface ZookeeperStormConfigurationAPI {
 	public void unregisterChannelConfigurationListener(String channelId, ConfigurationListener listener)
 			throws StormConfigurationException;
 
+	
+	//------------------------------- hieronder niet nmeer ---------------------
 	
 	public Map<String, String> getOperationConfiguration(String operationId) throws StormConfigurationException;
 
@@ -59,7 +50,17 @@ public interface ZookeeperStormConfigurationAPI {
 
 	public void unregisterFetcherConfigurationListener(String fetcherId, ConfigurationListener listener)
 			throws StormConfigurationException;
+
+	public Map<String, String> getStreamConfiguration(String streamId) throws StormConfigurationException;
+
+	public void registerStreamConfigurationListener(String streamId, ConfigurationListener listener)
+			throws StormConfigurationException;
+
+	public void unregisterStreamConfigurationListener(String streamId, ConfigurationListener listener)
+			throws StormConfigurationException;
+
 	
+
 	@SuppressWarnings("rawtypes")
 	public void setNativeStormConfig(Map nativeStormConfig);
 	

@@ -31,6 +31,6 @@ public interface MetaParticleHandler {
 	 * @param metaParticle
 	 * @return Returns a list containing MetaParticles or DataParticles
 	 */
-	public List<Particle> handleMetaParticle(MetaParticle metaParticle);
+	public List<? extends Particle> handleMetaParticle(MetaParticle metaParticle);
 
 }

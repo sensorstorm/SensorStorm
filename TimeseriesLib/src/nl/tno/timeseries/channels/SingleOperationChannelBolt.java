@@ -4,58 +4,49 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import nl.tno.storm.configuration.api.StormConfigurationException;
-import nl.tno.storm.configuration.api.ZookeeperStormConfigurationAPI;
-import nl.tno.storm.configuration.impl.ZookeeperStormConfigurationFactory;
 import nl.tno.timeseries.annotation.MetaParticleHandlerDecleration;
 import nl.tno.timeseries.annotation.OperationDeclaration;
-import nl.tno.timeseries.config.EmptyStormConfiguration;
+import nl.tno.timeseries.config.ConfigKeys;
 import nl.tno.timeseries.interfaces.BatchOperation;
 import nl.tno.timeseries.interfaces.Batcher;
 import nl.tno.timeseries.interfaces.BatcherException;
 import nl.tno.timeseries.interfaces.DataParticle;
 import nl.tno.timeseries.interfaces.DataParticleBatch;
-import nl.tno.timeseries.interfaces.FaultTolerant;
 import nl.tno.timeseries.interfaces.MetaParticle;
 import nl.tno.timeseries.interfaces.Operation;
 import nl.tno.timeseries.interfaces.OperationException;
 import nl.tno.timeseries.interfaces.Particle;
 import nl.tno.timeseries.interfaces.SingleOperation;
 import nl.tno.timeseries.mapper.ParticleMapper;
-import nl.tno.timeseries.particles.EmitParticleInterface;
 import nl.tno.timeseries.particles.MetaParticleHandler;
 import nl.tno.timeseries.particles.MetaParticleUtil;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import backtype.storm.Config;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
-public class SingleOperationChannelBolt extends BaseRichBolt implements
-		EmitParticleInterface, FaultTolerant {
-
+/**
+ * StormNativeConfig params used: ChannelSpout.TOPOLOGY_FAULT_TOLERANT
+ * Config.TOPOLOGY_MAX_SPOUT_PENDING Config.TOPOLOGY_MESSAGE_TIMEOUT_SECS
+ * ChannelSpout.TOPOLOGY_TUPLECACHE_MAX_SIZE
+ * 
+ * @author waaijbdvd
+ * 
+ */
+public class SingleOperationChannelBolt extends AbstractOperationChannelBolt {
 	private static final long serialVersionUID = -7628008145368347247L;
 	private final static String EMPTY_CHANNELID = "";
-	private final static long EMPTY_STARTTIMESTAMP = 0;
 
-	protected Logger logger = LoggerFactory
-			.getLogger(SingleOperationChannelBolt.class);
-	protected ZookeeperStormConfigurationAPI zookeeperStormConfiguration;
-	protected OutputCollector collector;
-	protected String boltName;
 	protected int nrOfOutputFields;
 	protected Fields metaParticleFields;
-	protected ParticleCache cache;
+	protected ParticleCache particleCache;
 	private final Operation operation;
-	private Batcher batcher;
-	protected boolean ackFailAndAnchor = false;
+	private final Batcher batcher;
 	private List<MetaParticleHandler> metaParticleHandlers;
+	protected boolean batcherPreparedForFirstParticle = false;
+	protected boolean operationPreparedForFirstParticle = false;
 
 	/**
 	 * Construct a {@link SingleOperationChannelBolt} with a {@link Batcher}
@@ -66,9 +57,17 @@ public class SingleOperationChannelBolt extends BaseRichBolt implements
 	 *            {@link Class} of the {@link Batcher} implementation
 	 * @param batchOperationClass
 	 *            {@link Class} of the {@link BatchOperation} implementation
+	 * @throws OperationException
 	 */
 	public SingleOperationChannelBolt(Config config, Batcher batcher,
-			BatchOperation batchOperation) {
+			BatchOperation batchOperation) throws OperationException {
+		if (batchOperation == null) {
+			throw new OperationException("batchOperation may not be null");
+		}
+		if (batcher == null) {
+			throw new OperationException("batcher may not be null");
+		}
+
 		// Set fields
 		this.operation = batchOperation;
 		this.batcher = batcher;
@@ -84,10 +83,17 @@ public class SingleOperationChannelBolt extends BaseRichBolt implements
 	 *            Storm configuration map
 	 * @param operationClass
 	 *            {@link Class} of the {@link Operation} implementation
+	 * @throws OperationException
 	 */
-	public SingleOperationChannelBolt(Config config, SingleOperation operation) {
+	public SingleOperationChannelBolt(Config config, SingleOperation operation)
+			throws OperationException {
+		if (operation == null) {
+			throw new OperationException("batchOperation may not be null");
+		}
+
 		// Set fields
 		this.operation = operation;
+		this.batcher = null;
 		this.metaParticleFields = MetaParticleUtil
 				.registerMetaParticleFieldsWithOperationClass(config,
 						operation.getClass());
@@ -96,101 +102,124 @@ public class SingleOperationChannelBolt extends BaseRichBolt implements
 	@Override
 	public void prepare(@SuppressWarnings("rawtypes") Map stormNativeConfig,
 			TopologyContext context, OutputCollector collector) {
-		this.collector = collector;
-		this.boltName = context.getThisComponentId();
+		super.prepare(stormNativeConfig, context, collector);
 
-		try {
-			zookeeperStormConfiguration = ZookeeperStormConfigurationFactory
-					.getInstance().getStormConfiguration(stormNativeConfig);
-		} catch (StormConfigurationException e) {
-			logger.error("Can not connect to zookeeper for get Storm configuration. Reason: "
-					+ e.getMessage());
-			zookeeperStormConfiguration = new EmptyStormConfiguration();
-		}
+		// initiate particle cache
+		int timeout = ConfigKeys.getStormNativeIntegerConfigValue(
+				stormNativeConfig, Config.TOPOLOGY_MESSAGE_TIMEOUT_SECS,
+				ConfigKeys.TOPOLOGY_MESSAGE_TIMEOUT_SECS_DEFAULT);
+		int maxSize = ConfigKeys.getStormNativeIntegerConfigValue(
+				stormNativeConfig, ConfigKeys.SPOUT_TUPLECACHE_MAX_SIZE,
+				ConfigKeys.SPOUT_TUPLECACHE_MAX_SIZE_DEFAULT);
+		particleCache = new ParticleCache(maxSize, timeout, this);
 
+		// initialze operation and optionally the batcher
 		try {
 			if (batcher != null) {
-				batcher.init(EMPTY_CHANNELID, EMPTY_STARTTIMESTAMP,
-						stormNativeConfig, zookeeperStormConfiguration);
+				batcher.init(EMPTY_CHANNELID, particleCache, stormNativeConfig,
+						zookeeperStormConfiguration);
 			}
-			if (operation != null) {
-				operation.init(EMPTY_CHANNELID, EMPTY_STARTTIMESTAMP,
-						stormNativeConfig, zookeeperStormConfiguration);
-				createMetaParticleHandlers(operation);
-			}
+			operation.init(EMPTY_CHANNELID, stormNativeConfig,
+					zookeeperStormConfiguration);
+			createMetaParticleHandlers(operation);
 		} catch (InstantiationException | IllegalAccessException
 				| OperationException | BatcherException e) {
 			logger.error("Unable to instantiate batcher and/or operation due to: "
 					+ e.getMessage());
 		}
 
-		ackFailAndAnchor = (stormNativeConfig
-				.containsKey(ChannelSpout.TOPOLOGY_FAULT_TOLERANT) && (boolean) stormNativeConfig
-				.get(ChannelSpout.TOPOLOGY_FAULT_TOLERANT))
-				|| (stormNativeConfig.get(Config.TOPOLOGY_MAX_SPOUT_PENDING) != null && (long) stormNativeConfig
-						.get(Config.TOPOLOGY_MAX_SPOUT_PENDING) > 0);
-
-		logger.info("Acking, Failing and Anchoring enabled: "
-				+ ackFailAndAnchor);
-
-		// initiate tuple cache
-		if (ackFailAndAnchor) {
-			int timeout = ((Long) stormNativeConfig
-					.get(Config.TOPOLOGY_MESSAGE_TIMEOUT_SECS)).intValue();
-			int maxSize = ((Long) stormNativeConfig
-					.get(ChannelSpout.TOPOLOGY_TUPLECACHE_MAX_SIZE)).intValue();
-			cache = new ParticleCache(maxSize, timeout, this);
-		}
-
 	}
 
+	/**
+	 * Handle the new incoming tuple
+	 */
 	@Override
 	public void execute(Tuple tuple) {
 		Particle inputParticle = ParticleMapper.tupleToParticle(tuple);
-		List<? extends Particle> outputParticles;
+
+		// is there a particle to process?
 		if (inputParticle != null) {
-			// handle metadata particle
+
+			// **** handle metadata particle
 			if (inputParticle instanceof MetaParticle) {
-				outputParticles = handleMetaParticle((MetaParticle) inputParticle);
+				List<Particle> outputParticles = handleMetaParticle((MetaParticle) inputParticle);
 				emitParticles(tuple, outputParticles);
 				this.ack(tuple);
-			} else if (inputParticle instanceof DataParticle) {
-				// perform batchoperation
-				if (batcher != null) {
-					try {
-						cache.put((DataParticle) inputParticle, tuple);
-						List<DataParticleBatch> batchedParticles = batcher
-								.batch(cache, (DataParticle) inputParticle);
-						// are there one or more batches to be sent?
-						if (batchedParticles != null) {
-							List<DataParticle> batchResult = new ArrayList<DataParticle>();
-							for (DataParticleBatch batchedParticle : batchedParticles) {
-								batchResult.addAll(((BatchOperation) operation)
-										.execute(batchedParticle));
-							}
-							outputParticles = batchResult;
-							emitParticles(tuple, outputParticles);
-						}
-					} catch (OperationException | BatcherException oe) {
-						this.fail(tuple);
-						logger.error(
-								"Unable to execute BatchOperation due to: "
-										+ oe.getMessage(), oe);
-					}
+			}
 
-				} else {
-					try {
-						outputParticles = ((SingleOperation) operation)
-								.execute((DataParticle) inputParticle);
-						emitParticles(tuple, outputParticles);
-						this.ack(tuple);
-					} catch (OperationException e) {
-						this.fail(tuple);
-						logger.error(
-								"Unable to execute SingleInputOperation due to: "
-										+ e.getMessage(), e);
-					}
+			// **** handle data particle
+			else if (inputParticle instanceof DataParticle) {
+				DataParticle dataParticle = (DataParticle) inputParticle;
+				handleDataParticle(tuple, dataParticle);
+			}
+		}
+	}
+
+	/**
+	 * Handle an incoming dataParticle
+	 * 
+	 * @param tuple
+	 * @param dataParticle
+	 */
+	protected void handleDataParticle(Tuple tuple, DataParticle dataParticle) {
+		// prepare the operation if it is the first time
+		if (!operationPreparedForFirstParticle) {
+			try {
+				operation.prepareForFirstParticle(dataParticle.getTimestamp());
+				operationPreparedForFirstParticle = true;
+			} catch (OperationException e) {
+				this.fail(tuple);
+				logger.error(
+						"Unable to prepare the SingleInputOperation for the first particle due to: "
+								+ e.getMessage(), e);
+			}
+		}
+
+		// Is there a batcher to call before the operation?
+		if (batcher != null) {
+			try {
+				// prepare the batcher if it is the first time
+				if (!batcherPreparedForFirstParticle) {
+					batcher.prepareForFirstParticle(dataParticle.getTimestamp());
+					batcherPreparedForFirstParticle = true;
 				}
+
+				// add data particle to the cache
+				particleCache.put(dataParticle, tuple);
+
+				// call the batcher to see if there is some batch ready
+				// for the operation
+				List<DataParticleBatch> batchedParticles = batcher
+						.batch(dataParticle);
+
+				// are there one or more batches to process?
+				if (batchedParticles != null) {
+					List<DataParticle> resultOfAllBatches = new ArrayList<DataParticle>();
+					for (DataParticleBatch batchedParticle : batchedParticles) {
+						resultOfAllBatches.addAll(((BatchOperation) operation)
+								.execute(batchedParticle));
+					}
+					emitParticles(tuple, resultOfAllBatches);
+				}
+			} catch (OperationException | BatcherException oe) {
+				this.fail(tuple);
+				logger.error(
+						"Unable to execute BatchOperation due to: "
+								+ oe.getMessage(), oe);
+			}
+		}
+
+		// no batcher, only the operation
+		else {
+			try {
+				List<DataParticle> outputDataParticles = ((SingleOperation) operation)
+						.execute(dataParticle);
+				emitParticles(tuple, outputDataParticles);
+				this.ack(tuple);
+			} catch (OperationException e) {
+				this.fail(tuple);
+				logger.error("Unable to execute SingleInputOperation due to: "
+						+ e.getMessage(), e);
 			}
 		}
 	}
@@ -202,7 +231,7 @@ public class SingleOperationChannelBolt extends BaseRichBolt implements
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 */
-	private void createMetaParticleHandlers(Operation operation)
+	protected void createMetaParticleHandlers(Operation operation)
 			throws InstantiationException, IllegalAccessException {
 		// walk through all specified metaHandlers in the annotation
 		OperationDeclaration operationDeclaration = operation.getClass()
@@ -220,13 +249,13 @@ public class SingleOperationChannelBolt extends BaseRichBolt implements
 	 * 
 	 * @param metaParticle
 	 */
-	private List<Particle> handleMetaParticle(MetaParticle metaParticle) {
-		List<Particle> result = null;
+	protected List<Particle> handleMetaParticle(MetaParticle metaParticle) {
+		List<Particle> result = new ArrayList<Particle>();
 		for (MetaParticleHandler mph : metaParticleHandlers) {
 			MetaParticleHandlerDecleration mphd = mph.getClass().getAnnotation(
 					MetaParticleHandlerDecleration.class);
 			if (metaParticle.getClass().isAssignableFrom(mphd.metaParticle())) {
-				result = mph.handleMetaParticle(metaParticle);
+				result.addAll(mph.handleMetaParticle(metaParticle));
 			}
 		}
 		return result;
@@ -325,33 +354,21 @@ public class SingleOperationChannelBolt extends BaseRichBolt implements
 		declarer.declare(fields);
 	}
 
+	/**
+	 * Emit an anchored particle, called from the batcher
+	 */
 	@Override
 	public void emitParticle(Tuple anchor, Particle particle) {
-		collector.emit(anchor,
-				ParticleMapper.particleToValues(particle, nrOfOutputFields));
-	}
-
-	@Override
-	public void ack(Tuple tuple) {
-		if (ackFailAndAnchor)
-			collector.ack(tuple);
-	}
-
-	@Override
-	public void fail(Tuple tuple) {
-		if (ackFailAndAnchor)
-			collector.fail(tuple);
-	}
-
-	public void emitParticles(Tuple anchor, List<? extends Particle> particles) {
-		for (Particle particle : particles) {
-			if (ackFailAndAnchor)
-				this.emitParticle(anchor, particle);
-			else
-				this.emitParticle(particle);
+		if (particle != null) {
+			collector
+					.emit(anchor, ParticleMapper.particleToValues(particle,
+							nrOfOutputFields));
 		}
 	}
 
+	/**
+	 * Emit a non-anchored particle, called from the batcher
+	 */
 	@Override
 	public void emitParticle(Particle particle) {
 		collector.emit(ParticleMapper.particleToValues(particle,
