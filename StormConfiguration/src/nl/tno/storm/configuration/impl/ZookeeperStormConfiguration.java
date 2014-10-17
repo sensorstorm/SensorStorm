@@ -4,13 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import nl.tno.storm.configuration.api.ConfigurationListener;
-import nl.tno.storm.configuration.api.StormConfigurationException;
 import nl.tno.storm.configuration.api.ExternalStormConfiguration;
+import nl.tno.storm.configuration.api.StormConfigurationException;
 
 import org.apache.curator.framework.CuratorFramework;
 
-public class ZookeeperStormConfiguration implements
-		ExternalStormConfiguration {
+public class ZookeeperStormConfiguration implements ExternalStormConfiguration {
 
 	public static final String PREFIX = "/topologies";
 
@@ -78,8 +77,10 @@ public class ZookeeperStormConfiguration implements
 		Map<String, String> res = new HashMap<String, String>();
 		if (zkClient.checkExists().forPath(path) != null) {
 			for (String key : zkClient.getChildren().forPath(path)) {
-				res.put(key,
-						new String(zkClient.getData().forPath(path + "/" + key)));
+				byte[] data = zkClient.getData().forPath(path + "/" + key);
+				if (data != null) {
+					res.put(key, new String(data));
+				}
 			}
 		}
 		return res;
