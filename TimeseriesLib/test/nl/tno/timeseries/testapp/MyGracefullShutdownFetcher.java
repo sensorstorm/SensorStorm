@@ -2,7 +2,7 @@ package nl.tno.timeseries.testapp;
 
 import java.util.Map;
 
-import nl.tno.storm.configuration.api.ZookeeperStormConfigurationAPI;
+import nl.tno.storm.configuration.api.ExternalStormConfiguration;
 import nl.tno.timeseries.annotation.FetcherDeclaration;
 import nl.tno.timeseries.interfaces.DataParticle;
 import nl.tno.timeseries.interfaces.Fetcher;
@@ -15,7 +15,7 @@ public class MyGracefullShutdownFetcher implements Fetcher {
 
 	@Override
 	public void prepare(@SuppressWarnings("rawtypes") Map stormNativeConfig,
-			ZookeeperStormConfigurationAPI stormConfiguration,
+			ExternalStormConfiguration stormConfiguration,
 			TopologyContext context) throws Exception {
 	}
 

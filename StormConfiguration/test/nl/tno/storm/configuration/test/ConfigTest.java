@@ -3,14 +3,14 @@ package nl.tno.storm.configuration.test;
 import java.util.Map;
 
 import nl.tno.storm.configuration.api.ConfigurationListener;
-import nl.tno.storm.configuration.api.ZookeeperStormConfigurationAPI;
+import nl.tno.storm.configuration.api.ExternalStormConfiguration;
 import nl.tno.storm.configuration.api.StormConfigurationException;
 import nl.tno.storm.configuration.impl.ZookeeperStormConfigurationFactory;
 
 public class ConfigTest implements ConfigurationListener {
 
 	private static final String TOPOLOGY_ID = "test";
-	private final ZookeeperStormConfigurationAPI stormConfiguration;
+	private final ExternalStormConfiguration stormConfiguration;
 
 	public ConfigTest() throws StormConfigurationException,
 			InterruptedException {

@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import nl.tno.storm.configuration.api.StormConfigurationException;
-import nl.tno.storm.configuration.api.ZookeeperStormConfigurationAPI;
+import nl.tno.storm.configuration.api.ExternalStormConfiguration;
 import nl.tno.storm.configuration.impl.ZookeeperStormConfigurationFactory;
 import nl.tno.timeseries.config.ConfigKeys;
 import nl.tno.timeseries.config.EmptyStormConfiguration;
@@ -30,7 +30,7 @@ public abstract class AbstractOperationChannelBolt extends BaseRichBolt
 	protected OutputCollector collector;
 	protected String boltName;
 	protected boolean ackFailAndAnchor = false;
-	protected ZookeeperStormConfigurationAPI zookeeperStormConfiguration;
+	protected ExternalStormConfiguration zookeeperStormConfiguration;
 	protected @SuppressWarnings("rawtypes")
 	Map stormNativeConfig;
 

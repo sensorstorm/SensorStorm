@@ -2,7 +2,7 @@ package nl.tno.timeseries.config;
 
 import java.util.Map;
 
-import nl.tno.storm.configuration.api.ZookeeperStormConfigurationAPI;
+import nl.tno.storm.configuration.api.ExternalStormConfiguration;
 import nl.tno.storm.configuration.api.StormConfigurationException;
 
 import org.slf4j.Logger;
@@ -12,7 +12,7 @@ public class OperationConfigManager extends ConfigManager {
 	private final Logger logger = LoggerFactory
 			.getLogger(OperationConfigManager.class);
 
-	private final ZookeeperStormConfigurationAPI stormConfiguration;
+	private final ExternalStormConfiguration stormConfiguration;
 	private final String operationName;
 
 	/**
@@ -24,14 +24,14 @@ public class OperationConfigManager extends ConfigManager {
 	 * @param stormConfiguration
 	 * @param operationName
 	 */
-	public OperationConfigManager(ZookeeperStormConfigurationAPI stormConfiguration,
-			String operationName) {
+	public OperationConfigManager(
+			ExternalStormConfiguration stormConfiguration, String operationName) {
 		this.stormConfiguration = stormConfiguration;
 		this.operationName = operationName;
 
 		try {
-			stormConfiguration.registerOperationConfigurationListener(
-					operationName, this);
+			stormConfiguration.registerTaskConfigurationListener(operationName,
+					this);
 		} catch (StormConfigurationException e) {
 			logger.error("Can not connect to zookeeper to get Storm configuration for operation "
 					+ operationName + ". Reason: " + e.getMessage());
@@ -46,7 +46,7 @@ public class OperationConfigManager extends ConfigManager {
 	 */
 	public void loadParameters() throws StormConfigurationException {
 		Map<String, String> operationConfiguration = stormConfiguration
-				.getOperationConfiguration(operationName);
+				.getTaskConfiguration(operationName);
 		configurationChanged(operationConfiguration);
 	}
 

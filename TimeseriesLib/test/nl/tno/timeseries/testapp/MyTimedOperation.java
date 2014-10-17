@@ -3,7 +3,7 @@ package nl.tno.timeseries.testapp;
 import java.util.List;
 import java.util.Map;
 
-import nl.tno.storm.configuration.api.ZookeeperStormConfigurationAPI;
+import nl.tno.storm.configuration.api.ExternalStormConfiguration;
 import nl.tno.timeseries.annotation.OperationDeclaration;
 import nl.tno.timeseries.interfaces.DataParticle;
 import nl.tno.timeseries.interfaces.OperationException;
@@ -21,7 +21,7 @@ public class MyTimedOperation implements SingleOperation, TimerTaskInterface {
 	@Override
 	public void init(String channelId,
 			@SuppressWarnings("rawtypes") Map stormNativeConfig,
-			ZookeeperStormConfigurationAPI stormConfiguration) {
+			ExternalStormConfiguration stormConfiguration) {
 		this.channelId = channelId;
 	}
 

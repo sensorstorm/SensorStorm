@@ -3,7 +3,7 @@ package nl.tno.timeseries.interfaces;
 import java.io.Serializable;
 import java.util.Map;
 
-import nl.tno.storm.configuration.api.ZookeeperStormConfigurationAPI;
+import nl.tno.storm.configuration.api.ExternalStormConfiguration;
 
 /**
  * An operation performs the processing of particles in a channel. This is the
@@ -35,7 +35,7 @@ public abstract interface Operation extends Serializable {
 	 */
 	public void init(String channelID,
 			@SuppressWarnings("rawtypes") Map stormNativeConfig,
-			ZookeeperStormConfigurationAPI zookeeperStormConfiguration)
+			ExternalStormConfiguration zookeeperStormConfiguration)
 			throws OperationException;
 
 	/**

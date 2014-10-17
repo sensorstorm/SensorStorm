@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import nl.tno.storm.configuration.api.ZookeeperStormConfigurationAPI;
+import nl.tno.storm.configuration.api.ExternalStormConfiguration;
 import nl.tno.timeseries.annotation.MetaParticleHandlerDecleration;
 import nl.tno.timeseries.annotation.OperationDeclaration;
 import nl.tno.timeseries.config.ConfigKeys;
@@ -48,7 +48,7 @@ public class ChannelManager implements Serializable {
 	private List<MetaParticleHandler> metaParticleHandlers;
 	private Class<? extends Operation> operationClass;
 	private Class<? extends Batcher> batcherClass;
-	private ZookeeperStormConfigurationAPI zookeeperStormConfiguration;
+	private ExternalStormConfiguration zookeeperStormConfiguration;
 	private @SuppressWarnings("rawtypes")
 	Map stormNativeConfig;
 	private int topologyMsgTimeout;
@@ -73,7 +73,7 @@ public class ChannelManager implements Serializable {
 			Class<? extends Batcher> batcherClass,
 			Class<? extends BatchOperation> batchOperationClass,
 			@SuppressWarnings("rawtypes") Map stormNativeConfig,
-			ZookeeperStormConfigurationAPI stormConfiguration,
+			ExternalStormConfiguration stormConfiguration,
 			FaultTolerant ackFailDelegator) {
 		channelManager(channelId, batcherClass, batchOperationClass,
 				stormNativeConfig, stormConfiguration, ackFailDelegator);
@@ -95,7 +95,7 @@ public class ChannelManager implements Serializable {
 	public ChannelManager(String channelId,
 			Class<? extends SingleOperation> operationClass,
 			@SuppressWarnings("rawtypes") Map stormNativeConfig,
-			ZookeeperStormConfigurationAPI stormConfiguration,
+			ExternalStormConfiguration stormConfiguration,
 			FaultTolerant ackFailDelegator) {
 		channelManager(channelId, null, operationClass, stormNativeConfig,
 				stormConfiguration, ackFailDelegator);
@@ -113,7 +113,7 @@ public class ChannelManager implements Serializable {
 			Class<? extends Batcher> batcherClass,
 			Class<? extends Operation> operationClass,
 			@SuppressWarnings("rawtypes") Map stormNativeConfig,
-			ZookeeperStormConfigurationAPI stormConfiguration,
+			ExternalStormConfiguration stormConfiguration,
 			FaultTolerant ackFailDelegator) {
 		this.channelId = channelId;
 		this.operationClass = operationClass;

@@ -3,7 +3,7 @@ package nl.tno.timeseries.interfaces;
 import java.util.List;
 import java.util.Map;
 
-import nl.tno.storm.configuration.api.ZookeeperStormConfigurationAPI;
+import nl.tno.storm.configuration.api.ExternalStormConfiguration;
 import nl.tno.timeseries.channels.ParticleCache;
 
 /**
@@ -27,7 +27,7 @@ public interface Batcher {
 	 */
 	public void init(String channelID, ParticleCache cache,
 			@SuppressWarnings("rawtypes") Map stormNativeConfig,
-			ZookeeperStormConfigurationAPI zookeeperStormConfiguration)
+			ExternalStormConfiguration zookeeperStormConfiguration)
 			throws BatcherException;
 
 	public void prepareForFirstParticle(long startTimestamp)

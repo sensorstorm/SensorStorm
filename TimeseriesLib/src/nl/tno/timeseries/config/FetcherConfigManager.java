@@ -2,8 +2,8 @@ package nl.tno.timeseries.config;
 
 import java.util.Map;
 
+import nl.tno.storm.configuration.api.ExternalStormConfiguration;
 import nl.tno.storm.configuration.api.StormConfigurationException;
-import nl.tno.storm.configuration.api.ZookeeperStormConfigurationAPI;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +12,7 @@ public class FetcherConfigManager extends ConfigManager {
 	private final Logger logger = LoggerFactory
 			.getLogger(FetcherConfigManager.class);
 
-	private final ZookeeperStormConfigurationAPI stormConfiguration;
+	private final ExternalStormConfiguration stormConfiguration;
 	private final String fetcherName;
 
 	/**
@@ -24,15 +24,14 @@ public class FetcherConfigManager extends ConfigManager {
 	 * @param stormConfiguration
 	 * @param fetcherName
 	 */
-	public FetcherConfigManager(
-			ZookeeperStormConfigurationAPI stormConfiguration,
+	public FetcherConfigManager(ExternalStormConfiguration stormConfiguration,
 			String fetcherName) {
 		this.stormConfiguration = stormConfiguration;
 		this.fetcherName = fetcherName;
 
 		try {
-			stormConfiguration.registerFetcherConfigurationListener(
-					fetcherName, this);
+			stormConfiguration.registerTaskConfigurationListener(fetcherName,
+					this);
 		} catch (StormConfigurationException e) {
 			logger.error("Can not connect to zookeeper to get Storm configuration for fetcher "
 					+ fetcherName + ". Reason: " + e.getMessage());
@@ -47,7 +46,7 @@ public class FetcherConfigManager extends ConfigManager {
 	 */
 	public void loadParameters() throws StormConfigurationException {
 		Map<String, String> fetcherConfiguration = stormConfiguration
-				.getFetcherConfiguration(fetcherName);
+				.getTaskConfiguration(fetcherName);
 		configurationChanged(fetcherConfiguration);
 	}
 

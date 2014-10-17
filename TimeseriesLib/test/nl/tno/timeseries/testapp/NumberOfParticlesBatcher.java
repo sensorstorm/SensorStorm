@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import nl.tno.storm.configuration.api.ZookeeperStormConfigurationAPI;
+import nl.tno.storm.configuration.api.ExternalStormConfiguration;
 import nl.tno.timeseries.channels.ParticleCache;
 import nl.tno.timeseries.interfaces.Batcher;
 import nl.tno.timeseries.interfaces.BatcherException;
@@ -23,7 +23,7 @@ public class NumberOfParticlesBatcher implements Batcher, Serializable {
 	@Override
 	public void init(String channelID, ParticleCache cache,
 			@SuppressWarnings("rawtypes") Map stormNativeConfig,
-			ZookeeperStormConfigurationAPI stormConfiguration) {
+			ExternalStormConfiguration stormConfiguration) {
 		this.cache = cache;
 
 		// TODO haal dit uit de stormConfig

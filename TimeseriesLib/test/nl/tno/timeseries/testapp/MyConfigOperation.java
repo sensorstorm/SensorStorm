@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import nl.tno.storm.configuration.api.StormConfigurationException;
-import nl.tno.storm.configuration.api.ZookeeperStormConfigurationAPI;
+import nl.tno.storm.configuration.api.ExternalStormConfiguration;
 import nl.tno.timeseries.annotation.OperationDeclaration;
 import nl.tno.timeseries.config.OperationConfigManager;
 import nl.tno.timeseries.interfaces.DataParticle;
@@ -26,7 +26,7 @@ public class MyConfigOperation implements SingleOperation {
 	@Override
 	public void init(String channelId,
 			@SuppressWarnings("rawtypes") Map stormNativeConfig,
-			ZookeeperStormConfigurationAPI stormConfiguration) {
+			ExternalStormConfiguration stormConfiguration) {
 		this.channelId = channelId;
 		OperationConfigManager operationConfigManager = new OperationConfigManager(
 				stormConfiguration, "myconfigoperation");

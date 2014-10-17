@@ -3,7 +3,7 @@ package nl.tno.timeseries.testapp;
 import java.util.List;
 import java.util.Map;
 
-import nl.tno.storm.configuration.api.ZookeeperStormConfigurationAPI;
+import nl.tno.storm.configuration.api.ExternalStormConfiguration;
 import nl.tno.timeseries.annotation.OperationDeclaration;
 import nl.tno.timeseries.interfaces.BatchOperation;
 import nl.tno.timeseries.interfaces.DataParticle;
@@ -18,7 +18,7 @@ public class MyBatchOperation implements BatchOperation {
 	@Override
 	public void init(String channelID,
 			@SuppressWarnings("rawtypes") Map stormNativeConfig,
-			ZookeeperStormConfigurationAPI stormConfiguration) {
+			ExternalStormConfiguration stormConfiguration) {
 		this.channelId = channelID;
 	}
 

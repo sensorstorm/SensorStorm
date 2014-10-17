@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import nl.tno.storm.configuration.api.StormConfigurationException;
-import nl.tno.storm.configuration.api.ZookeeperStormConfigurationAPI;
+import nl.tno.storm.configuration.api.ExternalStormConfiguration;
 import nl.tno.storm.configuration.impl.ZookeeperStormConfigurationFactory;
 import nl.tno.timeseries.annotation.FetcherDeclaration;
 import nl.tno.timeseries.config.ConfigKeys;
@@ -33,7 +33,7 @@ public class ChannelSpout implements IRichSpout {
 
 	protected Logger logger = LoggerFactory.getLogger(ChannelSpout.class);
 	protected Cache<Object, Object> tupleCache;
-	protected ZookeeperStormConfigurationAPI zookeeperStormConfiguration;
+	protected ExternalStormConfiguration zookeeperStormConfiguration;
 	protected SpoutOutputCollector collector;
 	protected Fetcher fetcher;
 	protected int nrOfOutputFields;

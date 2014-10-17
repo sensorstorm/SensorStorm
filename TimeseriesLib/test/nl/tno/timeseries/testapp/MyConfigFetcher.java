@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import nl.tno.storm.configuration.api.StormConfigurationException;
-import nl.tno.storm.configuration.api.ZookeeperStormConfigurationAPI;
+import nl.tno.storm.configuration.api.ExternalStormConfiguration;
 import nl.tno.timeseries.annotation.FetcherDeclaration;
 import nl.tno.timeseries.config.FetcherConfigManager;
 import nl.tno.timeseries.interfaces.DataParticle;
@@ -31,7 +31,7 @@ public class MyConfigFetcher implements Fetcher {
 
 	@Override
 	public void prepare(@SuppressWarnings("rawtypes") Map stormNativeConfig,
-			ZookeeperStormConfigurationAPI stormConfiguration,
+			ExternalStormConfiguration stormConfiguration,
 			TopologyContext context) throws Exception {
 		FetcherConfigManager fetcherConfigManager = new FetcherConfigManager(
 				stormConfiguration, "myconfigfetcher");
