@@ -51,8 +51,13 @@ public class TimerParticleHandler implements MetaParticleHandler,
 		if (metaParticle instanceof TimerTickParticle) {
 			TimerTickParticle timerParticle = (TimerTickParticle) metaParticle;
 			long timestamp = timerParticle.getTimestamp();
-			result.addAll(executeRecurringTasks(timestamp));
+
+			// do first the single task, to give it the possibility to schedule
+			// a recurring task at the current moment
+			// TODO fix that all new registered tasks are all being processed
+			// within the current moment
 			result.addAll(executeSingleTasks(timestamp));
+			result.addAll(executeRecurringTasks(timestamp));
 		}
 		return result;
 	}
