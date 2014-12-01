@@ -4,6 +4,7 @@ import nl.tno.timeseries.channels.ChannelGrouperBolt;
 import nl.tno.timeseries.channels.ChannelSpout;
 import nl.tno.timeseries.channels.MultipleOperationChannelBolt;
 import nl.tno.timeseries.channels.SingleOperationChannelBolt;
+import nl.tno.timeseries.groupers.TimeseriesShuffleGrouping;
 import nl.tno.timeseries.interfaces.OperationException;
 import nl.tno.timeseries.timer.TimerChannelSpout;
 import backtype.storm.Config;
@@ -29,12 +30,12 @@ public class TestRunner {
 
 		try {
 			// multipleOperationTopolgyTest(builder, config);
-			// timerTopolgyTest(builder, config);
+			timerTopolgyTest(builder, config);
 			// batchTopolgyTest(builder, config);
 			// timedBatchTopolgyTest(builder, config);
 			// groupedTopolgyTest(builder, config);
 			// basicConfigTopolgyTest(builder, config);
-			singleOperationTopolgyTest(builder, config);
+			// singleOperationTopolgyTest(builder, config);
 		} catch (OperationException e) {
 			System.out.println("Can not create topolgy: " + e.getMessage());
 			System.exit(0);
@@ -77,7 +78,8 @@ public class TestRunner {
 		builder.setBolt(
 				"src",
 				new MultipleOperationChannelBolt(config, MyTimedOperation.class),
-				1).shuffleGrouping("input");
+				1).customGrouping("input", new TimeseriesShuffleGrouping());
+		// 1).shuffleGrouping("input");
 	}
 
 	private void batchTopolgyTest(TopologyBuilder builder, Config config)
