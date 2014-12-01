@@ -9,9 +9,8 @@ import backtype.storm.generated.GlobalStreamId;
 import backtype.storm.grouping.CustomStreamGrouping;
 import backtype.storm.task.WorkerTopologyContext;
 
-public class TimeseriesShuffleGrouping implements CustomStreamGrouping,
+public class TimeseriesChannelIdGrouping implements CustomStreamGrouping,
 		Serializable {
-
 	private static final long serialVersionUID = 9192870640924179453L;
 	private int numTasks;
 	private List<Integer> targetTasks;
@@ -21,8 +20,14 @@ public class TimeseriesShuffleGrouping implements CustomStreamGrouping,
 			List<Integer> targetTasks) {
 		this.targetTasks = targetTasks;
 		numTasks = targetTasks.size();
+		System.out.println("TimeseriesShuffleGrouping.prepare targetTasks="
+				+ targetTasks);
 	}
 
+	// vermoedelijk is taskId het storm takstId, net zoals een bolt er eentje
+	// krijgen. \
+	// Deze geeft dus de instantie van deze grouper aan.
+	// NIET het gekozen boltId.
 	@Override
 	public List<Integer> chooseTasks(int taskId, List<Object> values) {
 		List<Integer> boltIds = new ArrayList<Integer>();
@@ -32,26 +37,45 @@ public class TimeseriesShuffleGrouping implements CustomStreamGrouping,
 				String channelId = (String) values.get(0);
 				Long timestamp = (Long) values.get(1);
 				String particleClassName = (String) values.get(2);
-				System.out.println("channelId = " + channelId + " timestamp="
+				System.out.println("  TSG incomming: taskId = " + taskId
+						+ " channelId = " + channelId + " timestamp="
 						+ timestamp + " particle class=" + particleClassName);
 				Class<?> particleClass = Class.forName(particleClassName);
 				// is this tuple a metaParticle?
 				if (MetaParticle.class.isAssignableFrom(particleClass)) {
 					// broadcast the MetaParticle tuple
 					for (Integer boltId : targetTasks) {
+						System.out
+								.println("    TSG: metaparticle broadcast to bolt "
+										+ boltId);
 						boltIds.add(boltId);
 					}
 				} else {
 					// DataParticle perform normal operation.
-					boltIds.add(taskId % numTasks);
+					// int targetTaskId = taskId % numTasks;
+					// object.hashCode can be negative! first abs before %.
+					int targetTaskId = determineTargetTaskId(channelId);
+					System.out.println("    TSG: DATAparticle send to bolt "
+							+ targetTaskId);
+					boltIds.add(targetTaskId);
 				}
 			}
 		} catch (Exception e) {
 			// error -> no or unknown particle structure, perform normal shuffle
+			int targetTaskId = 0;
+			if (values.size() > 0) {
+				targetTaskId = determineTargetTaskId(values.get(0));
+			}
+			System.out.println("    TSG: Unknown particle (exception="
+					+ e.getMessage() + ") send to bolt " + targetTaskId);
+
 			boltIds.add(taskId % numTasks);
 		} finally {
 			return boltIds;
 		}
 	}
 
+	private int determineTargetTaskId(Object obj) {
+		return targetTasks.get(Math.abs(obj.hashCode()) % numTasks);
+	}
 }

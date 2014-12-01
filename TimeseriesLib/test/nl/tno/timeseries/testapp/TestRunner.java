@@ -4,7 +4,7 @@ import nl.tno.timeseries.channels.ChannelGrouperBolt;
 import nl.tno.timeseries.channels.ChannelSpout;
 import nl.tno.timeseries.channels.MultipleOperationChannelBolt;
 import nl.tno.timeseries.channels.SingleOperationChannelBolt;
-import nl.tno.timeseries.groupers.TimeseriesShuffleGrouping;
+import nl.tno.timeseries.groupers.TimeseriesChannelIdGrouping;
 import nl.tno.timeseries.interfaces.OperationException;
 import nl.tno.timeseries.timer.TimerChannelSpout;
 import backtype.storm.Config;
@@ -78,7 +78,7 @@ public class TestRunner {
 		builder.setBolt(
 				"src",
 				new MultipleOperationChannelBolt(config, MyTimedOperation.class),
-				1).customGrouping("input", new TimeseriesShuffleGrouping());
+				2).customGrouping("input", new TimeseriesChannelIdGrouping());
 		// 1).shuffleGrouping("input");
 	}
 
