@@ -8,6 +8,7 @@ import nl.tno.timeseries.interfaces.MetaParticle;
 import backtype.storm.generated.GlobalStreamId;
 import backtype.storm.grouping.CustomStreamGrouping;
 import backtype.storm.task.WorkerTopologyContext;
+import backtype.storm.tuple.Fields;
 
 public class TimeseriesChannelIdGrouping implements CustomStreamGrouping,
 		Serializable {
@@ -18,6 +19,9 @@ public class TimeseriesChannelIdGrouping implements CustomStreamGrouping,
 	@Override
 	public void prepare(WorkerTopologyContext context, GlobalStreamId stream,
 			List<Integer> targetTasks) {
+		Fields componentOutputFields = context.getComponentOutputFields(stream);
+		componentOutputFields.fieldIndex("");
+
 		this.targetTasks = targetTasks;
 		numTasks = targetTasks.size();
 		System.out.println("TimeseriesShuffleGrouping.prepare targetTasks="
