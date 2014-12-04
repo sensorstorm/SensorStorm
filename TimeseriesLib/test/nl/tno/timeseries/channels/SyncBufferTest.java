@@ -18,15 +18,6 @@ public class SyncBufferTest extends TestCase {
 		}
 
 		@Override
-		public String getChannelId() {
-			return null;
-		}
-
-		@Override
-		public void setChannelId(String channelId) {
-		}
-
-		@Override
 		public long getTimestamp() {
 			return timestamp;
 		}
@@ -43,15 +34,6 @@ public class SyncBufferTest extends TestCase {
 
 		public TestMetaParticle(long timestamp) {
 			this.timestamp = timestamp;
-		}
-
-		@Override
-		public String getChannelId() {
-			return null;
-		}
-
-		@Override
-		public void setChannelId(String channelId) {
 		}
 
 		@Override
@@ -75,6 +57,15 @@ public class SyncBufferTest extends TestCase {
 			if (timestamp != other.timestamp)
 				return false;
 			return true;
+		}
+
+		@Override
+		public String getOriginId() {
+			return null;
+		}
+
+		@Override
+		public void setOriginId(String originId) {
 		}
 	}
 
