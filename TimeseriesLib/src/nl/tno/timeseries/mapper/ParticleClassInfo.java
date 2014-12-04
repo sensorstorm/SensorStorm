@@ -32,9 +32,8 @@ public class ParticleClassInfo {
 		this.fields = fields;
 		this.clazz = clazz;
 		ArrayList<String> copy = new ArrayList<>();
-		copy.add(ParticleMapper.STREAM_ID);
-		copy.add(ParticleMapper.SEQUENCE_NR);
-		copy.add(ParticleMapper.PARTICLE_CLASS);
+		copy.add(ParticleMapper.TIMESTAMP_FIELD_NAME);
+		copy.add(ParticleMapper.PARTICLE_CLASS_FIELD_NAME);
 		copy.addAll(this.fields.values());
 		outputFields = new Fields(copy);
 	}
@@ -44,10 +43,9 @@ public class ParticleClassInfo {
 		try {
 			assert clazz.equals(this.clazz);
 			Class<? extends Particle> particleClass = (Class<? extends Particle>) Class
-					.forName(tuple.getString(2));
+					.forName(tuple.getString(ParticleMapper.PARTICLE_CLASS_IDX));
 			Particle particle = particleClass.newInstance();
-			particle.setChannelId(tuple.getString(0));
-			particle.setTimestamp(tuple.getLong(1));
+			particle.setTimestamp(tuple.getLong(ParticleMapper.TIMESTAMP_IDX));
 			for (Entry<String, String> e : fields.entrySet()) {
 				Field declaredField = particleClass
 						.getDeclaredField(e.getKey());
@@ -58,19 +56,22 @@ public class ParticleClassInfo {
 			return (T) particle;
 		} catch (ClassNotFoundException | IllegalAccessException
 				| NoSuchFieldException | SecurityException e) {
-			log.error("Was not able to map tuple to particle", e);
+			log.error(
+					"Was unable to map tuple to particle: " + tuple.toString(),
+					e);
 			return null;
 		} catch (InstantiationException e) {
 			throw new IllegalArgumentException(
-					"Particles should always have at least an empty constructor");
+					"Particles should always have an empty constructor");
 		}
 	}
 
 	public Values particleToValues(Particle particle) {
 		try {
 			Values v = new Values();
-			v.add(particle.getChannelId());
+			// see constant TIMESTAP_IDX
 			v.add(particle.getTimestamp());
+			// see constant PARTICLE_CLASS_IDX
 			v.add(particle.getClass().getName());
 			for (String field : fields.keySet()) {
 				Field declaredField = clazz.getDeclaredField(field);

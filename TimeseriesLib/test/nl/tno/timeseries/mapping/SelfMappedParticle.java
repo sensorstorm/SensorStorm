@@ -8,31 +8,20 @@ import nl.tno.timeseries.mapper.annotation.Mapper;
 @Mapper(SomeCustomMapper.class)
 public class SelfMappedParticle implements Particle {
 
-	public String streamId;
-	public long sequenceNr;
+	public long timestamp;
 	public String id;
 	public int intId;
 	public Map<String, Double> map;
 	public int shouldNotBeSaved;
 
 	@Override
-	public String getChannelId() {
-		return streamId;
-	}
-
-	@Override
 	public long getTimestamp() {
-		return sequenceNr;
-	}
-
-	@Override
-	public void setChannelId(String streamId) {
-		this.streamId = streamId;
+		return timestamp;
 	}
 
 	@Override
 	public void setTimestamp(long sequenceNr) {
-		this.sequenceNr = sequenceNr;
+		this.timestamp = sequenceNr;
 	}
 
 	@Override
@@ -42,10 +31,8 @@ public class SelfMappedParticle implements Particle {
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + intId;
 		result = prime * result + ((map == null) ? 0 : map.hashCode());
-		result = prime * result + (int) (sequenceNr ^ (sequenceNr >>> 32));
 		result = prime * result + shouldNotBeSaved;
-		result = prime * result
-				+ ((streamId == null) ? 0 : streamId.hashCode());
+		result = prime * result + (int) (timestamp ^ (timestamp >>> 32));
 		return result;
 	}
 
@@ -70,14 +57,9 @@ public class SelfMappedParticle implements Particle {
 				return false;
 		} else if (!map.equals(other.map))
 			return false;
-		if (sequenceNr != other.sequenceNr)
-			return false;
 		if (shouldNotBeSaved != other.shouldNotBeSaved)
 			return false;
-		if (streamId == null) {
-			if (other.streamId != null)
-				return false;
-		} else if (!streamId.equals(other.streamId))
+		if (timestamp != other.timestamp)
 			return false;
 		return true;
 	}

@@ -7,8 +7,7 @@ import nl.tno.timeseries.mapper.annotation.TupleField;
 
 public class AutoMappedParticle implements Particle {
 
-	public String streamId;
-	public long sequenceNr;
+	public long timestamp;
 
 	@TupleField(name = "customNameForId")
 	public String id;
@@ -22,42 +21,29 @@ public class AutoMappedParticle implements Particle {
 	public int shouldNotBeSaved;
 
 	@Override
-	public String getChannelId() {
-		return streamId;
-	}
-
-	@Override
 	public long getTimestamp() {
-		return sequenceNr;
-	}
-
-	@Override
-	public void setChannelId(String streamId) {
-		this.streamId = streamId;
+		return timestamp;
 	}
 
 	@Override
 	public void setTimestamp(long sequenceNr) {
-		this.sequenceNr = sequenceNr;
+		this.timestamp = sequenceNr;
 	}
 
 	@Override
 	public int hashCode() {
-		// does not take sholdNotBeSaved into consideration
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + intId;
 		result = prime * result + ((map == null) ? 0 : map.hashCode());
-		result = prime * result + (int) (sequenceNr ^ (sequenceNr >>> 32));
-		result = prime * result
-				+ ((streamId == null) ? 0 : streamId.hashCode());
+		result = prime * result + shouldNotBeSaved;
+		result = prime * result + (int) (timestamp ^ (timestamp >>> 32));
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		// does not take sholdNotBeSaved into consideration
 		if (this == obj)
 			return true;
 		if (obj == null)
@@ -77,12 +63,9 @@ public class AutoMappedParticle implements Particle {
 				return false;
 		} else if (!map.equals(other.map))
 			return false;
-		if (sequenceNr != other.sequenceNr)
+		if (shouldNotBeSaved != other.shouldNotBeSaved)
 			return false;
-		if (streamId == null) {
-			if (other.streamId != null)
-				return false;
-		} else if (!streamId.equals(other.streamId))
+		if (timestamp != other.timestamp)
 			return false;
 		return true;
 	}

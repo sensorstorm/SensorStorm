@@ -73,6 +73,9 @@ public class SyncBuffer {
 		ArrayList<Particle> list = new ArrayList<Particle>(this.size());
 		list.addAll(particles);
 		particles.clear();
+		if (!list.isEmpty()) {
+			lastSentOutTimestamp = list.get(0).getTimestamp();
+		}
 		return list;
 	}
 

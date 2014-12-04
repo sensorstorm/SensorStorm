@@ -2,6 +2,7 @@ package nl.tno.timeseries.mapping;
 
 import java.util.Map;
 
+import nl.tno.timeseries.mapper.ParticleMapper;
 import nl.tno.timeseries.mapper.api.CustomParticlePojoMapper;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
@@ -10,14 +11,14 @@ import backtype.storm.tuple.Values;
 public class SomeCustomMapper implements
 		CustomParticlePojoMapper<SelfMappedParticle> {
 
-	private static Fields fields = new Fields("streamId", "sequenceNr",
-			"customNameForId", "intId", "map");
+	private static Fields fields = new Fields(
+			ParticleMapper.TIMESTAMP_FIELD_NAME, "customNameForId", "intId",
+			"map");
 
 	@Override
 	public Values particleToValues(SelfMappedParticle particle) {
 		Values v = new Values();
-		v.add(particle.streamId);
-		v.add(particle.sequenceNr);
+		v.add(particle.timestamp);
 		v.add(particle.id);
 		v.add(particle.intId);
 		v.add(particle.map);
@@ -28,8 +29,7 @@ public class SomeCustomMapper implements
 	@Override
 	public SelfMappedParticle tupleToParticle(Tuple tuple) {
 		SelfMappedParticle p = new SelfMappedParticle();
-		p.streamId = tuple.getStringByField("streamId");
-		p.sequenceNr = tuple.getLongByField("sequenceNr");
+		p.timestamp = tuple.getLongByField(ParticleMapper.TIMESTAMP_FIELD_NAME);
 		p.id = tuple.getStringByField("customNameForId");
 		p.intId = tuple.getIntegerByField("intId");
 		p.map = (Map<String, Double>) tuple.getValueByField("map");

@@ -28,9 +28,11 @@ public class ParticleMapper {
 	public static final Logger log = LoggerFactory
 			.getLogger(ParticleMapper.class);
 
-	public static final String SEQUENCE_NR = "sequenceNr";
-	public static final String STREAM_ID = "streamId";
-	public static final String PARTICLE_CLASS = "particleClass";
+	public static final int TIMESTAMP_IDX = 0;
+	public static final int PARTICLE_CLASS_IDX = 1;
+
+	public static final String TIMESTAMP_FIELD_NAME = "timestamp";
+	public static final String PARTICLE_CLASS_FIELD_NAME = "particleClass";
 
 	private static ConcurrentMap<Class<?>, CustomParticlePojoMapper<?>> customSerializers = new ConcurrentHashMap<>();
 	private static ConcurrentMap<Class<?>, Method> customSerializersMapMethods = new ConcurrentHashMap<>();
@@ -83,7 +85,7 @@ public class ParticleMapper {
 		Class<?> clazz = null;
 		ParticleClassInfo particleClassInfo;
 		try {
-			clazz = Class.forName(tuple.getString(2));
+			clazz = Class.forName(tuple.getString(PARTICLE_CLASS_IDX));
 			particleClassInfo = getParticleClassInfo(clazz);
 		} catch (ClassNotFoundException e) {
 			particleClassInfo = null;
@@ -120,7 +122,7 @@ public class ParticleMapper {
 		}
 	}
 
-	public void inspectClass(Class<? extends Particle> clazz) {
+	public static void inspectClass(Class<? extends Particle> clazz) {
 		getFields(clazz);
 	}
 

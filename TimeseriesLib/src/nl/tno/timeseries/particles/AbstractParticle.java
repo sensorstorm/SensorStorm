@@ -28,16 +28,6 @@ public abstract class AbstractParticle implements Particle {
 	}
 
 	@Override
-	public String getChannelId() {
-		return channelId;
-	}
-
-	@Override
-	public void setChannelId(String streamId) {
-		this.channelId = streamId;
-	}
-
-	@Override
 	public long getTimestamp() {
 		return timestamp;
 	}
