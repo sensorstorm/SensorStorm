@@ -8,4 +8,7 @@ package nl.tno.timeseries.interfaces;
  */
 public interface MetaParticle extends Particle {
 
+	public String getOriginId();
+
+	public void setOriginId(String originId);
 }
