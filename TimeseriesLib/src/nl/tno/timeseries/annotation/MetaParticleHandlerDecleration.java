@@ -5,7 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import nl.tno.timeseries.interfaces.MetaParticle;
+import nl.tno.timeseries.particles.MetaParticle;
 
 /**
  * Annotation for the MetaParticleHandler. The parameter metaParticle specifies

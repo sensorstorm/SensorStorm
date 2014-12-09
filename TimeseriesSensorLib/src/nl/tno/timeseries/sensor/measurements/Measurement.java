@@ -1,10 +1,10 @@
 package nl.tno.timeseries.sensor.measurements;
 
-import nl.tno.timeseries.interfaces.DataParticle;
 import nl.tno.timeseries.mapper.annotation.TupleField;
-import nl.tno.timeseries.particles.AbstractParticle;
+import nl.tno.timeseries.particles.AbstractMetaParticle;
+import nl.tno.timeseries.particles.DataParticle;
 
-public class Measurement<T> extends AbstractParticle implements DataParticle, Comparable<Measurement<?>> {
+public class Measurement<T> extends AbstractMetaParticle implements DataParticle, Comparable<Measurement<?>> {
 
 	@TupleField
 	T value;

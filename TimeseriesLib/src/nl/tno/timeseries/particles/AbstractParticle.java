@@ -1,13 +1,10 @@
 package nl.tno.timeseries.particles;
 
-import nl.tno.timeseries.interfaces.Particle;
-
 /**
  * A default implementation of a {@link Particle} (for convenience).
  */
 public abstract class AbstractParticle implements Particle {
 
-	protected String channelId;
 	protected long timestamp;
 
 	/**
@@ -17,13 +14,11 @@ public abstract class AbstractParticle implements Particle {
 	}
 
 	/**
-	 * Create a new AbstractParticle with the given channelId and timestamp.
+	 * Create a new AbstractParticle with the given timestamp.
 	 * 
-	 * @param channelId
 	 * @param timestamp
 	 */
-	public AbstractParticle(String channelId, long timestamp) {
-		this.channelId = channelId;
+	public AbstractParticle(long timestamp) {
 		this.timestamp = timestamp;
 	}
 
@@ -37,8 +32,4 @@ public abstract class AbstractParticle implements Particle {
 		this.timestamp = timestamp;
 	}
 
-	@Override
-	public String toString() {
-		return "P[" + channelId + "," + timestamp + "]";
-	}
 }

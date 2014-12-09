@@ -6,11 +6,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import nl.tno.timeseries.interfaces.Batcher;
-import nl.tno.timeseries.interfaces.BatcherException;
-import nl.tno.timeseries.interfaces.DataParticle;
-import nl.tno.timeseries.interfaces.DataParticleBatch;
 import nl.tno.timeseries.mapper.annotation.TupleField;
+import nl.tno.timeseries.particles.DataParticle;
+import nl.tno.timeseries.particles.DataParticleBatch;
 import backtype.storm.tuple.Fields;
 
 public abstract class DefaultBatcher implements Batcher {

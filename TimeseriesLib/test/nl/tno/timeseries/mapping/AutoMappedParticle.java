@@ -2,8 +2,8 @@ package nl.tno.timeseries.mapping;
 
 import java.util.Map;
 
-import nl.tno.timeseries.interfaces.Particle;
 import nl.tno.timeseries.mapper.annotation.TupleField;
+import nl.tno.timeseries.particles.Particle;
 
 public class AutoMappedParticle implements Particle {
 

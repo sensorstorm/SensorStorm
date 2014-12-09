@@ -2,10 +2,9 @@ package nl.tno.timeseries.particles;
 
 import java.util.List;
 
-import nl.tno.timeseries.channels.ChannelManager;
-import nl.tno.timeseries.interfaces.MetaParticle;
-import nl.tno.timeseries.interfaces.Operation;
 import nl.tno.timeseries.mapper.ParticleMapper;
+import nl.tno.timeseries.operations.Operation;
+import nl.tno.timeseries.operations.OperationManager;
 import backtype.storm.Config;
 import backtype.storm.tuple.Fields;
 
@@ -60,7 +59,7 @@ public class MetaParticleUtil {
 
 	public static Fields getMetaParticleOutputFields(
 			Class<? extends Operation> operationClass) {
-		List<Class<? extends MetaParticle>> outputMetaParticles = ChannelManager
+		List<Class<? extends MetaParticle>> outputMetaParticles = OperationManager
 				.getOutputMetaParticles(operationClass);
 		Fields fields = null;
 		for (Class<? extends MetaParticle> p : outputMetaParticles) {

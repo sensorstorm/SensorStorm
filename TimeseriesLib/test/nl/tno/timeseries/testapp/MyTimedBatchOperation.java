@@ -5,40 +5,40 @@ import java.util.Map;
 
 import nl.tno.storm.configuration.api.ExternalStormConfiguration;
 import nl.tno.timeseries.annotation.OperationDeclaration;
-import nl.tno.timeseries.interfaces.BatchOperation;
-import nl.tno.timeseries.interfaces.DataParticle;
-import nl.tno.timeseries.interfaces.DataParticleBatch;
-import nl.tno.timeseries.interfaces.OperationException;
-import nl.tno.timeseries.timer.TimerControllerInterface;
-import nl.tno.timeseries.timer.TimerParticleHandler;
-import nl.tno.timeseries.timer.TimerTaskInterface;
+import nl.tno.timeseries.operations.BatchOperation;
+import nl.tno.timeseries.operations.OperationException;
+import nl.tno.timeseries.particles.DataParticle;
+import nl.tno.timeseries.particles.DataParticleBatch;
+import nl.tno.timeseries.particles.timer.TimerControllerInterface;
+import nl.tno.timeseries.particles.timer.TimerParticleHandler;
+import nl.tno.timeseries.particles.timer.TimerTaskInterface;
 
 @OperationDeclaration(inputs = { MyDataParticle.class }, outputs = {}, metaParticleHandlers = { TimerParticleHandler.class })
 public class MyTimedBatchOperation implements BatchOperation,
 		TimerTaskInterface {
 	private static final long serialVersionUID = 773649574489299505L;
 	TimerControllerInterface timerController = null;
-	private String channelId;
+	private String fieldGrouper;
 
 	@Override
-	public void init(String channelID,
+	public void init(String fieldGrouper,
 			@SuppressWarnings("rawtypes") Map stormNativeConfig,
 			ExternalStormConfiguration stormConfiguration) {
-		this.channelId = channelID;
+		this.fieldGrouper = fieldGrouper;
 	}
 
 	@Override
 	public void prepareForFirstParticle(long startTimestamp)
 			throws OperationException {
-		System.out.println("init myTimedBatchOperation for channel "
-				+ channelId + " at " + startTimestamp);
+		System.out.println("init myTimedBatchOperation for fieldGrouper "
+				+ fieldGrouper + " at " + startTimestamp);
 	}
 
 	@Override
 	public List<DataParticle> execute(DataParticleBatch inputParticles) {
 		if (inputParticles != null) {
-			System.out.print("Timed Batch Operation channel " + channelId
-					+ " batch received :[");
+			System.out.print("Timed Batch Operation fieldGrouper "
+					+ fieldGrouper + " batch received :[");
 			for (DataParticle inputParticle : inputParticles) {
 				System.out.print(inputParticle + ", ");
 			}
@@ -50,24 +50,24 @@ public class MyTimedBatchOperation implements BatchOperation,
 	@Override
 	public void setTimerController(TimerControllerInterface timerController) {
 		this.timerController = timerController;
-		timerController.registerOperationForRecurringTimerTask(channelId, 1500,
-				this);
-		timerController.registerOperationForSingleTimerTask(channelId, 3300,
+		timerController.registerOperationForRecurringTimerTask(fieldGrouper,
+				1500, this);
+		timerController.registerOperationForSingleTimerTask(fieldGrouper, 3300,
 				this);
 		System.out.println("Timers set");
 	}
 
 	@Override
 	public List<DataParticle> doTimerRecurringTask(long timestamp) {
-		System.out.println("Recurring task for channel " + channelId + " at "
-				+ timestamp);
+		System.out.println("Recurring task for fieldGrouper " + fieldGrouper
+				+ " at " + timestamp);
 		return null;
 	}
 
 	@Override
 	public List<DataParticle> doTimerSingleTask(long timestamp) {
-		System.out.println("Single task for channel " + channelId + " at "
-				+ timestamp);
+		System.out.println("Single task for fieldGrouper " + fieldGrouper
+				+ " at " + timestamp);
 		return null;
 	}
 

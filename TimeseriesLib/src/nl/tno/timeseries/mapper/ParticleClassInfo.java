@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Map.Entry;
 import java.util.SortedMap;
 
-import nl.tno.timeseries.interfaces.Particle;
+import nl.tno.timeseries.particles.Particle;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

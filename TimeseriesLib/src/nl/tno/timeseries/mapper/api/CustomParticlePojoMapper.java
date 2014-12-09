@@ -1,8 +1,8 @@
 package nl.tno.timeseries.mapper.api;
 
-import nl.tno.timeseries.interfaces.Particle;
 import nl.tno.timeseries.mapper.annotation.Mapper;
 import nl.tno.timeseries.mapper.annotation.TupleField;
+import nl.tno.timeseries.particles.Particle;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;

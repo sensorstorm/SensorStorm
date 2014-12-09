@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <class-diagram version="1.1.5" icons="true" automaticImage="PNG" always-add-relationships="false" generalizations="true" 
   realizations="true" associations="true" dependencies="false" nesting-relationships="true">  
-  <interface id="1" language="java" name="nl.tno.timeseries.interfaces.Operation" project="TimeseriesLib" 
-    file="/TimeseriesLib/src/nl/tno/timeseries/interfaces/Operation.java" binary="false" corner="BOTTOM_RIGHT">    
+  <interface id="1" language="java" name="nl.tno.timeseries.operations.Operation" project="TimeseriesLib" 
+    file="/TimeseriesLib/src/nl/tno/timeseries/operations/Operation.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="81" width="144" x="185" y="37"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
@@ -10,8 +10,8 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </interface>  
-  <interface id="2" language="java" name="nl.tno.timeseries.interfaces.SingleOperation" project="TimeseriesLib" 
-    file="/TimeseriesLib/src/nl/tno/timeseries/interfaces/SingleOperation.java" binary="false" corner="BOTTOM_RIGHT">    
+  <interface id="2" language="java" name="nl.tno.timeseries.operations.SingleOperation" project="TimeseriesLib" 
+    file="/TimeseriesLib/src/nl/tno/timeseries/operations/SingleOperation.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="135" y="202"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
@@ -19,8 +19,8 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </interface>  
-  <interface id="3" language="java" name="nl.tno.timeseries.interfaces.BatchOperation" project="TimeseriesLib" 
-    file="/TimeseriesLib/src/nl/tno/timeseries/interfaces/BatchOperation.java" binary="false" corner="BOTTOM_RIGHT">    
+  <interface id="3" language="java" name="nl.tno.timeseries.operations.BatchOperation" project="TimeseriesLib" 
+    file="/TimeseriesLib/src/nl/tno/timeseries/operations/BatchOperation.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="414" y="202"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      

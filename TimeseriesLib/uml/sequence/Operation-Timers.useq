@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sequence-diagram version="1.1.5" icons="true" automaticImage="PNG">  
-  <object id="1" language="java" name="nl.tno.timeseries.channels.MultipleOperationChannelBolt" project="TimeseriesLib" 
-    file="/TimeseriesLib/src/nl/tno/timeseries/channels/MultipleOperationChannelBolt.java" binary="false" 
-    label="channelBolt" type="class" autoSize="true">    
+  <object id="1" language="java" name="nl.tno.timeseries.channels.SensorStormBolt" project="TimeseriesLib" 
+    file="/TimeseriesLib/src/nl/tno/timeseries/channels/SensorStormBolt.java" binary="false" label="channelBolt" 
+    type="class" autoSize="true">    
     <position height="-1" width="-1" x="81" y="0"/>    
     <execution id="2">      
       <position height="321" width="116" x="5" y="310"/>    
@@ -14,8 +14,8 @@
       <position height="21" width="7" x="60" y="526"/>    
     </execution>  
   </object>  
-  <object id="7" language="java" name="nl.tno.timeseries.channels.ChannelManager" project="TimeseriesLib" 
-    file="/TimeseriesLib/src/nl/tno/timeseries/channels/ChannelManager.java" binary="false" label="channelManager" 
+  <object id="7" language="java" name="nl.tno.timeseries.channels.OperationManager" project="TimeseriesLib" 
+    file="/TimeseriesLib/src/nl/tno/timeseries/channels/OperationManager.java" binary="false" label="channelManager" 
     type="class" autoSize="true">    
     <position height="-1" width="-1" x="193" y="0"/>    
     <execution id="8">      

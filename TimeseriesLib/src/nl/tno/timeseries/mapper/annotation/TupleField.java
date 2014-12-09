@@ -5,7 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import nl.tno.timeseries.interfaces.Particle;
+import nl.tno.timeseries.particles.Particle;
 
 /**
  * Tell the mapper that this field should be present in a tuple. Only relevant

@@ -10,10 +10,10 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentMap;
 
-import nl.tno.timeseries.interfaces.Particle;
 import nl.tno.timeseries.mapper.annotation.Mapper;
 import nl.tno.timeseries.mapper.annotation.TupleField;
 import nl.tno.timeseries.mapper.api.CustomParticlePojoMapper;
+import nl.tno.timeseries.particles.Particle;
 
 import org.jboss.netty.util.internal.ConcurrentHashMap;
 import org.slf4j.Logger;

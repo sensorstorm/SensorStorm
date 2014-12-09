@@ -2,9 +2,7 @@ package nl.tno.timeseries.particles;
 
 import java.util.List;
 
-import nl.tno.timeseries.interfaces.MetaParticle;
-import nl.tno.timeseries.interfaces.Operation;
-import nl.tno.timeseries.interfaces.Particle;
+import nl.tno.timeseries.operations.Operation;
 
 /**
  * An object must implement this interface to become a handler for a specific

@@ -5,42 +5,45 @@ import java.util.Map;
 
 import nl.tno.storm.configuration.api.ExternalStormConfiguration;
 import nl.tno.timeseries.annotation.OperationDeclaration;
-import nl.tno.timeseries.interfaces.DataParticle;
-import nl.tno.timeseries.interfaces.OperationException;
-import nl.tno.timeseries.interfaces.SingleOperation;
-import nl.tno.timeseries.timer.TimerControllerInterface;
-import nl.tno.timeseries.timer.TimerParticleHandler;
-import nl.tno.timeseries.timer.TimerTaskInterface;
+import nl.tno.timeseries.operations.OperationException;
+import nl.tno.timeseries.operations.SingleOperation;
+import nl.tno.timeseries.particles.DataParticle;
+import nl.tno.timeseries.particles.timer.TimerControllerInterface;
+import nl.tno.timeseries.particles.timer.TimerParticleHandler;
+import nl.tno.timeseries.particles.timer.TimerTaskInterface;
 
 @OperationDeclaration(inputs = { MyDataParticle.class }, outputs = {}, metaParticleHandlers = { TimerParticleHandler.class })
 public class MyTimedOperation implements SingleOperation, TimerTaskInterface {
 	private static final long serialVersionUID = 773649574489299505L;
 	TimerControllerInterface timerController = null;
-	private String channelId;
+	private String fieldGrouperValue;
 
 	@Override
-	public void init(String channelId,
+	public void init(String fieldGrouperValue,
 			@SuppressWarnings("rawtypes") Map stormNativeConfig,
 			ExternalStormConfiguration stormConfiguration) {
-		this.channelId = channelId;
+		this.fieldGrouperValue = fieldGrouperValue;
+		System.out.println("myTimedOperation.init for fieldGrouperValue "
+				+ fieldGrouperValue);
 	}
 
 	@Override
 	public void prepareForFirstParticle(long startTimestamp)
 			throws OperationException {
-		System.out.println("init myTimedOperation for channel " + channelId
-				+ " at " + startTimestamp);
+		System.out
+				.println("myTimedOperation.prepareForFirstParticle for fieldGrouperValue "
+						+ fieldGrouperValue + " at " + startTimestamp);
 	}
 
 	@Override
 	public List<DataParticle> execute(DataParticle inputParticle) {
 		if (inputParticle != null) {
 			if (inputParticle instanceof MyDataParticle<?>) {
-				System.out.println("Timed Operation channel " + channelId
-						+ " MyDataParticle received " + inputParticle);
+				System.out.println("myTimedOperation.MyDataParticle received "
+						+ inputParticle);
 			} else {
-				System.out.println("Timed Operation channel " + channelId
-						+ " Data particle received " + inputParticle);
+				System.out.println("myTimedOperation.Data particle received "
+						+ inputParticle);
 			}
 		}
 		return null;
@@ -49,24 +52,26 @@ public class MyTimedOperation implements SingleOperation, TimerTaskInterface {
 	@Override
 	public void setTimerController(TimerControllerInterface timerController) {
 		this.timerController = timerController;
-		timerController.registerOperationForRecurringTimerTask(channelId, 1500,
-				this);
-		timerController.registerOperationForSingleTimerTask(channelId, 3300,
-				this);
-		System.out.println("Timers set");
+		timerController.registerOperationForRecurringTimerTask(
+				fieldGrouperValue, 1500, this);
+		timerController.registerOperationForSingleTimerTask(fieldGrouperValue,
+				3300, this);
+		System.out.println("myTimedOperation.Timers set");
 	}
 
 	@Override
 	public List<DataParticle> doTimerRecurringTask(long timestamp) {
-		System.out.println("Recurring task for channel " + channelId + " at "
-				+ timestamp);
+		System.out
+				.println("myTimedOperation.Recurring task for fieldGrouperValue "
+						+ fieldGrouperValue + " at " + timestamp);
 		return null;
 	}
 
 	@Override
 	public List<DataParticle> doTimerSingleTask(long timestamp) {
-		System.out.println("Single task for channel " + channelId + " at "
-				+ timestamp);
+		System.out
+				.println("myTimedOperation.Single task for fieldGrouperValue "
+						+ fieldGrouperValue + " at " + timestamp);
 		return null;
 	}
 

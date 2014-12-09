@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <class-diagram version="1.1.5" icons="true" automaticImage="PNG" always-add-relationships="false" generalizations="true" 
   realizations="true" associations="true" dependencies="false" nesting-relationships="true">  
-  <class id="1" language="java" name="nl.tno.timeseries.channels.MultipleOperationChannelBolt" project="TimeseriesLib" 
-    file="/TimeseriesLib/src/nl/tno/timeseries/channels/MultipleOperationChannelBolt.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
+  <class id="1" language="java" name="nl.tno.timeseries.channels.SensorStormBolt" project="TimeseriesLib" 
+    file="/TimeseriesLib/src/nl/tno/timeseries/channels/SensorStormBolt.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="451" y="119"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
@@ -11,8 +10,8 @@
       <operations public="true" package="true" protected="false" private="false" static="true"/>    
     </display>  
   </class>  
-  <class id="2" language="java" name="nl.tno.timeseries.channels.ChannelManager" project="TimeseriesLib" 
-    file="/TimeseriesLib/src/nl/tno/timeseries/channels/ChannelManager.java" binary="false" corner="BOTTOM_RIGHT">    
+  <class id="2" language="java" name="nl.tno.timeseries.channels.OperationManager" project="TimeseriesLib" 
+    file="/TimeseriesLib/src/nl/tno/timeseries/channels/OperationManager.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="166" width="463" x="226" y="243"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
@@ -20,8 +19,8 @@
       <operations public="true" package="true" protected="false" private="false" static="true"/>    
     </display>  
   </class>  
-  <interface id="3" language="java" name="nl.tno.timeseries.interfaces.Batcher" project="TimeseriesLib" 
-    file="/TimeseriesLib/src/nl/tno/timeseries/interfaces/Batcher.java" binary="false" corner="BOTTOM_RIGHT">    
+  <interface id="3" language="java" name="nl.tno.timeseries.batchers.Batcher" project="TimeseriesLib" 
+    file="/TimeseriesLib/src/nl/tno/timeseries/batchers/Batcher.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="217" y="498"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
@@ -29,8 +28,8 @@
       <operations public="true" package="true" protected="false" private="false" static="true"/>    
     </display>  
   </interface>  
-  <interface id="4" language="java" name="nl.tno.timeseries.interfaces.Operation" project="TimeseriesLib" 
-    file="/TimeseriesLib/src/nl/tno/timeseries/interfaces/Operation.java" binary="false" corner="BOTTOM_RIGHT">    
+  <interface id="4" language="java" name="nl.tno.timeseries.operations.Operation" project="TimeseriesLib" 
+    file="/TimeseriesLib/src/nl/tno/timeseries/operations/Operation.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="453" y="496"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
@@ -47,8 +46,8 @@
       <operations public="true" package="true" protected="false" private="false" static="true"/>    
     </display>  
   </interface>  
-  <interface id="6" language="java" name="nl.tno.timeseries.interfaces.SingleOperation" project="TimeseriesLib" 
-    file="/TimeseriesLib/src/nl/tno/timeseries/interfaces/SingleOperation.java" binary="false" corner="BOTTOM_RIGHT">    
+  <interface id="6" language="java" name="nl.tno.timeseries.operations.SingleOperation" project="TimeseriesLib" 
+    file="/TimeseriesLib/src/nl/tno/timeseries/operations/SingleOperation.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="567" y="627"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
@@ -56,8 +55,8 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </interface>  
-  <interface id="7" language="java" name="nl.tno.timeseries.interfaces.BatchOperation" project="TimeseriesLib" 
-    file="/TimeseriesLib/src/nl/tno/timeseries/interfaces/BatchOperation.java" binary="false" corner="BOTTOM_RIGHT">    
+  <interface id="7" language="java" name="nl.tno.timeseries.operations.BatchOperation" project="TimeseriesLib" 
+    file="/TimeseriesLib/src/nl/tno/timeseries/operations/BatchOperation.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="308" y="628"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
@@ -65,44 +64,36 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </interface>  
-  <association id="8">    
+  <generalization id="8">    
+    <end type="SOURCE" refId="6"/>    
+    <end type="TARGET" refId="4"/>  
+  </generalization>  
+  <association id="9">    
     <end type="SOURCE" refId="2" navigable="false">      
-      <attribute id="9" name="metaParticleHandlers"/>      
-      <multiplicity id="10" minimum="0" maximum="2147483647"/>    
+      <attribute id="10" name="operation"/>      
+      <multiplicity id="11" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="4" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="12">    
+    <end type="SOURCE" refId="2" navigable="false">      
+      <attribute id="13" name="metaParticleHandlers"/>      
+      <multiplicity id="14" minimum="0" maximum="2147483647"/>    
     </end>    
     <end type="TARGET" refId="5" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <generalization id="11">    
-    <end type="SOURCE" refId="6"/>    
-    <end type="TARGET" refId="4"/>  
-  </generalization>  
-  <association id="12">    
-    <end type="SOURCE" refId="2" navigable="false">      
-      <attribute id="13" name="batcher"/>      
-      <multiplicity id="14" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="3" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="15">    
-    <end type="SOURCE" refId="1" navigable="false">      
-      <attribute id="16" name="channelManagers"/>      
-      <multiplicity id="17" minimum="0" maximum="2147483647"/>    
-    </end>    
-    <end type="TARGET" refId="2" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <generalization id="18">    
+  <generalization id="15">    
     <end type="SOURCE" refId="7"/>    
     <end type="TARGET" refId="4"/>  
   </generalization>  
-  <association id="19">    
+  <association id="16">    
     <end type="SOURCE" refId="2" navigable="false">      
-      <attribute id="20" name="operation"/>      
-      <multiplicity id="21" minimum="0" maximum="1"/>    
+      <attribute id="17" name="batcher"/>      
+      <multiplicity id="18" minimum="0" maximum="1"/>    
     </end>    
-    <end type="TARGET" refId="4" navigable="true"/>    
+    <end type="TARGET" refId="3" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
   <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 

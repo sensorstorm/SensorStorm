@@ -4,8 +4,8 @@ import java.util.Map;
 
 import nl.tno.storm.configuration.api.ExternalStormConfiguration;
 import nl.tno.timeseries.annotation.FetcherDeclaration;
-import nl.tno.timeseries.interfaces.DataParticle;
-import nl.tno.timeseries.interfaces.Fetcher;
+import nl.tno.timeseries.fetchers.Fetcher;
+import nl.tno.timeseries.particles.DataParticle;
 import backtype.storm.task.TopologyContext;
 
 @FetcherDeclaration(outputs = { MyDataParticle.class })

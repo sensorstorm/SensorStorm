@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <class-diagram version="1.1.5" icons="true" automaticImage="PNG" always-add-relationships="false" generalizations="true" 
   realizations="true" associations="true" dependencies="false" nesting-relationships="true">  
-  <interface id="1" language="java" name="nl.tno.timeseries.interfaces.Particle" project="TimeseriesLib" 
-    file="/TimeseriesLib/src/nl/tno/timeseries/interfaces/Particle.java" binary="false" corner="BOTTOM_RIGHT">    
+  <interface id="1" language="java" name="nl.tno.timeseries.particles.Particle" project="TimeseriesLib" 
+    file="/TimeseriesLib/src/nl/tno/timeseries/particles/Particle.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="237" y="94"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
@@ -10,8 +10,8 @@
       <operations public="true" package="true" protected="false" private="false" static="true"/>    
     </display>  
   </interface>  
-  <interface id="2" language="java" name="nl.tno.timeseries.interfaces.MetaParticle" project="TimeseriesLib" 
-    file="/TimeseriesLib/src/nl/tno/timeseries/interfaces/MetaParticle.java" binary="false" corner="BOTTOM_RIGHT">    
+  <interface id="2" language="java" name="nl.tno.timeseries.particles.MetaParticle" project="TimeseriesLib" 
+    file="/TimeseriesLib/src/nl/tno/timeseries/particles/MetaParticle.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="158" y="232"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
@@ -19,8 +19,8 @@
       <operations public="true" package="true" protected="false" private="false" static="true"/>    
     </display>  
   </interface>  
-  <interface id="3" language="java" name="nl.tno.timeseries.interfaces.DataParticle" project="TimeseriesLib" 
-    file="/TimeseriesLib/src/nl/tno/timeseries/interfaces/DataParticle.java" binary="false" corner="BOTTOM_RIGHT">    
+  <interface id="3" language="java" name="nl.tno.timeseries.particles.DataParticle" project="TimeseriesLib" 
+    file="/TimeseriesLib/src/nl/tno/timeseries/particles/DataParticle.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="324" y="232"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
@@ -47,14 +47,14 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <realization id="6">    
-    <end type="SOURCE" refId="4"/>    
-    <end type="TARGET" refId="2"/>  
-  </realization>  
-  <generalization id="7">    
+  <generalization id="6">    
     <end type="SOURCE" refId="2"/>    
     <end type="TARGET" refId="1"/>  
   </generalization>  
+  <realization id="7">    
+    <end type="SOURCE" refId="4"/>    
+    <end type="TARGET" refId="2"/>  
+  </realization>  
   <realization id="8">    
     <end type="SOURCE" refId="5"/>    
     <end type="TARGET" refId="2"/>  

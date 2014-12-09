@@ -3,9 +3,10 @@ package nl.tno.timeseries.channels;
 import java.util.List;
 
 import junit.framework.TestCase;
-import nl.tno.timeseries.interfaces.DataParticle;
-import nl.tno.timeseries.interfaces.MetaParticle;
-import nl.tno.timeseries.interfaces.Particle;
+import nl.tno.timeseries.operations.SyncBuffer;
+import nl.tno.timeseries.particles.DataParticle;
+import nl.tno.timeseries.particles.MetaParticle;
+import nl.tno.timeseries.particles.Particle;
 
 public class SyncBufferTest extends TestCase {
 
