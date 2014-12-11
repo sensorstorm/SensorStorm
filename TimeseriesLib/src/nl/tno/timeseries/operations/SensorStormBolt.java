@@ -30,6 +30,7 @@ import backtype.storm.tuple.Tuple;
 
 public class SensorStormBolt extends BaseRichBolt {
 	private static final long serialVersionUID = -5109656134961759532L;
+	private static final long SYNC_BUFFFER_SIZE_MS = 1000;
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	protected Class<? extends Operation> operationClass;
@@ -43,6 +44,8 @@ public class SensorStormBolt extends BaseRichBolt {
 	protected String boltName;
 	protected ExternalStormConfiguration zookeeperStormConfiguration;
 	protected @SuppressWarnings("rawtypes") Map stormNativeConfig;
+	private SyncBuffer syncBuffer;
+	private String originId;
 
 	/**
 	 * Construct a {@link SensorStormBolt} with a {@link Batcher}
@@ -119,7 +122,6 @@ public class SensorStormBolt extends BaseRichBolt {
 		this.metaParticleFields = MetaParticleUtil
 				.registerMetaParticleFieldsWithOperationClass(config,
 						operationClass);
-
 	}
 
 	@Override
@@ -128,6 +130,8 @@ public class SensorStormBolt extends BaseRichBolt {
 		this.stormNativeConfig = stormNativeConfig;
 		this.collector = collector;
 		this.boltName = context.getThisComponentId();
+		this.originId = operationClass.getName() + "."
+				+ context.getThisTaskIndex();
 
 		// connect to the zoopkeeper configuration
 		try {
@@ -156,6 +160,7 @@ public class SensorStormBolt extends BaseRichBolt {
 			msg = msg + ", with no batcher.";
 		}
 		logger.info(msg);
+		this.syncBuffer = new SyncBuffer(SYNC_BUFFFER_SIZE_MS);
 	}
 
 	/**
@@ -168,23 +173,28 @@ public class SensorStormBolt extends BaseRichBolt {
 		Particle inputParticle = ParticleMapper.tupleToParticle(originalTuple);
 
 		if (inputParticle != null) {
-			if (inputParticle instanceof MetaParticle) {
-				List<Particle> outputParticles = processMetaParticle(
-						originalTuple, (MetaParticle) inputParticle);
-				// Emit new particles (if any)
-				emitParticles(originalTuple, outputParticles);
-				// Pass through the current MetaParticle
-				emitParticle(originalTuple, inputParticle);
-			} else if (inputParticle instanceof DataParticle) {
-				List<Particle> outputParticles = processDataParticle(
-						originalTuple, (DataParticle) inputParticle);
-				emitParticles(originalTuple, outputParticles);
-			} else {
-				// This is not a MetaParticle and not a DataParticle
-				logger.error("Unknown particle type, not a MetaParticle or a DataParticle, but a "
-						+ inputParticle.getClass().getName());
+			// Push the particle through the SyncBuffer
+			List<Particle> particlesToProcess = syncBuffer
+					.pushParticle(inputParticle);
+			// Process the particles from the buffer (if any)
+			for (Particle particle : particlesToProcess) {
+				if (particle instanceof MetaParticle) {
+					List<Particle> outputParticles = processMetaParticle(
+							originalTuple, (MetaParticle) particle);
+					// Emit new particles (if any)
+					emitParticles(originalTuple, outputParticles);
+					// Pass through the current MetaParticle
+					emitParticle(originalTuple, particle);
+				} else if (particle instanceof DataParticle) {
+					List<Particle> outputParticles = processDataParticle(
+							originalTuple, (DataParticle) particle);
+					emitParticles(originalTuple, outputParticles);
+				} else {
+					// This is not a MetaParticle and not a DataParticle
+					logger.error("Unknown particle type, not a MetaParticle or a DataParticle, but a "
+							+ particle.getClass().getName());
+				}
 			}
-
 		}
 		// Always acknowledge tuples
 		collector.ack(originalTuple);
@@ -341,6 +351,9 @@ public class SensorStormBolt extends BaseRichBolt {
 	 */
 	public void emitParticle(Tuple anchor, Particle particle) {
 		if (particle != null) {
+			if (particle instanceof MetaParticle) {
+				((MetaParticle) particle).setOriginId(this.originId);
+			}
 			collector
 					.emit(anchor, ParticleMapper.particleToValues(particle,
 							nrOfOutputFields));
