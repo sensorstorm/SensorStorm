@@ -160,7 +160,7 @@ public class SensorStormBolt extends BaseRichBolt {
 			msg = msg + ", with no batcher.";
 		}
 		logger.info(msg);
-		this.syncBuffer = new SyncBuffer(SYNC_BUFFFER_SIZE_MS);
+		this.syncBuffer = new FlushingSyncBuffer(SYNC_BUFFFER_SIZE_MS);
 	}
 
 	/**

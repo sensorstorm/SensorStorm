@@ -17,8 +17,31 @@ public class GracefullShutdownParticle extends AbstractMetaParticle implements
 	public GracefullShutdownParticle() {
 	}
 
-	public GracefullShutdownParticle(long timestamp) {
+	public GracefullShutdownParticle(long timestamp, String originId) {
 		super(timestamp);
+		setOriginId(originId);
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (timestamp ^ (timestamp >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		GracefullShutdownParticle other = (GracefullShutdownParticle) obj;
+		if (timestamp != other.timestamp)
+			return false;
+		return true;
 	}
 
 	@Override
