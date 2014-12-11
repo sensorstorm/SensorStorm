@@ -203,11 +203,11 @@ public class OperationManager implements Serializable {
 	 *         error. These particles should be emitted by the bolt.
 	 */
 	public List<Particle> processMetaParticle(MetaParticle metaParticle) {
-		if (metaParticle == null)
+		if (metaParticle != null) {
+			return handleMetaParticle(metaParticle);
+		} else {
 			return null;
-
-		List<Particle> outputParticles = handleMetaParticle(metaParticle);
-		return outputParticles;
+		}
 	}
 
 	/**

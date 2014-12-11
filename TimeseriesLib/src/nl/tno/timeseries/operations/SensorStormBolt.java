@@ -171,7 +171,10 @@ public class SensorStormBolt extends BaseRichBolt {
 			if (inputParticle instanceof MetaParticle) {
 				List<Particle> outputParticles = processMetaParticle(
 						originalTuple, (MetaParticle) inputParticle);
+				// Emit new particles (if any)
 				emitParticles(originalTuple, outputParticles);
+				// Pass through the current MetaParticle
+				emitParticle(originalTuple, inputParticle);
 			} else if (inputParticle instanceof DataParticle) {
 				List<Particle> outputParticles = processDataParticle(
 						originalTuple, (DataParticle) inputParticle);
