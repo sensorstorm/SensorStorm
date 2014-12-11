@@ -1,5 +1,6 @@
 package nl.tno.timeseries.operations;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -41,8 +42,7 @@ public class SensorStormBolt extends BaseRichBolt {
 	protected OutputCollector collector;
 	protected String boltName;
 	protected ExternalStormConfiguration zookeeperStormConfiguration;
-	protected @SuppressWarnings("rawtypes")
-	Map stormNativeConfig;
+	protected @SuppressWarnings("rawtypes") Map stormNativeConfig;
 
 	/**
 	 * Construct a {@link SensorStormBolt} with a {@link Batcher}
@@ -100,7 +100,7 @@ public class SensorStormBolt extends BaseRichBolt {
 	}
 
 	/**
-	 * general logic for the constructors of the singleOperation and the
+	 * General logic for the constructors of the singleOperation and the
 	 * batchOperation.
 	 * 
 	 * @param config
@@ -162,65 +162,107 @@ public class SensorStormBolt extends BaseRichBolt {
 	 * Handle the new incoming tuple
 	 */
 	@Override
-	public void execute(Tuple tuple) {
-		Particle inputParticle = ParticleMapper.tupleToParticle(tuple);
+	public void execute(Tuple originalTuple) {
+		// Map the Tuple to a Particle
+		// FYI: ParticleMapper will log an error if it is not able to map
+		Particle inputParticle = ParticleMapper.tupleToParticle(originalTuple);
 
-		// is there a particle to process?
 		if (inputParticle != null) {
 			if (inputParticle instanceof MetaParticle) {
-				// broadcast metaParticle to all operationManagers
-				Collection<OperationManager> allOperationManagers = operationManagers
-						.values();
-				for (OperationManager operationManager : allOperationManagers) {
-					operationManager
-							.processMetaParticle((MetaParticle) inputParticle);
-				}
+				List<Particle> outputParticles = processMetaParticle(
+						originalTuple, (MetaParticle) inputParticle);
+				emitParticles(originalTuple, outputParticles);
 			} else if (inputParticle instanceof DataParticle) {
-				// deliver dataParticle to the correct operationManager
-
-				// get an operation manager based on the value of the
-				// fieldGrouperId field in the tuple, as specified in the
-				// constructor
-				OperationManager operationManager;
-				if (fieldGrouperId == null) { // single instance operation mode
-					operationManager = getOperationManager(null);
-				} else { // try to select an operationManager from the value of
-							// the fieldGrouperId field
-					String fieldGrouperValue = tuple
-							.getStringByField(fieldGrouperId);
-					if (fieldGrouperValue != null) { // fieldGrouperId exists
-						operationManager = getOperationManager(fieldGrouperValue);
-					} else {
-						operationManager = null;
-						logger.error("Specified fieldGrouperId "
-								+ fieldGrouperId
-								+ " does not exists in particle "
-								+ inputParticle
-								+ ". Therefore can not route it to a specific operation.");
-					}
-				}
-
-				if (operationManager != null) {
-					// process the particle and emit the output
-					List<Particle> outputParticles = operationManager
-							.processDataParticle((DataParticle) inputParticle);
-					emitParticles(tuple, outputParticles);
-					collector.ack(tuple);
-				}
-
+				List<Particle> outputParticles = processDataParticle(
+						originalTuple, (DataParticle) inputParticle);
+				emitParticles(originalTuple, outputParticles);
 			} else {
+				// This is not a MetaParticle and not a DataParticle
 				logger.error("Unknown particle type, not a MetaParticle or a DataParticle, but a "
 						+ inputParticle.getClass().getName());
 			}
 
 		}
+		// Always acknowledge tuples
+		collector.ack(originalTuple);
+	}
+
+	/**
+	 * Process a single DataParticle. This method sends the DataParticle to
+	 * appropriate {@link OperationManager}.
+	 * 
+	 * @param originalTuple
+	 *            The unmapped tuple
+	 * @param inputParticle
+	 *            originalTuple mapped to a DataParticle
+	 * @return List of output particles
+	 */
+	private List<Particle> processDataParticle(Tuple originalTuple,
+			DataParticle inputParticle) {
+		// deliver dataParticle to the correct operationManager
+
+		// get an operation manager based on the value of the
+		// fieldGrouperId field in the tuple, as specified in the
+		// constructor
+		OperationManager operationManager;
+		if (fieldGrouperId == null) {
+			// single instance operation mode
+			operationManager = getOperationManager(null);
+		} else {
+			// try to select an operationManager from the value of the
+			// fieldGrouperId field
+			String fieldGrouperValue = originalTuple
+					.getStringByField(fieldGrouperId);
+			if (fieldGrouperValue != null) { // fieldGrouperId exists
+				operationManager = getOperationManager(fieldGrouperValue);
+			} else {
+				operationManager = null;
+				logger.error("Specified fieldGrouperId "
+						+ fieldGrouperId
+						+ " does not exists in particle "
+						+ inputParticle
+						+ ". Therefore can not route it to a specific operation.");
+			}
+		}
+
+		if (operationManager == null) {
+			return null;
+		} else {
+			return operationManager.processDataParticle(inputParticle);
+		}
+	}
+
+	/**
+	 * Process a single MetaParticle. This method sends the MetaParticle to all
+	 * {@link OperationManager}s.
+	 * 
+	 * @param originalTuple
+	 *            The unmapped tuple
+	 * @param inputParticle
+	 *            originalTuple mapped to a MetaParticle
+	 * @return List of output particles
+	 */
+	private List<Particle> processMetaParticle(Tuple originalTuple,
+			MetaParticle inputParticle) {
+		// broadcast metaParticle to all operationManagers
+		List<Particle> outputParticles = new ArrayList<Particle>();
+		Collection<OperationManager> allOperationManagers = operationManagers
+				.values();
+		for (OperationManager operationManager : allOperationManagers) {
+			List<Particle> particles = operationManager
+					.processMetaParticle(inputParticle);
+			if (particles != null) {
+				outputParticles.addAll(particles);
+			}
+		}
+		return outputParticles;
 	}
 
 	/**
 	 * Returns the operationManager related to the fieldGrouper, or instantiate
 	 * one if it was not present.
 	 * 
-	 * @fieldGrouperValue
+	 * @param fieldGrouperValue
 	 * @return Returns an operationManager for the fieldGrouper. Returns null in
 	 *         case of an exception, this will be logged.
 	 */
@@ -277,21 +319,12 @@ public class SensorStormBolt extends BaseRichBolt {
 		List<Class<? extends DataParticle>> outputParticles = OperationManager
 				.getOutputDataParticles(operationClass);
 		for (Class<? extends DataParticle> outputParticleClass : outputParticles) {
-			if (fields == null) {
-				fields = ParticleMapper.getFields(outputParticleClass);
-			} else {
-				fields = ParticleMapper.mergeFields(fields,
-						ParticleMapper.getFields(outputParticleClass));
-			}
+			fields = ParticleMapper.mergeFields(fields,
+					ParticleMapper.getFields(outputParticleClass));
 		}
 
 		// Add fields for MetaParticles
-		if (fields == null) {
-			fields = this.metaParticleFields;
-		} else {
-			fields = ParticleMapper
-					.mergeFields(fields, this.metaParticleFields);
-		}
+		fields = ParticleMapper.mergeFields(fields, this.metaParticleFields);
 
 		nrOfOutputFields = fields.size();
 		declarer.declare(fields);

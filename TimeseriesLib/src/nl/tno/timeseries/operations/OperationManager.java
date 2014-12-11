@@ -172,10 +172,8 @@ public class OperationManager implements Serializable {
 								.execute(batchedParticle));
 					}
 				}
-			}
-
-			// it is an operation without a batcher?
-			else {
+			} else {
+				// it is an operation without a batcher
 				outputDataParticles = ((SingleOperation) operation)
 						.execute(dataParticle);
 			}
@@ -189,7 +187,7 @@ public class OperationManager implements Serializable {
 			return result;
 		} catch (BatcherException | OperationException e) {
 			logger.error(
-					"Unable to execugte operation due to: " + e.getMessage(), e);
+					"Unable to execute operation due to: " + e.getMessage(), e);
 			return null;
 		}
 	}

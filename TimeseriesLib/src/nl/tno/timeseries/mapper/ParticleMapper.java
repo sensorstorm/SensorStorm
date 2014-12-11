@@ -187,15 +187,26 @@ public class ParticleMapper {
 		return null;
 	}
 
-	public static Fields mergeFields(Fields one, Fields two) {
+	/**
+	 * Merge two Fields objects. Duplicate fields are removed in the process. If
+	 * one of the arguments is null the method will return a copy of the other
+	 * Fields. If both are null the result is an empty Fields object.
+	 * 
+	 * @param first
+	 *            The first Fields object (may be null)
+	 * @param second
+	 *            The second Fields object (may be null)
+	 * @return Fields object
+	 */
+	public static Fields mergeFields(Fields first, Fields second) {
 		List<String> copy;
-		if (one == null) {
+		if (first == null) {
 			copy = new ArrayList<String>();
 		} else {
-			copy = one.toList();
+			copy = first.toList();
 		}
-		if (two != null) {
-			for (String s : two.toList()) {
+		if (second != null) {
+			for (String s : second.toList()) {
 				if (!copy.contains(s)) {
 					copy.add(s);
 				}
