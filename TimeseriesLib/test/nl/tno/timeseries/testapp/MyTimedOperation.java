@@ -3,14 +3,13 @@ package nl.tno.timeseries.testapp;
 import java.util.List;
 import java.util.Map;
 
+import nl.tno.sensorstorm.annotation.OperationDeclaration;
+import nl.tno.sensorstorm.operations.SingleOperation;
+import nl.tno.sensorstorm.particles.DataParticle;
+import nl.tno.sensorstorm.particles.timer.TimerControllerInterface;
+import nl.tno.sensorstorm.particles.timer.TimerParticleHandler;
+import nl.tno.sensorstorm.particles.timer.TimerTaskInterface;
 import nl.tno.storm.configuration.api.ExternalStormConfiguration;
-import nl.tno.timeseries.annotation.OperationDeclaration;
-import nl.tno.timeseries.operations.OperationException;
-import nl.tno.timeseries.operations.SingleOperation;
-import nl.tno.timeseries.particles.DataParticle;
-import nl.tno.timeseries.particles.timer.TimerControllerInterface;
-import nl.tno.timeseries.particles.timer.TimerParticleHandler;
-import nl.tno.timeseries.particles.timer.TimerTaskInterface;
 
 @OperationDeclaration(inputs = { MyDataParticle.class }, outputs = {}, metaParticleHandlers = { TimerParticleHandler.class })
 public class MyTimedOperation implements SingleOperation, TimerTaskInterface {
@@ -19,20 +18,12 @@ public class MyTimedOperation implements SingleOperation, TimerTaskInterface {
 	private String fieldGrouperValue;
 
 	@Override
-	public void init(String fieldGrouperValue,
+	public void init(String fieldGrouperValue, long startTimestamp,
 			@SuppressWarnings("rawtypes") Map stormNativeConfig,
 			ExternalStormConfiguration stormConfiguration) {
 		this.fieldGrouperValue = fieldGrouperValue;
 		System.out.println("myTimedOperation.init for fieldGrouperValue "
-				+ fieldGrouperValue);
-	}
-
-	@Override
-	public void prepareForFirstParticle(long startTimestamp)
-			throws OperationException {
-		System.out
-				.println("myTimedOperation.prepareForFirstParticle for fieldGrouperValue "
-						+ fieldGrouperValue + " at " + startTimestamp);
+				+ fieldGrouperValue + " at " + startTimestamp);
 	}
 
 	@Override
@@ -52,10 +43,8 @@ public class MyTimedOperation implements SingleOperation, TimerTaskInterface {
 	@Override
 	public void setTimerController(TimerControllerInterface timerController) {
 		this.timerController = timerController;
-		timerController.registerOperationForRecurringTimerTask(
-				fieldGrouperValue, 1500, this);
-		timerController.registerOperationForSingleTimerTask(fieldGrouperValue,
-				3300, this);
+		timerController.registerOperationForRecurringTimerTask(1500, this);
+		timerController.registerOperationForSingleTimerTask(3300, this);
 		System.out.println("myTimedOperation.Timers set");
 	}
 

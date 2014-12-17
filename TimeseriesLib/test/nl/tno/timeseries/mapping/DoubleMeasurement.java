@@ -1,8 +1,8 @@
 package nl.tno.timeseries.mapping;
 
-import nl.tno.timeseries.mapper.annotation.TupleField;
-import nl.tno.timeseries.particles.AbstractMetaParticle;
-import nl.tno.timeseries.particles.Particle;
+import nl.tno.sensorstorm.mapper.annotation.TupleField;
+import nl.tno.sensorstorm.particles.AbstractMetaParticle;
+import nl.tno.sensorstorm.particles.Particle;
 
 public class DoubleMeasurement extends AbstractMetaParticle implements Particle {
 

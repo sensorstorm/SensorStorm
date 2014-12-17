@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence-diagram version="1.1.5" icons="true" automaticImage="PNG">  
+  <object id="1" language="java" name="backtype.storm.topology.base.BaseRichBolt" project="TimeseriesLib" 
+    file="C:/programs/apache-maven-3.0.4/repositorylocaldata/m2-repository/org/apache/storm/storm-core/0.9.2-incubating/storm-core-0.9.2-incubating.jar" 
+    binary="true" label="baseRichBolt" type="class" autoSize="true">    
+    <position height="-1" width="-1" x="152" y="0"/>    
+    <execution id="2">      
+      <position height="103" width="134" x="5" y="115"/>    
+    </execution>    
+    <execution id="7">      
+      <position height="483" width="134" x="5" y="252"/>    
+    </execution>  
+  </object>  
+  <object id="10" language="java" name="nl.tno.sensorstorm.stormcomponents.SensorStormBolt" project="TimeseriesLib" 
+    file="/TimeseriesLib/src/nl/tno/sensorstorm/stormcomponents/SensorStormBolt.java" binary="false" 
+    label="sensorStormBolt" type="class" autoSize="true">    
+    <position height="-1" width="-1" x="167" y="0"/>    
+    <execution id="4">      
+      <position height="21" width="163" x="143" y="136"/>    
+    </execution>    
+    <execution id="6">      
+      <position height="21" width="163" x="143" y="176"/>    
+    </execution>    
+    <execution id="9">      
+      <position height="441" width="163" x="143" y="273"/>    
+    </execution>    
+    <execution id="18">      
+      <position height="21" width="7" x="221" y="589"/>    
+    </execution>  
+  </object>  
+  <object id="23" language="java" name="nl.tno.sensorstorm.mapper.ParticleMapper" project="TimeseriesLib" 
+    file="/TimeseriesLib/src/nl/tno/sensorstorm/mapper/ParticleMapper.java" binary="false" label="particleMapper" 
+    type="class" autoSize="true">    
+    <position height="-1" width="-1" x="769" y="0"/>    
+    <execution id="12">      
+      <position height="21" width="119" x="310" y="294"/>    
+    </execution>  
+  </object>  
+  <object id="24" language="java" name="nl.tno.sensorstorm.operations.SyncBuffer" project="TimeseriesLib" 
+    file="/TimeseriesLib/src/nl/tno/sensorstorm/operations/SyncBuffer.java" binary="false" label="syncBuffer" 
+    type="class" autoSize="true">    
+    <position height="-1" width="-1" x="824" y="0"/>    
+    <execution id="14">      
+      <position height="21" width="131" x="433" y="320"/>    
+    </execution>  
+  </object>  
+  <object id="25" language="java" name="nl.tno.sensorstorm.operations.OperationManager" project="TimeseriesLib" 
+    file="/TimeseriesLib/src/nl/tno/sensorstorm/operations/OperationManager.java" binary="false" 
+    label="operationManager" type="class" autoSize="true">    
+    <position height="-1" width="-1" x="428" y="0"/>    
+    <execution id="16">      
+      <position height="210" width="131" x="568" y="348"/>    
+    </execution>    
+    <execution id="27">      
+      <position height="21" width="131" x="568" y="390"/>    
+    </execution>  
+  </object>  
+  <object id="36" language="java" name="nl.tno.sensorstorm.operations.BatchOperation" project="TimeseriesLib" 
+    file="/TimeseriesLib/src/nl/tno/sensorstorm/operations/BatchOperation.java" binary="false" label="batchOperation" 
+    type="interface" autoSize="true">    
+    <position height="-1" width="-1" x="526" y="0"/>    
+    <execution id="29">      
+      <position height="21" width="131" x="703" y="421"/>    
+    </execution>    
+    <execution id="31">      
+      <position height="21" width="131" x="703" y="454"/>    
+    </execution>    
+    <execution id="35">      
+      <position height="21" width="131" x="703" y="516"/>    
+    </execution>  
+  </object>  
+  <object id="37" language="java" name="nl.tno.sensorstorm.particles.MetaParticleHandler" project="TimeseriesLib" 
+    file="/TimeseriesLib/src/nl/tno/sensorstorm/particles/MetaParticleHandler.java" binary="false" 
+    label="metaParticleHandler" type="interface" autoSize="true">    
+    <position height="-1" width="-1" x="951" y="0"/>    
+    <execution id="33">      
+      <position height="21" width="139" x="838" y="490"/>    
+    </execution>  
+  </object>  
+  <object id="38" language="java" name="backtype.storm.task.OutputCollector" project="TimeseriesLib" 
+    file="C:/programs/apache-maven-3.0.4/repositorylocaldata/m2-repository/org/apache/storm/storm-core/0.9.2-incubating/storm-core-0.9.2-incubating.jar" 
+    binary="true" label="outputCollector" type="class" autoSize="true">    
+    <position height="-1" width="-1" x="571" y="0"/>    
+    <execution id="20">      
+      <position height="21" width="112" x="838" y="641"/>    
+    </execution>    
+    <execution id="22">      
+      <position height="21" width="112" x="838" y="672"/>    
+    </execution>  
+  </object>  
+  <message id="3" 
+    operation="prepare(java.util.Map,backtype.storm.task.TopologyContext,backtype.storm.task.OutputCollector):void">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="4"/>  
+  </message>  
+  <message id="5" operation="declareOutputFields(backtype.storm.topology.OutputFieldsDeclarer):void">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="6"/>  
+  </message>  
+  <message id="8" operation="execute(backtype.storm.tuple.Tuple):void">    
+    <end type="SOURCE" refId="7"/>    
+    <end type="TARGET" refId="9"/>  
+  </message>  
+  <message id="11" operation="tupleToParticle(backtype.storm.tuple.Tuple):nl.tno.sensorstorm.particles.Particle">    
+    <end type="SOURCE" refId="9"/>    
+    <end type="TARGET" refId="12"/>  
+  </message>  
+  <message id="13" operation="pushParticle(nl.tno.sensorstorm.particles.Particle):java.util.List&lt;Particle&gt;">    
+    <end type="SOURCE" refId="9"/>    
+    <end type="TARGET" refId="14"/>  
+  </message>  
+  <message id="15" 
+    operation="processDataParticle(nl.tno.sensorstorm.particles.DataParticle):java.util.List&lt;Particle&gt;">    
+    <end type="SOURCE" refId="9"/>    
+    <end type="TARGET" refId="16"/>  
+  </message>  
+  <message id="17" 
+    operation="emitParticles(backtype.storm.tuple.Tuple,java.util.List&lt;? extends nl.tno.sensorstorm.particles.Particle&gt;):void">    
+    <end type="SOURCE" refId="9"/>    
+    <end type="TARGET" refId="18"/>  
+  </message>  
+  <message id="19" 
+    operation="emit(backtype.storm.tuple.Tuple,java.util.List&lt;java.lang.Object&gt;):java.util.List&lt;java.lang.Integer&gt;">    
+    <end type="SOURCE" refId="9"/>    
+    <end type="TARGET" refId="20"/>  
+  </message>  
+  <message id="21" operation="ack(backtype.storm.tuple.Tuple):void">    
+    <end type="SOURCE" refId="9"/>    
+    <end type="TARGET" refId="22"/>  
+  </message>  
+  <message id="26" operation="createOperation(nl.tno.sensorstorm.particles.Particle):void">    
+    <end type="SOURCE" refId="16"/>    
+    <end type="TARGET" refId="27"/>  
+  </message>  
+  <message id="28" 
+    operation="init(java.lang.String,java.util.Map,nl.tno.storm.configuration.api.ExternalStormConfiguration):void">    
+    <end type="SOURCE" refId="16"/>    
+    <end type="TARGET" refId="29"/>  
+  </message>  
+  <message id="30" operation="prepareForFirstParticle(long):void">    
+    <end type="SOURCE" refId="16"/>    
+    <end type="TARGET" refId="31"/>  
+  </message>  
+  <message id="32" operation="init(nl.tno.sensorstorm.operations.Operation):void">    
+    <end type="SOURCE" refId="16"/>    
+    <end type="TARGET" refId="33"/>  
+  </message>  
+  <message id="34" 
+    operation="execute(nl.tno.sensorstorm.particles.DataParticleBatch):java.util.List&lt;DataParticle&gt;">    
+    <end type="SOURCE" refId="16"/>    
+    <end type="TARGET" refId="35"/>  
+  </message>
+</sequence-diagram>

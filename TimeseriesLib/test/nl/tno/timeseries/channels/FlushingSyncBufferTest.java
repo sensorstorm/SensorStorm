@@ -3,12 +3,12 @@ package nl.tno.timeseries.channels;
 import java.util.List;
 
 import junit.framework.TestCase;
-import nl.tno.timeseries.operations.FlushingSyncBuffer;
-import nl.tno.timeseries.operations.SyncBuffer;
-import nl.tno.timeseries.particles.AbstractMetaParticle;
-import nl.tno.timeseries.particles.DataParticle;
-import nl.tno.timeseries.particles.Particle;
-import nl.tno.timeseries.particles.gracefullshutdown.GracefullShutdownParticle;
+import nl.tno.sensorstorm.operations.FlushingSyncBuffer;
+import nl.tno.sensorstorm.operations.SyncBuffer;
+import nl.tno.sensorstorm.particles.AbstractMetaParticle;
+import nl.tno.sensorstorm.particles.DataParticle;
+import nl.tno.sensorstorm.particles.Particle;
+import nl.tno.sensorstorm.particles.gracefullshutdown.GracefullShutdownParticle;
 
 public class FlushingSyncBufferTest extends TestCase {
 

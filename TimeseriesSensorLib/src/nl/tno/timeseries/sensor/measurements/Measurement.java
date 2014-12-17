@@ -1,8 +1,8 @@
 package nl.tno.timeseries.sensor.measurements;
 
-import nl.tno.timeseries.mapper.annotation.TupleField;
-import nl.tno.timeseries.particles.AbstractMetaParticle;
-import nl.tno.timeseries.particles.DataParticle;
+import nl.tno.sensorstorm.mapper.annotation.TupleField;
+import nl.tno.sensorstorm.particles.AbstractMetaParticle;
+import nl.tno.sensorstorm.particles.DataParticle;
 
 public class Measurement<T> extends AbstractMetaParticle implements DataParticle, Comparable<Measurement<?>> {
 

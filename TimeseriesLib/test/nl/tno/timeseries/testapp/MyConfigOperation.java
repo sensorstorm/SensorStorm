@@ -4,13 +4,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
+import nl.tno.sensorstorm.annotation.OperationDeclaration;
+import nl.tno.sensorstorm.config.OperationConfigManager;
+import nl.tno.sensorstorm.operations.SingleOperation;
+import nl.tno.sensorstorm.particles.DataParticle;
 import nl.tno.storm.configuration.api.ExternalStormConfiguration;
 import nl.tno.storm.configuration.api.StormConfigurationException;
-import nl.tno.timeseries.annotation.OperationDeclaration;
-import nl.tno.timeseries.config.OperationConfigManager;
-import nl.tno.timeseries.operations.OperationException;
-import nl.tno.timeseries.operations.SingleOperation;
-import nl.tno.timeseries.particles.DataParticle;
 
 @OperationDeclaration(inputs = { MyDataParticle.class }, outputs = {})
 public class MyConfigOperation implements SingleOperation {
@@ -24,10 +23,13 @@ public class MyConfigOperation implements SingleOperation {
 			"");
 
 	@Override
-	public void init(String fieldGrouper,
+	public void init(String fieldGrouper, long startTimestamp,
 			@SuppressWarnings("rawtypes") Map stormNativeConfig,
 			ExternalStormConfiguration stormConfiguration) {
 		this.fieldGrouper = fieldGrouper;
+		System.out.println("init myConfigOperation for fieldGrouper "
+				+ fieldGrouper + " at " + startTimestamp);
+
 		OperationConfigManager operationConfigManager = new OperationConfigManager(
 				stormConfiguration, "myconfigoperation");
 		try {
@@ -38,13 +40,6 @@ public class MyConfigOperation implements SingleOperation {
 		} catch (StormConfigurationException e) {
 			System.out.println("Can not load parameters.");
 		}
-	}
-
-	@Override
-	public void prepareForFirstParticle(long startTimestamp)
-			throws OperationException {
-		System.out.println("init myConfigOperation for fieldGrouper "
-				+ fieldGrouper + " at " + startTimestamp);
 	}
 
 	@Override

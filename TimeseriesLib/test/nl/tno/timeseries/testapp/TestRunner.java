@@ -1,9 +1,8 @@
 package nl.tno.timeseries.testapp;
 
-import nl.tno.timeseries.fetchers.SensorStormSpout;
-import nl.tno.timeseries.operations.OperationException;
-import nl.tno.timeseries.operations.SensorStormBolt;
-import nl.tno.timeseries.particles.timer.TimerSensorStormSpout;
+import nl.tno.sensorstorm.operations.OperationException;
+import nl.tno.sensorstorm.stormcomponents.SensorStormBolt;
+import nl.tno.sensorstorm.stormcomponents.SensorStormSpout;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.topology.TopologyBuilder;
@@ -21,10 +20,10 @@ public class TestRunner {
 		try {
 			prepare();
 
-			testSingleOperationTopology();
+			// testSingleOperationTopology();
 			// testFieldGrouperOperationTopology();
 			// testTimerTicksFieldGrouperOperationTopology();
-			// testTimerTicksSingleOperationTopology();
+			testTimerTicksSingleOperationTopology();
 
 			submitAndWait();
 			tearDown();
@@ -37,7 +36,7 @@ public class TestRunner {
 	public void testTimerTicksFieldGrouperOperationTopology()
 			throws OperationException {
 		System.out.println("timer topology test");
-		builder.setSpout("input", new TimerSensorStormSpout(config,
+		builder.setSpout("input", new SensorStormSpout(config,
 				new MyFetcher(4), true, 500L));
 		builder.setBolt("src",
 				new SensorStormBolt(config, MyTimedOperation.class, "myId"), 1)
@@ -47,7 +46,7 @@ public class TestRunner {
 	public void testTimerTicksSingleOperationTopology()
 			throws OperationException {
 		System.out.println("timer topology test");
-		builder.setSpout("input", new TimerSensorStormSpout(config,
+		builder.setSpout("input", new SensorStormSpout(config,
 				new MyFetcher(4), true, 500L));
 		builder.setBolt("src",
 				new SensorStormBolt(config, MyTimedOperation.class, null), 1)

@@ -3,14 +3,13 @@ package nl.tno.timeseries.testapp;
 import java.util.List;
 import java.util.Map;
 
+import nl.tno.sensorstorm.annotation.OperationDeclaration;
+import nl.tno.sensorstorm.operations.SingleOperation;
+import nl.tno.sensorstorm.particles.DataParticle;
+import nl.tno.sensorstorm.particles.gracefullshutdown.GracefulShutdownParticleHandler;
+import nl.tno.sensorstorm.particles.gracefullshutdown.GracefullShutdownInterface;
+import nl.tno.sensorstorm.particles.timer.TimerControllerInterface;
 import nl.tno.storm.configuration.api.ExternalStormConfiguration;
-import nl.tno.timeseries.annotation.OperationDeclaration;
-import nl.tno.timeseries.operations.OperationException;
-import nl.tno.timeseries.operations.SingleOperation;
-import nl.tno.timeseries.particles.DataParticle;
-import nl.tno.timeseries.particles.gracefullshutdown.GracefulShutdownParticleHandler;
-import nl.tno.timeseries.particles.gracefullshutdown.GracefullShutdownInterface;
-import nl.tno.timeseries.particles.timer.TimerControllerInterface;
 
 @OperationDeclaration(inputs = { MyDataParticle.class }, outputs = {}, metaParticleHandlers = { GracefulShutdownParticleHandler.class })
 public class MyGracefullShutdownOperation implements SingleOperation,
@@ -20,15 +19,10 @@ public class MyGracefullShutdownOperation implements SingleOperation,
 	private String fieldGrouper;
 
 	@Override
-	public void init(String fieldGrouper,
+	public void init(String fieldGrouper, long startTimestamp,
 			@SuppressWarnings("rawtypes") Map stormNativeConfig,
 			ExternalStormConfiguration stormConfiguration) {
 		this.fieldGrouper = fieldGrouper;
-	}
-
-	@Override
-	public void prepareForFirstParticle(long startTimestamp)
-			throws OperationException {
 		System.out.println("init myoperation for fieldGrouper " + fieldGrouper
 				+ " at " + startTimestamp);
 	}

@@ -3,12 +3,12 @@ package nl.tno.timeseries.testapp;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
+import nl.tno.sensorstorm.annotation.FetcherDeclaration;
+import nl.tno.sensorstorm.config.FetcherConfigManager;
+import nl.tno.sensorstorm.fetchers.Fetcher;
+import nl.tno.sensorstorm.particles.DataParticle;
 import nl.tno.storm.configuration.api.StormConfigurationException;
 import nl.tno.storm.configuration.api.ExternalStormConfiguration;
-import nl.tno.timeseries.annotation.FetcherDeclaration;
-import nl.tno.timeseries.config.FetcherConfigManager;
-import nl.tno.timeseries.fetchers.Fetcher;
-import nl.tno.timeseries.particles.DataParticle;
 import backtype.storm.task.TopologyContext;
 
 @FetcherDeclaration(outputs = { MyDataParticle.class })

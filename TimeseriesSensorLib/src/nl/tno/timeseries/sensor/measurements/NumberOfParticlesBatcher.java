@@ -6,12 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import nl.tno.sensorstorm.batchers.Batcher;
+import nl.tno.sensorstorm.batchers.BatcherException;
+import nl.tno.sensorstorm.operations.ParticleCache;
+import nl.tno.sensorstorm.particles.DataParticle;
+import nl.tno.sensorstorm.particles.DataParticleBatch;
 import nl.tno.storm.configuration.api.ExternalStormConfiguration;
-import nl.tno.timeseries.batchers.Batcher;
-import nl.tno.timeseries.batchers.BatcherException;
-import nl.tno.timeseries.operations.ParticleCache;
-import nl.tno.timeseries.particles.DataParticle;
-import nl.tno.timeseries.particles.DataParticleBatch;
 
 public class NumberOfParticlesBatcher implements Batcher, Serializable {
 

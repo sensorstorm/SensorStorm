@@ -1,58 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <class-diagram version="1.1.5" icons="true" automaticImage="PNG" always-add-relationships="false" generalizations="true" 
   realizations="true" associations="true" dependencies="false" nesting-relationships="true">  
-  <class id="1" language="java" name="nl.tno.timeseries.channels.SensorStormSpout" project="TimeseriesLib" 
-    file="/TimeseriesLib/src/nl/tno/timeseries/channels/SensorStormSpout.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="245" y="216"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="false" package="false" protected="false" private="false" static="true"/>      
-      <operations public="true" package="true" protected="false" private="false" static="true"/>    
-    </display>  
-  </class>  
-  <class id="2" language="java" name="nl.tno.timeseries.gracefullshutdown.GracefulShutdownParticleHandler" 
+  <interface id="1" language="java" name="nl.tno.sensorstorm.particles.gracefullshutdown.GracefullShutdownInterface" 
     project="TimeseriesLib" 
-    file="/TimeseriesLib/src/nl/tno/timeseries/gracefullshutdown/GracefulShutdownParticleHandler.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="566" y="224"/>    
+    file="/TimeseriesLib/src/nl/tno/sensorstorm/particles/gracefullshutdown/GracefullShutdownInterface.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="347" y="382"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
-      <attributes public="false" package="false" protected="false" private="false" static="true"/>      
-      <operations public="true" package="true" protected="false" private="false" static="true"/>    
-    </display>  
-  </class>  
-  <interface id="3" language="java" name="nl.tno.timeseries.gracefullshutdown.GracefullShutdownInterface" 
-    project="TimeseriesLib" 
-    file="/TimeseriesLib/src/nl/tno/timeseries/gracefullshutdown/GracefullShutdownInterface.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="565" y="360"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="false" package="false" protected="false" private="false" static="true"/>      
-      <operations public="true" package="true" protected="false" private="false" static="true"/>    
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </interface>  
-  <interface id="4" language="java" name="nl.tno.timeseries.particles.MetaParticleHandler" project="TimeseriesLib" 
-    file="/TimeseriesLib/src/nl/tno/timeseries/particles/MetaParticleHandler.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="566" y="75"/>    
+  <class id="2" language="java" name="nl.tno.sensorstorm.particles.gracefullshutdown.GracefulShutdownParticleHandler" 
+    project="TimeseriesLib" 
+    file="/TimeseriesLib/src/nl/tno/sensorstorm/particles/gracefullshutdown/GracefulShutdownParticleHandler.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="345" y="212"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
-      <attributes public="false" package="false" protected="false" private="false" static="true"/>      
-      <operations public="true" package="true" protected="false" private="false" static="true"/>    
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <interface id="3" language="java" name="nl.tno.sensorstorm.particles.MetaParticleHandler" project="TimeseriesLib" 
+    file="/TimeseriesLib/src/nl/tno/sensorstorm/particles/MetaParticleHandler.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="99" width="300" x="197" y="-10"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </interface>  
-  <realization id="5">    
-    <end type="SOURCE" refId="2"/>    
-    <end type="TARGET" refId="4"/>  
-  </realization>  
-  <association id="6">    
+  <association id="4">    
     <end type="SOURCE" refId="2" navigable="false">      
-      <attribute id="7" name="graceFullShutdownOperation"/>      
-      <multiplicity id="8" minimum="0" maximum="1"/>    
+      <attribute id="5" name="graceFullShutdownOperation"/>      
+      <multiplicity id="6" minimum="0" maximum="1"/>    
     </end>    
-    <end type="TARGET" refId="3" navigable="true"/>    
+    <end type="TARGET" refId="1" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
+  <realization id="7">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="3"/>  
+  </realization>  
   <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
     accessors="true" visibility="true">    
     <attributes public="true" package="true" protected="true" private="true" static="true"/>    

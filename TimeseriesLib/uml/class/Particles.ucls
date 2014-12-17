@@ -1,46 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <class-diagram version="1.1.5" icons="true" automaticImage="PNG" always-add-relationships="false" generalizations="true" 
   realizations="true" associations="true" dependencies="false" nesting-relationships="true">  
-  <interface id="1" language="java" name="nl.tno.timeseries.particles.Particle" project="TimeseriesLib" 
-    file="/TimeseriesLib/src/nl/tno/timeseries/particles/Particle.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="237" y="94"/>    
+  <interface id="1" language="java" name="nl.tno.sensorstorm.particles.Particle" project="TimeseriesLib" 
+    file="/TimeseriesLib/src/nl/tno/sensorstorm/particles/Particle.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="195" y="84"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
-      <attributes public="false" package="false" protected="false" private="false" static="true"/>      
-      <operations public="true" package="true" protected="false" private="false" static="true"/>    
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </interface>  
-  <interface id="2" language="java" name="nl.tno.timeseries.particles.MetaParticle" project="TimeseriesLib" 
-    file="/TimeseriesLib/src/nl/tno/timeseries/particles/MetaParticle.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="158" y="232"/>    
+  <interface id="2" language="java" name="nl.tno.sensorstorm.particles.DataParticle" project="TimeseriesLib" 
+    file="/TimeseriesLib/src/nl/tno/sensorstorm/particles/DataParticle.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="63" width="126" x="41" y="230"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
-      <attributes public="false" package="false" protected="false" private="false" static="true"/>      
-      <operations public="true" package="true" protected="false" private="false" static="true"/>    
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </interface>  
-  <interface id="3" language="java" name="nl.tno.timeseries.particles.DataParticle" project="TimeseriesLib" 
-    file="/TimeseriesLib/src/nl/tno/timeseries/particles/DataParticle.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="324" y="232"/>    
+  <interface id="3" language="java" name="nl.tno.sensorstorm.particles.MetaParticle" project="TimeseriesLib" 
+    file="/TimeseriesLib/src/nl/tno/sensorstorm/particles/MetaParticle.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="99" width="136" x="224" y="230"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
-      <attributes public="false" package="false" protected="false" private="false" static="true"/>      
-      <operations public="true" package="true" protected="false" private="false" static="true"/>    
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </interface>  
-  <class id="4" language="java" name="nl.tno.timeseries.timer.TimerTickParticle" project="TimeseriesLib" 
-    file="/TimeseriesLib/src/nl/tno/timeseries/timer/TimerTickParticle.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="111" y="398"/>    
+  <class id="4" language="java" name="nl.tno.sensorstorm.particles.gracefullshutdown.GracefullShutdownParticle" 
+    project="TimeseriesLib" 
+    file="/TimeseriesLib/src/nl/tno/sensorstorm/particles/gracefullshutdown/GracefullShutdownParticle.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="416" y="473"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
-      <attributes public="false" package="false" protected="false" private="false" static="true"/>      
-      <operations public="true" package="true" protected="false" private="false" static="true"/>    
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="5" language="java" name="nl.tno.timeseries.gracefullshutdown.GracefullShutdownParticle" 
-    project="TimeseriesLib" file="/TimeseriesLib/src/nl/tno/timeseries/gracefullshutdown/GracefullShutdownParticle.java" 
-    binary="false" corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="335" y="398"/>    
+  <class id="5" language="java" name="nl.tno.sensorstorm.particles.timer.TimerTickParticle" project="TimeseriesLib" 
+    file="/TimeseriesLib/src/nl/tno/sensorstorm/particles/timer/TimerTickParticle.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="176" y="455"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
@@ -52,12 +54,12 @@
     <end type="TARGET" refId="1"/>  
   </generalization>  
   <realization id="7">    
-    <end type="SOURCE" refId="4"/>    
-    <end type="TARGET" refId="2"/>  
+    <end type="SOURCE" refId="5"/>    
+    <end type="TARGET" refId="3"/>  
   </realization>  
   <realization id="8">    
-    <end type="SOURCE" refId="5"/>    
-    <end type="TARGET" refId="2"/>  
+    <end type="SOURCE" refId="4"/>    
+    <end type="TARGET" refId="3"/>  
   </realization>  
   <generalization id="9">    
     <end type="SOURCE" refId="3"/>    

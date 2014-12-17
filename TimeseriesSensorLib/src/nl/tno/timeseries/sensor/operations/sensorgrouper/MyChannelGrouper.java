@@ -8,8 +8,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import nl.tno.timeseries.annotation.ChannelGrouperDeclaration;
-import nl.tno.timeseries.fetchers.ChannelGrouper;
+import nl.tno.sensorstorm.annotation.ChannelGrouperDeclaration;
+import nl.tno.sensorstorm.fetchers.ChannelGrouper;
 import nl.tno.timeseries.testapp.MyDataParticle;
 
 @ChannelGrouperDeclaration(outputs = { MyDataParticle.class })

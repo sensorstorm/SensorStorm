@@ -4,13 +4,13 @@ package nl.tno.timeseries.sensor.operations.sensorgrouper;
 import java.util.List;
 import java.util.Map;
 
-import nl.tno.timeseries.annotation.ChannelGrouperDeclaration;
-import nl.tno.timeseries.fetchers.ChannelGrouper;
-import nl.tno.timeseries.mapper.ParticleMapper;
-import nl.tno.timeseries.particles.DataParticle;
-import nl.tno.timeseries.particles.MetaParticle;
-import nl.tno.timeseries.particles.MetaParticleUtil;
-import nl.tno.timeseries.particles.Particle;
+import nl.tno.sensorstorm.annotation.ChannelGrouperDeclaration;
+import nl.tno.sensorstorm.fetchers.ChannelGrouper;
+import nl.tno.sensorstorm.mapper.ParticleMapper;
+import nl.tno.sensorstorm.particles.DataParticle;
+import nl.tno.sensorstorm.particles.MetaParticle;
+import nl.tno.sensorstorm.particles.MetaParticleUtil;
+import nl.tno.sensorstorm.particles.Particle;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

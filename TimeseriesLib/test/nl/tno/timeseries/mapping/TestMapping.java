@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import junit.framework.TestCase;
-import nl.tno.timeseries.mapper.ParticleMapper;
+import nl.tno.sensorstorm.mapper.ParticleMapper;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;

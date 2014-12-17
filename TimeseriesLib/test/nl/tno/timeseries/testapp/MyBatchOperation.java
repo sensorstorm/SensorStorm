@@ -3,12 +3,11 @@ package nl.tno.timeseries.testapp;
 import java.util.List;
 import java.util.Map;
 
+import nl.tno.sensorstorm.annotation.OperationDeclaration;
+import nl.tno.sensorstorm.operations.BatchOperation;
+import nl.tno.sensorstorm.particles.DataParticle;
+import nl.tno.sensorstorm.particles.DataParticleBatch;
 import nl.tno.storm.configuration.api.ExternalStormConfiguration;
-import nl.tno.timeseries.annotation.OperationDeclaration;
-import nl.tno.timeseries.operations.BatchOperation;
-import nl.tno.timeseries.operations.OperationException;
-import nl.tno.timeseries.particles.DataParticle;
-import nl.tno.timeseries.particles.DataParticleBatch;
 
 @OperationDeclaration(inputs = { MyDataParticle.class }, outputs = {})
 public class MyBatchOperation implements BatchOperation {
@@ -16,15 +15,10 @@ public class MyBatchOperation implements BatchOperation {
 	private String fieldGrouper;
 
 	@Override
-	public void init(String fieldGrouper,
+	public void init(String fieldGrouper, long startTimestamp,
 			@SuppressWarnings("rawtypes") Map stormNativeConfig,
 			ExternalStormConfiguration stormConfiguration) {
 		this.fieldGrouper = fieldGrouper;
-	}
-
-	@Override
-	public void prepareForFirstParticle(long startTimestamp)
-			throws OperationException {
 		System.out.println("init myBatchOperation at " + startTimestamp);
 	}
 
