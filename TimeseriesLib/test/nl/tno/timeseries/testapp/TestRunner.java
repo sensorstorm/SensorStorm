@@ -3,6 +3,8 @@ package nl.tno.timeseries.testapp;
 import nl.tno.sensorstorm.operations.OperationException;
 import nl.tno.sensorstorm.stormcomponents.SensorStormBolt;
 import nl.tno.sensorstorm.stormcomponents.SensorStormSpout;
+import nl.tno.sensorstorm.stormcomponents.groupers.SensorStormFieldGrouping;
+import nl.tno.sensorstorm.stormcomponents.groupers.SensorStormShuffleGrouping;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.topology.TopologyBuilder;
@@ -20,10 +22,12 @@ public class TestRunner {
 		try {
 			prepare();
 
-			// testSingleOperationTopology();
+			testSingleOperationTopology();
 			// testFieldGrouperOperationTopology();
 			// testTimerTicksFieldGrouperOperationTopology();
-			testTimerTicksSingleOperationTopology();
+			// testTimerTicksSingleOperationTopology();
+			// testSensorStormFieldGroupingTopology();
+			// testSensorStormShuffleGroupingTopology();
 
 			submitAndWait();
 			tearDown();
@@ -35,7 +39,7 @@ public class TestRunner {
 
 	public void testTimerTicksFieldGrouperOperationTopology()
 			throws OperationException {
-		System.out.println("timer topology test");
+		System.out.println("timer fieldgrouper operation topology test");
 		builder.setSpout("input", new SensorStormSpout(config,
 				new MyFetcher(4), true, 500L));
 		builder.setBolt("src",
@@ -45,7 +49,7 @@ public class TestRunner {
 
 	public void testTimerTicksSingleOperationTopology()
 			throws OperationException {
-		System.out.println("timer topology test");
+		System.out.println("timer single operation topology test");
 		builder.setSpout("input", new SensorStormSpout(config,
 				new MyFetcher(4), true, 500L));
 		builder.setBolt("src",
@@ -54,7 +58,7 @@ public class TestRunner {
 	}
 
 	public void testFieldGrouperOperationTopology() throws OperationException {
-		System.out.println("Single operation topology test");
+		System.out.println("Field grouper operation topology test");
 		builder.setSpout("input",
 				new SensorStormSpout(config, new MyFetcher(4)));
 		builder.setBolt("src",
@@ -69,6 +73,26 @@ public class TestRunner {
 		builder.setBolt("src",
 				new SensorStormBolt(config, MyOperation.class, null), 1)
 				.shuffleGrouping("input");
+	}
+
+	public void testSensorStormFieldGroupingTopology()
+			throws OperationException {
+		System.out.println("timer topology test");
+		builder.setSpout("input", new SensorStormSpout(config,
+				new MyFetcher(4), true, 500L));
+		builder.setBolt("src",
+				new SensorStormBolt(config, MyTimedOperation.class, "myId"), 2)
+				.customGrouping("input", new SensorStormFieldGrouping("myId"));
+	}
+
+	public void testSensorStormShuffleGroupingTopology()
+			throws OperationException {
+		System.out.println("timer topology test");
+		builder.setSpout("input", new SensorStormSpout(config,
+				new MyFetcher(4), true, 500L));
+		builder.setBolt("src",
+				new SensorStormBolt(config, MyTimedOperation.class, "myId"), 3)
+				.customGrouping("input", new SensorStormShuffleGrouping());
 	}
 
 	public void prepare() {

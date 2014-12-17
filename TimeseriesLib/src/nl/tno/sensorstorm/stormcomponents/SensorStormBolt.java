@@ -37,7 +37,7 @@ import backtype.storm.tuple.Tuple;
 
 public class SensorStormBolt extends BaseRichBolt {
 	private static final long serialVersionUID = -5109656134961759532L;
-	private static final long SYNC_BUFFFER_SIZE_MS = 1000;
+	private static final long SYNC_BUFFFER_SIZE_MS = 1;
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	protected Class<? extends Operation> operationClass;
@@ -50,7 +50,8 @@ public class SensorStormBolt extends BaseRichBolt {
 	protected OutputCollector collector;
 	protected String boltName;
 	protected ExternalStormConfiguration zookeeperStormConfiguration;
-	protected @SuppressWarnings("rawtypes") Map stormNativeConfig;
+	protected @SuppressWarnings("rawtypes")
+	Map stormNativeConfig;
 	private SyncBuffer syncBuffer;
 	private String originId;
 
@@ -229,10 +230,12 @@ public class SensorStormBolt extends BaseRichBolt {
 			// single instance operation mode
 			operationManager = getOperationManager(null);
 		} else {
+
 			// try to select an operationManager from the value of the
 			// fieldGrouperId field
-			String fieldGrouperValue = originalTuple
-					.getStringByField(fieldGrouperId);
+			String fieldGrouperValue = ParticleMapper.getValueByField(
+					inputParticle, fieldGrouperId);
+
 			if (fieldGrouperValue != null) { // fieldGrouperId exists
 				operationManager = getOperationManager(fieldGrouperValue);
 			} else {

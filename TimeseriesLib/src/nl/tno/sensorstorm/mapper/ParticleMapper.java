@@ -30,6 +30,7 @@ public class ParticleMapper {
 
 	public static final int TIMESTAMP_IDX = 0;
 	public static final int PARTICLE_CLASS_IDX = 1;
+	public static final int PARTICLE_MINIMAL_FIELDS = 2;
 
 	public static final String TIMESTAMP_FIELD_NAME = "timestamp";
 	public static final String PARTICLE_CLASS_FIELD_NAME = "particleClass";
@@ -213,6 +214,51 @@ public class ParticleMapper {
 			}
 		}
 		return new Fields(copy);
+	}
+
+	/**
+	 * Returns the value of the fieldId within the particle
+	 * 
+	 * @param particle
+	 * @param fieldId
+	 * @return
+	 */
+	public static String getValueByField(Particle particle, String fieldId) {
+
+		// determine value of the fieldGrouperId based on the fields and values
+		Values values = ParticleMapper.particleToValues(particle);
+		Fields fields = ParticleMapper.getFields(particle.getClass());
+
+		int fieldNr = -1;
+		for (String field : fields) {
+			fieldNr++;
+			if (field != null) {
+				if (fieldId.equals(field)) {
+					Object result = values.get(fieldNr);
+					if (result instanceof String) {
+						return (String) result;
+					} else {
+						return null;
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	public static int getFieldIdx(Class<? extends Particle> clazz,
+			String fieldId) {
+		Fields fields = ParticleMapper.getFields(clazz);
+		int fieldNr = -1;
+		for (String field : fields) {
+			fieldNr++;
+			if (field != null) {
+				if (fieldId.equals(field)) {
+					return fieldNr;
+				}
+			}
+		}
+		return -1;
 	}
 
 }
