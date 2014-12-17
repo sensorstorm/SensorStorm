@@ -92,8 +92,9 @@ public abstract class ConfigManager implements ConfigurationListener {
 						+ ", " + value + "] into its container");
 			}
 		} catch (NumberFormatException e) {
-			logger.error("Can not set config parameter " + key + " to value "
-					+ value, e);
+			logger.error("Can not set config parameter " + key + " of type "
+					+ keyValueContainer.get().getClass().getName()
+					+ " to value " + value + " msg=" + e);
 		}
 	}
 

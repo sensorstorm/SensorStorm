@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import nl.tno.storm.configuration.api.ExternalStormConfiguration;
 import nl.tno.storm.configuration.api.StormConfigurationException;
 import nl.tno.storm.configuration.api.StormConfigurationFactory;
-import nl.tno.storm.configuration.api.ExternalStormConfiguration;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -17,6 +17,7 @@ public class ZookeeperStormConfigurationFactory implements
 	public static String CONNECTING_STRING = "config.zookeeper.connectionstring";
 	public static String TOPOLOGY_NAME = "config.zookeeper.topologyname";
 
+	private static ExternalStormConfiguration externalStormConfiguration = null;
 	private static ZookeeperStormConfigurationFactory instance = new ZookeeperStormConfigurationFactory();
 
 	public static ZookeeperStormConfigurationFactory getInstance() {
@@ -27,6 +28,11 @@ public class ZookeeperStormConfigurationFactory implements
 		// mag niet!
 	}
 
+	public static void setExternalStormConfiguration(
+			ExternalStormConfiguration newExternalStormConfiguration) {
+		externalStormConfiguration = newExternalStormConfiguration;
+	}
+
 	private CuratorFramework zkClient;
 	private final Map<String, ExternalStormConfiguration> stormConfigurations = new HashMap<String, ExternalStormConfiguration>();
 
@@ -35,14 +41,20 @@ public class ZookeeperStormConfigurationFactory implements
 			String topologyId, String connectionString)
 			throws StormConfigurationException {
 		try {
-			if (zkClient == null) {
-				zkClient = CuratorFrameworkFactory.newClient(connectionString,
-						new ExponentialBackoffRetry(1000, 3));
-				zkClient.start();
-			}
 			if (!stormConfigurations.containsKey(topologyId)) {
-				stormConfigurations.put(topologyId,
-						new ZookeeperStormConfiguration(topologyId, zkClient));
+				// default externalStormConfiguration or other?
+				if (externalStormConfiguration == null) {
+					// zookeeper connection available
+					if (zkClient == null) {
+						zkClient = CuratorFrameworkFactory.newClient(
+								connectionString, new ExponentialBackoffRetry(
+										1000, 3));
+						zkClient.start();
+					}
+					externalStormConfiguration = new ZookeeperStormConfiguration(
+							topologyId, zkClient);
+				}
+				stormConfigurations.put(topologyId, externalStormConfiguration);
 			}
 			return stormConfigurations.get(topologyId);
 		} catch (Exception e) {
@@ -68,7 +80,9 @@ public class ZookeeperStormConfigurationFactory implements
 
 	@Override
 	public synchronized void close() throws IOException {
-		zkClient.close();
+		if (zkClient != null) {
+			zkClient.close();
+		}
 		zkClient = null;
 	}
 

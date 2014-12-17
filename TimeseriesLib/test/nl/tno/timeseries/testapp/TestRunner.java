@@ -5,6 +5,7 @@ import nl.tno.sensorstorm.stormcomponents.SensorStormBolt;
 import nl.tno.sensorstorm.stormcomponents.SensorStormSpout;
 import nl.tno.sensorstorm.stormcomponents.groupers.SensorStormFieldGrouping;
 import nl.tno.sensorstorm.stormcomponents.groupers.SensorStormShuffleGrouping;
+import nl.tno.storm.configuration.impl.ZookeeperStormConfigurationFactory;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.topology.TopologyBuilder;
@@ -22,12 +23,13 @@ public class TestRunner {
 		try {
 			prepare();
 
-			testSingleOperationTopology();
+			// testSingleOperationTopology();
 			// testFieldGrouperOperationTopology();
 			// testTimerTicksFieldGrouperOperationTopology();
 			// testTimerTicksSingleOperationTopology();
 			// testSensorStormFieldGroupingTopology();
 			// testSensorStormShuffleGroupingTopology();
+			testSingleOperationWithConfigTopology();
 
 			submitAndWait();
 			tearDown();
@@ -93,6 +95,19 @@ public class TestRunner {
 		builder.setBolt("src",
 				new SensorStormBolt(config, MyTimedOperation.class, "myId"), 3)
 				.customGrouping("input", new SensorStormShuffleGrouping());
+	}
+
+	public void testSingleOperationWithConfigTopology()
+			throws OperationException {
+		System.out.println("Single operation with config topology test");
+		ZookeeperStormConfigurationFactory
+				.setExternalStormConfiguration(new MyExternalStormConfiguration());
+
+		builder.setSpout("input",
+				new SensorStormSpout(config, new MyFetcher(4)));
+		builder.setBolt("src",
+				new SensorStormBolt(config, MyConfigOperation.class, null), 1)
+				.shuffleGrouping("input");
 	}
 
 	public void prepare() {
