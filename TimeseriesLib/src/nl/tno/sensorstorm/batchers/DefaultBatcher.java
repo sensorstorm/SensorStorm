@@ -17,17 +17,18 @@ public abstract class DefaultBatcher implements Batcher {
 	private final ArrayList<Field> fields;
 
 	public DefaultBatcher(Fields groupBy, Class<? extends DataParticle> clazz) {
-		this.fields = new ArrayList<Field>();
+		fields = new ArrayList<Field>();
 		for (Field f : clazz.getDeclaredFields()) {
 			f.setAccessible(true);
 			for (Annotation a : f.getAnnotations()) {
 				if (a instanceof TupleField) {
 					String name = ((TupleField) a).name();
-					if (name == null || name.length() == 0) {
+					if ((name == null) || (name.length() == 0)) {
 						name = f.getName();
 					}
-					if (groupBy.contains(name))
+					if (groupBy.contains(name)) {
 						fields.add(f);
+					}
 				}
 			}
 		}
@@ -35,7 +36,7 @@ public abstract class DefaultBatcher implements Batcher {
 
 	/**
 	 * Generates the key for the provided tuple using the fields provided at
-	 * construction time
+	 * construction time.
 	 * 
 	 * @param tuple
 	 * @return key created for this tuple or NULL if no key could be created

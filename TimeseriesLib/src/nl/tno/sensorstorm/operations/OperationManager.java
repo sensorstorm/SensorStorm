@@ -172,8 +172,9 @@ public class OperationManager implements Serializable {
 				if (batchedParticles != null) {
 					outputDataParticles = new ArrayList<DataParticle>();
 					for (DataParticleBatch batchedParticle : batchedParticles) {
-						outputDataParticles.addAll(((ParticleBatchOperation) operation)
-								.execute(batchedParticle));
+						outputDataParticles
+								.addAll(((ParticleBatchOperation) operation)
+										.execute(batchedParticle));
 					}
 				}
 			} else {
@@ -245,8 +246,9 @@ public class OperationManager implements Serializable {
 
 			// is it a BatchOperation?
 			if (ParticleBatchOperation.class.isInstance(operation)) {
-				((ParticleBatchOperation) operation).init(fieldGrouperValue, timestamp,
-						stormNativeConfig, zookeeperStormConfiguration);
+				((ParticleBatchOperation) operation).init(fieldGrouperValue,
+						timestamp, stormNativeConfig,
+						zookeeperStormConfiguration);
 			}
 
 			// or is it a SingleOperation?
