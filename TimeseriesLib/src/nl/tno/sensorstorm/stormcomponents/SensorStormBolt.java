@@ -9,11 +9,11 @@ import java.util.Map;
 import nl.tno.sensorstorm.batchers.Batcher;
 import nl.tno.sensorstorm.config.EmptyStormConfiguration;
 import nl.tno.sensorstorm.mapper.ParticleMapper;
-import nl.tno.sensorstorm.operations.ParticleBatchOperation;
 import nl.tno.sensorstorm.operations.FlushingSyncBuffer;
 import nl.tno.sensorstorm.operations.Operation;
 import nl.tno.sensorstorm.operations.OperationException;
 import nl.tno.sensorstorm.operations.OperationManager;
+import nl.tno.sensorstorm.operations.ParticleBatchOperation;
 import nl.tno.sensorstorm.operations.SingleParticleOperation;
 import nl.tno.sensorstorm.operations.SyncBuffer;
 import nl.tno.sensorstorm.particles.DataParticle;
@@ -36,35 +36,110 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
 public class SensorStormBolt extends BaseRichBolt {
+
+	// ///////////// //
+	// Static fields //
+	// ///////////// //
 	private static final long serialVersionUID = -5109656134961759532L;
-	private static final long SYNC_BUFFFER_SIZE_MS = 1;
+	private static Logger logger = LoggerFactory.getLogger(BaseRichBolt.class);
 
-	protected Logger logger = LoggerFactory.getLogger(this.getClass());
-
-	protected Class<? extends Operation> operationClass;
-	protected int nrOfOutputFields;
+	// ///////////////////////// //
+	// Fields set in constructor //
+	// ///////////////////////// //
+	protected long syncBufferSize;
 	protected Class<? extends Batcher> batcherClass;
-	protected Map<String, OperationManager> operationManagers;
-	protected Fields metaParticleFields;
+	protected Class<? extends Operation> operationClass;
 	protected String fieldGrouperId;
+	protected Fields metaParticleFields;
+	protected Map<String, OperationManager> operationManagers;
 
-	protected OutputCollector collector;
-	protected String boltName;
-	protected ExternalStormConfiguration zookeeperStormConfiguration;
+	// ///////////////////// //
+	// Fields set in prepare //
+	// ///////////////////// //
 	protected @SuppressWarnings("rawtypes") Map stormNativeConfig;
-	protected SyncBuffer syncBuffer;
+	protected OutputCollector collector;
 	protected String originId;
+	protected ExternalStormConfiguration zookeeperStormConfiguration;
+	protected SyncBuffer syncBuffer;
 	protected HashMap<Particle, String> fieldGrouperValues;
+
+	// //////////// //
+	// Other fields //
+	// //////////// //
+	protected int nrOfOutputFields;
 
 	/**
 	 * Construct a {@link SensorStormBolt} with a {@link Batcher}
 	 * 
 	 * @param conf
 	 *            Storm configuration map
+	 * @param syncBufferSize
+	 *            size of the SyncBuffer in ms
 	 * @param batcherClass
 	 *            {@link Class} of the {@link Batcher} implementation
 	 * @param batchOperationClass
-	 *            {@link Class} of the {@link ParticleBatchOperation} implementation
+	 *            {@link Class} of the {@link ParticleBatchOperation}
+	 *            implementation
+	 * @param fieldGrouperId
+	 *            The field name on which this bolt the operations should
+	 *            instantiated. To specify an single operation, one instance of
+	 *            the operation class for all particles, the fieldGrouper must
+	 *            be null.
+	 * @throws OperationException
+	 */
+	public SensorStormBolt(Config config, long syncBufferSize,
+			Class<? extends Batcher> batcherClass,
+			Class<? extends ParticleBatchOperation> batchOperationClass,
+			String fieldGrouperId) throws OperationException {
+		if (batcherClass == null) {
+			throw new OperationException("batcherClass may not be null");
+		}
+		if (batchOperationClass == null) {
+			throw new OperationException("batchOperationClass may not be null");
+		}
+
+		sensorStormBolt(config, syncBufferSize, batcherClass,
+				batchOperationClass, fieldGrouperId);
+	}
+
+	/**
+	 * Construct a {@link SensorStormBolt} without a {@link Batcher}
+	 * 
+	 * @param conf
+	 *            Storm configuration map
+	 * @param syncBufferSize
+	 *            size of the SyncBuffer in ms
+	 * @param singleOperationClass
+	 *            {@link Class} of the {@link Operation} implementation
+	 * @param fieldGrouperId
+	 *            The field name on which this bolt the operations should
+	 *            instantiated. To specify an single operation, one instance of
+	 *            the operation class for all particles, the fieldGrouper must
+	 *            be null.
+	 * @throws OperationException
+	 */
+	public SensorStormBolt(Config config, long syncBufferSize,
+			Class<? extends SingleParticleOperation> singleOperationClass,
+			String fieldGrouperId) throws OperationException {
+		if (singleOperationClass == null) {
+			throw new OperationException("operationClass may not be null");
+		}
+
+		sensorStormBolt(config, syncBufferSize, null, singleOperationClass,
+				fieldGrouperId);
+	}
+
+	/**
+	 * Construct a {@link SensorStormBolt} with a {@link Batcher} and a default
+	 * SyncBuffer size of 1000 ms
+	 * 
+	 * @param conf
+	 *            Storm configuration map
+	 * @param batcherClass
+	 *            {@link Class} of the {@link Batcher} implementation
+	 * @param batchOperationClass
+	 *            {@link Class} of the {@link ParticleBatchOperation}
+	 *            implementation
 	 * @param fieldGrouperId
 	 *            The field name on which this bolt the operations should
 	 *            instantiated. To specify an single operation, one instance of
@@ -83,12 +158,13 @@ public class SensorStormBolt extends BaseRichBolt {
 			throw new OperationException("batchOperationClass may not be null");
 		}
 
-		sensorStormBolt(config, batcherClass, batchOperationClass,
+		sensorStormBolt(config, 1000, batcherClass, batchOperationClass,
 				fieldGrouperId);
 	}
 
 	/**
-	 * Construct a {@link SensorStormBolt} without a {@link Batcher}
+	 * Construct a {@link SensorStormBolt} without a {@link Batcher} and a
+	 * default SyncBuffer size of 1000 ms
 	 * 
 	 * @param conf
 	 *            Storm configuration map
@@ -108,7 +184,8 @@ public class SensorStormBolt extends BaseRichBolt {
 			throw new OperationException("operationClass may not be null");
 		}
 
-		sensorStormBolt(config, null, singleOperationClass, fieldGrouperId);
+		sensorStormBolt(config, 1000, null, singleOperationClass,
+				fieldGrouperId);
 	}
 
 	/**
@@ -120,13 +197,16 @@ public class SensorStormBolt extends BaseRichBolt {
 	 * @param operationClass
 	 * @param fieldGrouperId
 	 */
-	private void sensorStormBolt(Config config,
+	private void sensorStormBolt(Config config, long syncBufferSize,
 			Class<? extends Batcher> batcherClass,
 			Class<? extends Operation> operationClass, String fieldGrouperId) {
-
+		// Set fields
+		this.syncBufferSize = syncBufferSize;
+		this.batcherClass = batcherClass;
 		this.operationClass = operationClass;
-		this.batcherClass = null;
 		this.fieldGrouperId = fieldGrouperId;
+
+		// Initialize data structures
 		this.operationManagers = new HashMap<String, OperationManager>();
 		this.metaParticleFields = MetaParticleUtil
 				.registerMetaParticleFieldsWithOperationClass(config,
@@ -138,7 +218,6 @@ public class SensorStormBolt extends BaseRichBolt {
 			TopologyContext context, OutputCollector collector) {
 		this.stormNativeConfig = stormNativeConfig;
 		this.collector = collector;
-		this.boltName = context.getThisComponentId();
 		this.originId = operationClass.getName() + "."
 				+ context.getThisTaskIndex();
 
@@ -169,7 +248,7 @@ public class SensorStormBolt extends BaseRichBolt {
 			msg = msg + ", with no batcher.";
 		}
 		logger.info(msg);
-		this.syncBuffer = new FlushingSyncBuffer(SYNC_BUFFFER_SIZE_MS);
+		this.syncBuffer = new FlushingSyncBuffer(this.syncBufferSize);
 		this.fieldGrouperValues = new HashMap<Particle, String>();
 	}
 
@@ -296,15 +375,19 @@ public class SensorStormBolt extends BaseRichBolt {
 			// no operation manager present yet for the fieldGrouper
 			if (operationManager == null) {
 				// is it a single operation?
-				if (SingleParticleOperation.class.isAssignableFrom(operationClass)) {
-					operationManager = new OperationManager(fieldGrouperValue,
+				if (SingleParticleOperation.class
+						.isAssignableFrom(operationClass)) {
+					operationManager = new OperationManager(
+							fieldGrouperValue,
 							(Class<? extends SingleParticleOperation>) operationClass,
 							stormNativeConfig, zookeeperStormConfiguration);
 				}
 
 				// is it a batch operation?
-				else if (ParticleBatchOperation.class.isAssignableFrom(operationClass)) {
-					operationManager = new OperationManager(fieldGrouperValue,
+				else if (ParticleBatchOperation.class
+						.isAssignableFrom(operationClass)) {
+					operationManager = new OperationManager(
+							fieldGrouperValue,
 							batcherClass,
 							(Class<? extends ParticleBatchOperation>) operationClass,
 							stormNativeConfig, zookeeperStormConfiguration);
