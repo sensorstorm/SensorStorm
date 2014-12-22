@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import backtype.storm.Config;
+import backtype.storm.metric.api.CountMetric;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -42,7 +43,8 @@ public class SensorStormBolt extends BaseRichBolt {
 	// Static fields //
 	// ///////////// //
 	private static final long serialVersionUID = -5109656134961759532L;
-	private static Logger logger = LoggerFactory.getLogger(BaseRichBolt.class);
+	private static final Logger logger = LoggerFactory
+			.getLogger(SensorStormBolt.class);
 
 	// ///////////////////////// //
 	// Fields set in constructor //
@@ -52,17 +54,18 @@ public class SensorStormBolt extends BaseRichBolt {
 	protected Class<? extends Operation> operationClass;
 	protected String fieldGrouperId;
 	protected Fields metaParticleFields;
-	protected Map<String, OperationManager> operationManagers;
 
 	// ///////////////////// //
 	// Fields set in prepare //
 	// ///////////////////// //
-	protected @SuppressWarnings("rawtypes") Map stormNativeConfig;
-	protected OutputCollector collector;
-	protected String originId;
-	protected ExternalStormConfiguration zookeeperStormConfiguration;
-	protected SyncBuffer syncBuffer;
-	protected HashMap<Particle, String> fieldGrouperValues;
+	protected transient @SuppressWarnings("rawtypes") Map stormNativeConfig;
+	protected transient OutputCollector collector;
+	protected transient String originId;
+	protected transient ExternalStormConfiguration zookeeperStormConfiguration;
+	protected transient SyncBuffer syncBuffer;
+	protected transient Map<String, OperationManager> operationManagers;
+	protected transient HashMap<Particle, String> fieldGrouperValues;
+	protected transient CountMetric bufferRejectMetric;
 
 	// //////////// //
 	// Other fields //
@@ -208,7 +211,6 @@ public class SensorStormBolt extends BaseRichBolt {
 		this.fieldGrouperId = fieldGrouperId;
 
 		// Initialize data structures
-		this.operationManagers = new HashMap<String, OperationManager>();
 		this.metaParticleFields = MetaParticleUtil
 				.registerMetaParticleFieldsFromOperationClass(config,
 						operationClass);
@@ -250,7 +252,10 @@ public class SensorStormBolt extends BaseRichBolt {
 		}
 		logger.info(msg);
 		this.syncBuffer = new FlushingSyncBuffer(this.syncBufferSize);
+		this.operationManagers = new HashMap<String, OperationManager>();
 		this.fieldGrouperValues = new HashMap<Particle, String>();
+		this.bufferRejectMetric = new CountMetric();
+		context.registerMetric("syncbuffer_rejects", bufferRejectMetric, 10);
 	}
 
 	/**
@@ -269,24 +274,31 @@ public class SensorStormBolt extends BaseRichBolt {
 
 		if (inputParticle != null) {
 			// Push the particle through the SyncBuffer
-			List<Particle> particlesToProcess = syncBuffer
-					.pushParticle(inputParticle);
-			// Process the particles from the buffer (if any)
-			for (Particle particle : particlesToProcess) {
-				if (particle instanceof MetaParticle) {
-					List<Particle> outputParticles = processMetaParticle((MetaParticle) particle);
-					// Emit new particles (if any)
-					emitParticles(originalTuple, outputParticles);
-					// Pass through the current MetaParticle
-					emitParticle(originalTuple, particle);
-				} else if (particle instanceof DataParticle) {
-					List<Particle> outputParticles = processDataParticle((DataParticle) particle);
-					emitParticles(originalTuple, outputParticles);
-				} else {
-					// This is not a MetaParticle and not a DataParticle
-					logger.error("Unknown particle type, not a MetaParticle or a DataParticle, but a "
-							+ particle.getClass().getName());
+			try {
+				List<Particle> particlesToProcess = syncBuffer
+						.pushParticle(inputParticle);
+				// Process the particles from the buffer (if any)
+				for (Particle particle : particlesToProcess) {
+					if (particle instanceof MetaParticle) {
+						List<Particle> outputParticles = processMetaParticle((MetaParticle) particle);
+						// Emit new particles (if any)
+						emitParticles(originalTuple, outputParticles);
+						// Pass through the current MetaParticle
+						emitParticle(originalTuple, particle);
+					} else if (particle instanceof DataParticle) {
+						List<Particle> outputParticles = processDataParticle((DataParticle) particle);
+						emitParticles(originalTuple, outputParticles);
+					} else {
+						// This is not a MetaParticle and not a DataParticle
+						logger.error("Unknown particle type, not a MetaParticle or a DataParticle, but a "
+								+ particle.getClass().getName());
+					}
 				}
+			} catch (IllegalArgumentException e) {
+				bufferRejectMetric.incr();
+				logger.warn("Particle with timestamp "
+						+ inputParticle.getTimestamp()
+						+ " was rejected from SyncBuffer of bolt " + originId);
 			}
 		}
 		// Always acknowledge tuples
