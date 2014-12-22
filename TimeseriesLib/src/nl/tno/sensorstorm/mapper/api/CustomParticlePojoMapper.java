@@ -8,7 +8,7 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 
 /**
- * Custom mapper for a Particle
+ * Custom mapper for a Particle.
  * 
  * Particles are represented in Storm by dynamically typed Tuples.For
  * transportation Particles are mapped to Tuples. Particles are automatically
@@ -22,12 +22,37 @@ import backtype.storm.tuple.Values;
  */
 public interface CustomParticlePojoMapper<T extends Particle> {
 
-	public Values particleToValues(T particle);
+	/**
+	 * Map a {@link Particle} object into a {@link Values} object.
+	 * 
+	 * @param particle
+	 *            {@link Particle} object to be mapped
+	 * @return mapped {@link Particle}
+	 */
+	Values particleToValues(T particle);
 
-	public T tupleToParticle(Tuple tuple);
+	/**
+	 * Map a {@link Tuple} object into a {@link Particle} object.
+	 * 
+	 * @param tuple
+	 *            {@link Tuple} to be mapped
+	 * @return mapped {@link Tuple}
+	 */
+	T tupleToParticle(Tuple tuple);
 
-	public Fields getFields();
+	/**
+	 * @return The {@link Fields} present in this {@link Particle}
+	 */
+	Fields getFields();
 
-	public boolean canMapTuple(Tuple tuple);
+	/**
+	 * Check if a {@link Tuple} can be mapped to this type of {@link Particle}.
+	 * 
+	 * @param tuple
+	 *            To be checked
+	 * @return True if the {@link Tuple} corresports to this mapper, false
+	 *         otherwise
+	 */
+	boolean canMapTuple(Tuple tuple);
 
 }

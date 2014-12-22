@@ -7,25 +7,33 @@ import nl.tno.sensorstorm.particles.DataParticle;
 import nl.tno.sensorstorm.particles.DataParticleBatch;
 import nl.tno.storm.configuration.api.ExternalStormConfiguration;
 
+import com.sun.xml.internal.bind.v2.schemagen.xmlschema.Particle;
+
 /**
  * An interface describing the batch functionality: to collect one or more
  * particles in a batch based on a certain criteria. Particles must be added to
  * an inner batch and maintained until the batch is ready to be sent.
- * 
- * @author waaijbdvd
  */
 public interface Batcher {
 
 	/**
+	 * Initialize the Batcher.
+	 * 
 	 * @param fieldGrouper
-	 * @param startTimeStamp
+	 *            When this bolt uses field grouping, the value of the field
+	 *            which is used for grouping, null otherwise
+	 * @param startTimestamp
+	 *            Timestamp of the first {@link Particle}
 	 * @param stormNativeConfig
-	 * @param zookeeperStormConfiguration
+	 *            Native Storm Configuration
+	 * @param externalStormConfiguration
+	 *            Reference to the {@link ExternalStormConfiguration}
 	 * @throws BatcherException
+	 *             When an error occurs in this {@link Batcher}
 	 */
-	public void init(String fieldGrouper, long startTimestamp,
+	void init(String fieldGrouper, long startTimestamp,
 			@SuppressWarnings("rawtypes") Map stormNativeConfig,
-			ExternalStormConfiguration zookeeperStormConfiguration)
+			ExternalStormConfiguration externalStormConfiguration)
 			throws BatcherException;
 
 	/**
@@ -37,8 +45,10 @@ public interface Batcher {
 	 *            The new data particle to be added to the inner batch.
 	 * @return Returns null to indicate the batch is not ready yet, or a list
 	 *         with one or more DataPatricleBatches
+	 * @throws BatcherException
+	 *             When an error occurs in this {@link Batcher}
 	 */
-	public List<DataParticleBatch> batch(DataParticle inputParticle)
+	List<DataParticleBatch> batch(DataParticle inputParticle)
 			throws BatcherException;
 
 }

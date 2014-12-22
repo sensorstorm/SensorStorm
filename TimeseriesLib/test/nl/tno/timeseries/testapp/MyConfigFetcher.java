@@ -7,8 +7,8 @@ import nl.tno.sensorstorm.annotation.FetcherDeclaration;
 import nl.tno.sensorstorm.config.FetcherConfigManager;
 import nl.tno.sensorstorm.fetchers.Fetcher;
 import nl.tno.sensorstorm.particles.DataParticle;
-import nl.tno.storm.configuration.api.StormConfigurationException;
 import nl.tno.storm.configuration.api.ExternalStormConfiguration;
+import nl.tno.storm.configuration.api.StormConfigurationException;
 import backtype.storm.task.TopologyContext;
 
 @FetcherDeclaration(outputs = { MyDataParticle.class })
@@ -32,7 +32,7 @@ public class MyConfigFetcher implements Fetcher {
 	@Override
 	public void prepare(@SuppressWarnings("rawtypes") Map stormNativeConfig,
 			ExternalStormConfiguration stormConfiguration,
-			TopologyContext context) throws Exception {
+			TopologyContext context) {
 		FetcherConfigManager fetcherConfigManager = new FetcherConfigManager(
 				stormConfiguration, "myconfigfetcher");
 		try {

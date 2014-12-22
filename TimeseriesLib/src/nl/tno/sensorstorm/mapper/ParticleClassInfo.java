@@ -2,6 +2,7 @@ package nl.tno.sensorstorm.mapper;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.SortedMap;
 
@@ -16,7 +17,7 @@ import backtype.storm.tuple.Values;
 
 /**
  * The ParticleClassInfo contains information and methods on how to map
- * Particles without a custom mapper
+ * {@link Particle}s without a custom mapper.
  */
 public class ParticleClassInfo {
 
@@ -28,16 +29,37 @@ public class ParticleClassInfo {
 	private final Fields outputFields;
 	private final Class<?> clazz;;
 
+	/**
+	 * Construct a {@link ParticleClassInfo} for a type of {@link Particle}.
+	 * 
+	 * @param clazz
+	 *            {@link Class} of this {@link Particle}
+	 * @param fields
+	 *            Map with as key the name of the field in the {@link Particle},
+	 *            value the name in the {@link Tuple}
+	 */
 	public ParticleClassInfo(Class<?> clazz, SortedMap<String, String> fields) {
 		this.fields = fields;
 		this.clazz = clazz;
-		ArrayList<String> copy = new ArrayList<>();
+		List<String> copy = new ArrayList<>();
 		copy.add(ParticleMapper.TIMESTAMP_FIELD_NAME);
 		copy.add(ParticleMapper.PARTICLE_CLASS_FIELD_NAME);
 		copy.addAll(this.fields.values());
 		outputFields = new Fields(copy);
 	}
 
+	/**
+	 * Map a {@link Tuple} into a {@link Particle}.
+	 * 
+	 * @param <T>
+	 *            Type of the {@link Particle}
+	 * @param tuple
+	 *            {@link Tuple} to be mapped
+	 * @param clazz
+	 *            {@link Class} of the {@link Particle}, should be equal to the
+	 *            {@link Class} passed in the constructor
+	 * @return The mapped {@link Particle}
+	 */
 	@SuppressWarnings("unchecked")
 	public <T> T tupleToParticle(Tuple tuple, Class<T> clazz) {
 		try {
@@ -66,6 +88,13 @@ public class ParticleClassInfo {
 		}
 	}
 
+	/**
+	 * Map a {@link Particle} to a {@link Values} object.
+	 * 
+	 * @param particle
+	 *            {@link Particle} to map
+	 * @return Mapped {@link Particle}
+	 */
 	public Values particleToValues(Particle particle) {
 		try {
 			Values v = new Values();
@@ -86,6 +115,11 @@ public class ParticleClassInfo {
 		}
 	}
 
+	/**
+	 * {@link Fields} object describing the {@link Particle}.
+	 * 
+	 * @return {@link Fields} with fields the {@link Tuple}
+	 */
 	public Fields getFields() {
 		return outputFields;
 	}

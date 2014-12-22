@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import nl.tno.sensorstorm.annotation.MetaParticleHandlerDecleration;
+import nl.tno.sensorstorm.annotation.MetaParticleHandlerDeclaration;
 import nl.tno.sensorstorm.annotation.OperationDeclaration;
 import nl.tno.sensorstorm.batchers.Batcher;
 import nl.tno.sensorstorm.batchers.BatcherException;
@@ -30,6 +30,7 @@ public class OperationManager implements Serializable {
 	protected Logger logger = LoggerFactory.getLogger(OperationManager.class);
 
 	private static final long serialVersionUID = 3141072548366321818L;
+
 	/** The fieldGroupValue this manager works for. */
 	private String fieldGrouperValue;
 
@@ -113,11 +114,11 @@ public class OperationManager implements Serializable {
 			@SuppressWarnings("rawtypes") Map stormNativeConfig,
 			ExternalStormConfiguration stormConfiguration)
 			throws InstantiationException, IllegalAccessException {
-		this.fieldGrouperValue = fieldGroupValue;
+		fieldGrouperValue = fieldGroupValue;
 		this.operationClass = operationClass;
 		this.batcherClass = batcherClass;
 		this.operationClass = operationClass;
-		this.zookeeperStormConfiguration = stormConfiguration;
+		zookeeperStormConfiguration = stormConfiguration;
 		metaParticleHandlers = new ArrayList<MetaParticleHandler>();
 
 		// precreate the operation in order to give it time to initialze before
@@ -140,8 +141,9 @@ public class OperationManager implements Serializable {
 	 *         will be logged
 	 */
 	public List<Particle> processDataParticle(DataParticle dataParticle) {
-		if (dataParticle == null)
+		if (dataParticle == null) {
 			return null;
+		}
 
 		// make sure this operation manager has an operation and optional
 		// metaParticleHandlers.
@@ -231,7 +233,7 @@ public class OperationManager implements Serializable {
 		}
 
 		// create batcher if needed
-		if (batcherClass != null)
+		if (batcherClass != null) {
 			try {
 				batcher = batcherClass.newInstance();
 				batcher.init(fieldGrouperValue, timestamp, stormNativeConfig,
@@ -239,6 +241,7 @@ public class OperationManager implements Serializable {
 			} catch (BatcherException e) {
 				throw new InstantiationException(e.getMessage());
 			}
+		}
 
 		try {
 			// create new operation and initialize it
@@ -302,8 +305,8 @@ public class OperationManager implements Serializable {
 	protected List<Particle> handleMetaParticle(MetaParticle metaParticle) {
 		List<Particle> result = new ArrayList<Particle>();
 		for (MetaParticleHandler mph : metaParticleHandlers) {
-			MetaParticleHandlerDecleration mphd = mph.getClass().getAnnotation(
-					MetaParticleHandlerDecleration.class);
+			MetaParticleHandlerDeclaration mphd = mph.getClass().getAnnotation(
+					MetaParticleHandlerDeclaration.class);
 			if (metaParticle.getClass().isAssignableFrom(mphd.metaParticle())) {
 				result.addAll(mph.handleMetaParticle(metaParticle));
 			}
@@ -329,8 +332,8 @@ public class OperationManager implements Serializable {
 		}
 		for (Class<? extends MetaParticleHandler> cl : od
 				.metaParticleHandlers()) {
-			MetaParticleHandlerDecleration mphd = cl
-					.getAnnotation(MetaParticleHandlerDecleration.class);
+			MetaParticleHandlerDeclaration mphd = cl
+					.getAnnotation(MetaParticleHandlerDeclaration.class);
 			result.add(mphd.metaParticle());
 		}
 		return result;
@@ -370,8 +373,8 @@ public class OperationManager implements Serializable {
 				.getAnnotation(OperationDeclaration.class);
 		for (Class<? extends MetaParticleHandler> cl : od
 				.metaParticleHandlers()) {
-			MetaParticleHandlerDecleration mphd = cl
-					.getAnnotation(MetaParticleHandlerDecleration.class);
+			MetaParticleHandlerDeclaration mphd = cl
+					.getAnnotation(MetaParticleHandlerDeclaration.class);
 			result.add(mphd.metaParticle());
 		}
 		return result;

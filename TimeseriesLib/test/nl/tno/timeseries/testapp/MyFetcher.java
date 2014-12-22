@@ -22,7 +22,7 @@ public class MyFetcher implements Fetcher {
 	@Override
 	public void prepare(@SuppressWarnings("rawtypes") Map stormNativeConfig,
 			ExternalStormConfiguration stormConfiguration,
-			TopologyContext context) throws Exception {
+			TopologyContext context) {
 		System.out.println("MyFetcher prepare");
 	}
 

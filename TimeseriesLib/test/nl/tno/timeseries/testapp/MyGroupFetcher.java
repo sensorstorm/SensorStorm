@@ -18,7 +18,7 @@ public class MyGroupFetcher implements Fetcher {
 	@Override
 	public void prepare(@SuppressWarnings("rawtypes") Map stormNativeConfig,
 			ExternalStormConfiguration stormConfiguration,
-			TopologyContext context) throws Exception {
+			TopologyContext context) {
 	}
 
 	@Override

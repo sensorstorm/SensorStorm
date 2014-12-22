@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import nl.tno.sensorstorm.annotation.MetaParticleHandlerDecleration;
+import nl.tno.sensorstorm.annotation.MetaParticleHandlerDeclaration;
 import nl.tno.sensorstorm.operations.Operation;
 import nl.tno.sensorstorm.particles.DataParticle;
 import nl.tno.sensorstorm.particles.MetaParticle;
@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
  * @author waaijbdvd
  * 
  */
-@MetaParticleHandlerDecleration(metaParticle = TimerTickParticle.class)
+@MetaParticleHandlerDeclaration(metaParticle = TimerTickParticle.class)
 public class TimerParticleHandler implements MetaParticleHandler,
 		TimerControllerInterface, Serializable {
 	protected Logger logger = LoggerFactory

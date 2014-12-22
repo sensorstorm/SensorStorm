@@ -5,35 +5,34 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import nl.tno.sensorstorm.operations.Operation;
 import nl.tno.sensorstorm.particles.DataParticle;
 import nl.tno.sensorstorm.particles.MetaParticleHandler;
 
 /**
- * Annotation for the Operation. There can be three paramters (inputs, outputs
- * and metaParticleHandlers). The inputs is mandatory and the other two are
- * optional.
- * 
- * inputs: is an array containing one or more DataParticles specifying the
- * dataParticles must be passed to the operation as input.
- * 
- * outputs: is an array containing zero or more DataParticles specifying the
- * dataParticles the operation outputs.
- * 
- * metaParticleHandlers: is an array containing zero or more
- * MetaParticleHandlers that must be instantiated and connected to this
- * operation.
- * 
- * @author waaijbdvd
- * 
+ * Annotation for the {@link Operation}. There can be three parameters (inputs,
+ * outputs and metaParticleHandlers). The inputs is mandatory and the other two
+ * are optional.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE })
 public @interface OperationDeclaration {
-
+	/**
+	 * An array containing one or more types of {@link DataParticle}s that this
+	 * {@link Operation} can process.
+	 */
 	Class<? extends DataParticle>[] inputs();
 
+	/**
+	 * An array containing zero or more types of {@link DataParticle}s
+	 * specifying the dataParticles this {@link Operation} produces.
+	 */
 	Class<? extends DataParticle>[] outputs() default {};
 
+	/**
+	 * An array containing zero or more {@link MetaParticleHandler}s that must
+	 * be instantiated and connected to this operation.
+	 */
 	Class<? extends MetaParticleHandler>[] metaParticleHandlers() default {};
 
 }

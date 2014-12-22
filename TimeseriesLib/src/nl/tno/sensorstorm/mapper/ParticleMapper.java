@@ -14,6 +14,8 @@ import nl.tno.sensorstorm.mapper.annotation.Mapper;
 import nl.tno.sensorstorm.mapper.annotation.TupleField;
 import nl.tno.sensorstorm.mapper.api.CustomParticlePojoMapper;
 import nl.tno.sensorstorm.particles.Particle;
+import nl.tno.sensorstorm.stormcomponents.SensorStormBolt;
+import nl.tno.sensorstorm.stormcomponents.SensorStormSpout;
 
 import org.jboss.netty.util.internal.ConcurrentHashMap;
 import org.slf4j.Logger;
@@ -23,6 +25,11 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 
+/**
+ * Utility Class that can map {@link Tuple}s to {@link Particle}s and
+ * {@link Particle}s to {@link Values}. The class also has useful related
+ * methods.
+ */
 public class ParticleMapper {
 
 	public static final Logger log = LoggerFactory
@@ -35,10 +42,26 @@ public class ParticleMapper {
 	public static final String TIMESTAMP_FIELD_NAME = "timestamp";
 	public static final String PARTICLE_CLASS_FIELD_NAME = "particleClass";
 
+	private static final String PARTICLE_TO_VALUES_METHOD_NAME = "particleToValues";
+
 	private static ConcurrentMap<Class<?>, CustomParticlePojoMapper<?>> customSerializers = new ConcurrentHashMap<>();
 	private static ConcurrentMap<Class<?>, Method> customSerializersMapMethods = new ConcurrentHashMap<>();
 	private static ConcurrentMap<Class<?>, ParticleClassInfo> particleClassInfos = new ConcurrentHashMap<>();
 
+	/**
+	 * Private constructor, this class should not be instantiated.
+	 */
+	private ParticleMapper() {
+
+	}
+
+	/**
+	 * Map a {@link Particle} to a {@link Values} object.
+	 * 
+	 * @param particle
+	 *            {@link Particle} to map
+	 * @return Corresponding {@link Values} object
+	 */
 	public static Values particleToValues(Particle particle) {
 		Class<? extends Particle> clazz = particle.getClass();
 		if (hasCustomSerializer(clazz)) {
@@ -57,6 +80,17 @@ public class ParticleMapper {
 		}
 	}
 
+	/**
+	 * Map a {@link Particle} to a {@link Values} object and make sure it has
+	 * expectedNrOfFields fields. This is useful for when a Spout or Bolt has
+	 * declared more output fields than this {@link Particle} has.
+	 * 
+	 * @param particle
+	 *            {@link Particle} to map
+	 * @param expectedNrOfFields
+	 *            Desired number of fields
+	 * @return Corresponding {@link Values} object
+	 */
 	public static Values particleToValues(Particle particle,
 			int expectedNrOfFields) {
 		Values values = particleToValues(particle);
@@ -72,6 +106,18 @@ public class ParticleMapper {
 		return values;
 	}
 
+	/**
+	 * Map a {@link Tuple} to a {@link Particle} when the type of the
+	 * {@link Particle} is already known.
+	 * 
+	 * @param <T>
+	 *            The type of the {@link Particle}
+	 * @param tuple
+	 *            {@link Tuple} to be mapped
+	 * @param clazz
+	 *            {@link Class} of the expected type of {@link Particle}
+	 * @return The mapped {@link Tuple}
+	 */
 	@SuppressWarnings("unchecked")
 	public static <T extends Particle> T tupleToParticle(Tuple tuple,
 			Class<T> clazz) {
@@ -82,6 +128,14 @@ public class ParticleMapper {
 		}
 	}
 
+	/**
+	 * Map a {@link Tuple} to a {@link Particle} when the type of the
+	 * {@link Particle} is not yet known.
+	 * 
+	 * @param tuple
+	 *            {@link Tuple} to be mapped
+	 * @return The mapped {@link Tuple}
+	 */
 	public static Particle tupleToParticle(Tuple tuple) {
 		Class<?> clazz = null;
 		ParticleClassInfo particleClassInfo;
@@ -106,6 +160,14 @@ public class ParticleMapper {
 		}
 	}
 
+	/**
+	 * Check if a type of {@link Particle} has a
+	 * {@link CustomParticlePojoMapper}.
+	 * 
+	 * @param clazz
+	 *            Type of the {@link Particle}
+	 * @return if the {@link Particle} has a custom serializer
+	 */
 	private static boolean hasCustomSerializer(Class<? extends Particle> clazz) {
 		for (Annotation a : clazz.getAnnotations()) {
 			if (a instanceof Mapper) {
@@ -115,6 +177,13 @@ public class ParticleMapper {
 		return false;
 	}
 
+	/**
+	 * Get the {@link Fields} present in type of {@link Particle}.
+	 * 
+	 * @param clazz
+	 *            {@link Class} of the {@link Particle}
+	 * @return {@link Fields} in the {@link Particle}
+	 */
 	public static Fields getFields(Class<? extends Particle> clazz) {
 		if (hasCustomSerializer(clazz)) {
 			return getCustomMapper(clazz).getFields();
@@ -123,10 +192,27 @@ public class ParticleMapper {
 		}
 	}
 
+	/**
+	 * Inspect a type of {@link Particle}. A {@link Particle} cannot be mapped
+	 * until it is known by the {@link ParticleMapper}. No worries, the
+	 * {@link SensorStormSpout} and {@link SensorStormBolt} usually take care of
+	 * this.
+	 * 
+	 * @param clazz
+	 *            Type of the {@link Particle} to inspect
+	 */
 	public static void inspectClass(Class<? extends Particle> clazz) {
 		getFields(clazz);
 	}
 
+	/**
+	 * Get the {@link ParticleClassInfo} of a auto-mapped {@link Particle} type.
+	 * One is created if it is not present yet.
+	 * 
+	 * @param clazz
+	 *            {@link Class} of the {@link Particle}.
+	 * @return {@link ParticleClassInfo} for this type of {@link Particle}
+	 */
 	private static ParticleClassInfo getParticleClassInfo(Class<?> clazz) {
 		ParticleClassInfo pci = particleClassInfos.get(clazz);
 		if (pci != null) {
@@ -140,7 +226,7 @@ public class ParticleMapper {
 				for (Annotation a : f.getAnnotations()) {
 					if (a instanceof TupleField) {
 						String name = ((TupleField) a).name();
-						if (name == null || name.length() == 0) {
+						if ((name == null) || (name.length() == 0)) {
 							name = f.getName();
 						}
 						outputFields.put(f.getName(), name);
@@ -154,6 +240,15 @@ public class ParticleMapper {
 		}
 	}
 
+	/**
+	 * Get the {@link CustomParticlePojoMapper} of a manual-mapped
+	 * {@link Particle} type. One is created if it is not present yet.
+	 * 
+	 * @param clazz
+	 *            {@link Class} of the {@link Particle}.
+	 * @return {@link CustomParticlePojoMapper} for this type of
+	 *         {@link Particle}
+	 */
 	private static CustomParticlePojoMapper<?> getCustomMapper(Class<?> clazz) {
 		CustomParticlePojoMapper<?> ps = customSerializers.get(clazz);
 		if (ps != null) {
@@ -170,7 +265,8 @@ public class ParticleMapper {
 						CustomParticlePojoMapper<?> customSerializer = getCustomMapper(clazz);
 						for (Method m : customSerializer.getClass()
 								.getMethods()) {
-							if (m.getName().equals("particleToValues")) {
+							if (m.getName().equals(
+									PARTICLE_TO_VALUES_METHOD_NAME)) {
 								customSerializersMapMethods.putIfAbsent(clazz,
 										m);
 								break;
@@ -216,6 +312,15 @@ public class ParticleMapper {
 		return new Fields(copy);
 	}
 
+	/**
+	 * Get the index of a Field in the {@link Tuple} of a {@link Particle}.
+	 * 
+	 * @param clazz
+	 *            Type of {@link Particle}.
+	 * @param fieldId
+	 *            Name of the field
+	 * @return position of the field. -1 if not found.
+	 */
 	public static int getFieldIdx(Class<? extends Particle> clazz,
 			String fieldId) {
 		Fields fields = ParticleMapper.getFields(clazz);
