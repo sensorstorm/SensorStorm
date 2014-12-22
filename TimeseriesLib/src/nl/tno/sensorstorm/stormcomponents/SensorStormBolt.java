@@ -38,6 +38,7 @@ import backtype.storm.tuple.Tuple;
 public class SensorStormBolt extends BaseRichBolt {
 	private static final long serialVersionUID = -5109656134961759532L;
 	private static final long SYNC_BUFFFER_SIZE_MS = 1;
+
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	protected Class<? extends Operation> operationClass;
@@ -50,10 +51,10 @@ public class SensorStormBolt extends BaseRichBolt {
 	protected OutputCollector collector;
 	protected String boltName;
 	protected ExternalStormConfiguration zookeeperStormConfiguration;
-	protected @SuppressWarnings("rawtypes")
-	Map stormNativeConfig;
-	private SyncBuffer syncBuffer;
-	private String originId;
+	protected @SuppressWarnings("rawtypes") Map stormNativeConfig;
+	protected SyncBuffer syncBuffer;
+	protected String originId;
+	protected HashMap<Particle, String> fieldGrouperValues;
 
 	/**
 	 * Construct a {@link SensorStormBolt} with a {@link Batcher}
@@ -169,6 +170,7 @@ public class SensorStormBolt extends BaseRichBolt {
 		}
 		logger.info(msg);
 		this.syncBuffer = new FlushingSyncBuffer(SYNC_BUFFFER_SIZE_MS);
+		this.fieldGrouperValues = new HashMap<Particle, String>();
 	}
 
 	/**
@@ -180,6 +182,11 @@ public class SensorStormBolt extends BaseRichBolt {
 		// FYI: ParticleMapper will log an error if it is not able to map
 		Particle inputParticle = ParticleMapper.tupleToParticle(originalTuple);
 
+		if (fieldGrouperId != null) {
+			fieldGrouperValues.put(inputParticle,
+					originalTuple.getStringByField(fieldGrouperId));
+		}
+
 		if (inputParticle != null) {
 			// Push the particle through the SyncBuffer
 			List<Particle> particlesToProcess = syncBuffer
@@ -187,15 +194,13 @@ public class SensorStormBolt extends BaseRichBolt {
 			// Process the particles from the buffer (if any)
 			for (Particle particle : particlesToProcess) {
 				if (particle instanceof MetaParticle) {
-					List<Particle> outputParticles = processMetaParticle(
-							originalTuple, (MetaParticle) particle);
+					List<Particle> outputParticles = processMetaParticle((MetaParticle) particle);
 					// Emit new particles (if any)
 					emitParticles(originalTuple, outputParticles);
 					// Pass through the current MetaParticle
 					emitParticle(originalTuple, particle);
 				} else if (particle instanceof DataParticle) {
-					List<Particle> outputParticles = processDataParticle(
-							originalTuple, (DataParticle) particle);
+					List<Particle> outputParticles = processDataParticle((DataParticle) particle);
 					emitParticles(originalTuple, outputParticles);
 				} else {
 					// This is not a MetaParticle and not a DataParticle
@@ -212,14 +217,11 @@ public class SensorStormBolt extends BaseRichBolt {
 	 * Process a single DataParticle. This method sends the DataParticle to
 	 * appropriate {@link OperationManager}.
 	 * 
-	 * @param originalTuple
-	 *            The unmapped tuple
 	 * @param inputParticle
 	 *            originalTuple mapped to a DataParticle
 	 * @return List of output particles
 	 */
-	private List<Particle> processDataParticle(Tuple originalTuple,
-			DataParticle inputParticle) {
+	private List<Particle> processDataParticle(DataParticle inputParticle) {
 		// deliver dataParticle to the correct operationManager
 
 		// get an operation manager based on the value of the
@@ -233,8 +235,7 @@ public class SensorStormBolt extends BaseRichBolt {
 
 			// try to select an operationManager from the value of the
 			// fieldGrouperId field
-			String fieldGrouperValue = ParticleMapper.getValueByField(
-					inputParticle, fieldGrouperId);
+			String fieldGrouperValue = fieldGrouperValues.get(inputParticle);
 
 			if (fieldGrouperValue != null) { // fieldGrouperId exists
 				operationManager = getOperationManager(fieldGrouperValue);
@@ -259,14 +260,11 @@ public class SensorStormBolt extends BaseRichBolt {
 	 * Process a single MetaParticle. This method sends the MetaParticle to all
 	 * {@link OperationManager}s.
 	 * 
-	 * @param originalTuple
-	 *            The unmapped tuple
 	 * @param inputParticle
 	 *            originalTuple mapped to a MetaParticle
 	 * @return List of output particles
 	 */
-	private List<Particle> processMetaParticle(Tuple originalTuple,
-			MetaParticle inputParticle) {
+	private List<Particle> processMetaParticle(MetaParticle inputParticle) {
 		// broadcast metaParticle to all operationManagers
 		List<Particle> outputParticles = new ArrayList<Particle>();
 		Collection<OperationManager> allOperationManagers = operationManagers
@@ -361,6 +359,7 @@ public class SensorStormBolt extends BaseRichBolt {
 	 */
 	public void emitParticle(Tuple anchor, Particle particle) {
 		if (particle != null) {
+			fieldGrouperValues.remove(particle);
 			if (particle instanceof MetaParticle) {
 				((MetaParticle) particle).setOriginId(this.originId);
 			}

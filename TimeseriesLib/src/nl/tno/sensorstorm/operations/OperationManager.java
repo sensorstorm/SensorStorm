@@ -30,9 +30,9 @@ public class OperationManager implements Serializable {
 	protected Logger logger = LoggerFactory.getLogger(OperationManager.class);
 
 	private static final long serialVersionUID = 3141072548366321818L;
+	/** The fieldGroupValue this manager works for. */
+	private String fieldGrouperValue;
 
-	private String fieldGrouperValue; // The fieldGroupValue this manager works
-										// for.
 	private Operation operation;
 	private Batcher batcher;
 	private List<MetaParticleHandler> metaParticleHandlers;
