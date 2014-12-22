@@ -30,12 +30,12 @@ public interface Fetcher extends Serializable {
 			TopologyContext context) throws Exception;
 
 	/**
-	 * activate the fetcher. It is called from the spout.activate
+	 * Activate the fetcher. It is called from the spout.activate
 	 */
 	public void activate();
 
 	/**
-	 * deactivate the fetcher. It is called from the spout.deactivate
+	 * Deactivate the fetcher. It is called from the spout.deactivate
 	 */
 	public void deactivate();
 
@@ -45,7 +45,7 @@ public interface Fetcher extends Serializable {
 	 * FetcherDeclaration annotation.
 	 * 
 	 * @return Returns the next particle, or null indicating no particle has to
-	 *         be emited.
+	 *         be emitted.
 	 */
 	public DataParticle fetchParticle();
 

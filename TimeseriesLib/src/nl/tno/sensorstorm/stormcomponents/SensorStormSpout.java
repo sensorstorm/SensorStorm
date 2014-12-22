@@ -1,6 +1,9 @@
 package nl.tno.sensorstorm.stormcomponents;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import nl.tno.sensorstorm.annotation.FetcherDeclaration;
 import nl.tno.sensorstorm.config.EmptyStormConfiguration;
@@ -52,7 +55,7 @@ import backtype.storm.tuple.Fields;
  * @author waaijbdvd
  * 
  */
-
+// TODO explain registerMetaParticle
 public class SensorStormSpout implements IRichSpout {
 	private static final long serialVersionUID = -3199538353837853899L;
 
@@ -61,14 +64,16 @@ public class SensorStormSpout implements IRichSpout {
 	protected SpoutOutputCollector collector;
 	protected Fetcher fetcher;
 	protected int nrOfOutputFields;
-	private Long mainTimerTickFreq;
-	private Boolean useParticleTime;
-	private Long lastKnownNow;
+	private long mainTimerTickFreq;
+	private boolean useParticleTime;
+	private long lastKnownNow;
+	private List<Class<? extends MetaParticle>> registeredMetaParticles;
+	private String originId;
 
 	/**
 	 * Construct SensorStormSpout. Subclasses are responsible for adding
 	 * {@link MetaParticle}s to the config map! See ticket #3 for more elegant
-	 * solution?.
+	 * solution?. TODO
 	 * 
 	 * Default is that the main timer will be synced to the incoming particles,
 	 * but the mainTimerTickFreq is set to 0 which means no TimerTickParticles
@@ -84,8 +89,8 @@ public class SensorStormSpout implements IRichSpout {
 	}
 
 	/**
-	 * Create a new TimerSensorStormSpout. How to sync the main timer and what
-	 * its frequency is can be specified.
+	 * TODO Create a new TimerSensorStormSpout. How to sync the main timer and
+	 * what its frequency is can be specified.
 	 * 
 	 * @param config
 	 *            Reference to the Storm config.
@@ -94,13 +99,14 @@ public class SensorStormSpout implements IRichSpout {
 	 * @param useParticleTime
 	 *            Parameter to indicate how to sync the main timer. True means
 	 *            it is synced to the time in the DataParticle coming from the
-	 *            fetcher. False means it is synced to the live timer of the
-	 *            server this spout is running on.
+	 *            fetcher. False means it is synced to the system clock of the
+	 *            server this spout is running on AND that the timestap in the
+	 *            praticles will be overwritten with the system time
 	 * @param mainTimerTickFreq
 	 *            The frequency the main timer must run on in ms.
 	 */
 	public SensorStormSpout(Config config, Fetcher fetcher,
-			Boolean useParticleTime, Long mainTimerTickFreq) {
+			boolean useParticleTime, long mainTimerTickFreq) {
 		sensorStormSpout(fetcher, useParticleTime, mainTimerTickFreq, config);
 	}
 
@@ -112,21 +118,34 @@ public class SensorStormSpout implements IRichSpout {
 	 * @param useParticleTime
 	 * @param mainTimerTickFreq
 	 */
-	private void sensorStormSpout(Fetcher fetcher, Boolean useParticleTime,
-			Long mainTimerTickFreq, Config config) {
+	private void sensorStormSpout(Fetcher fetcher, boolean useParticleTime,
+			long mainTimerTickFreq, Config config) {
 		this.fetcher = fetcher;
+		if (fetcher.getClass().getAnnotation(FetcherDeclaration.class) == null) {
+			throw new IllegalArgumentException(
+					"The fetcher is missing the FetcherDeclaration annotation");
+		}
 		this.mainTimerTickFreq = mainTimerTickFreq;
 		this.useParticleTime = useParticleTime;
-		lastKnownNow = null;
+		lastKnownNow = -1;
+		registeredMetaParticles = new ArrayList<Class<? extends MetaParticle>>();
+		registerMetaParticle(config, TimerTickParticle.class);
+	}
 
-		MetaParticleUtil.registerMetaParticleFieldsWithMetaParticleClass(
+	// TODO javadoc
+	protected void registerMetaParticle(Config config,
+			Class<? extends MetaParticle> metaParticleClass) {
+		MetaParticleUtil.registerMetaParticleFieldsFromMetaParticleClass(
 				config, TimerTickParticle.class);
+		registeredMetaParticles.add(metaParticleClass);
 	}
 
 	@Override
 	public void open(@SuppressWarnings("rawtypes") Map stormNativeConfig,
 			TopologyContext context, SpoutOutputCollector collector) {
 		this.collector = collector;
+		this.originId = this.getClass().getName() + "."
+				+ context.getThisTaskIndex();
 
 		try {
 			zookeeperStormConfiguration = ZookeeperStormConfigurationFactory
@@ -148,9 +167,26 @@ public class SensorStormSpout implements IRichSpout {
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		Fields outputFields = getOutputFields();
-		nrOfOutputFields = outputFields.size();
-		declarer.declare(outputFields);
+		Fields fields = null;
+		FetcherDeclaration fetcherDeclaration = fetcher.getClass()
+				.getAnnotation(FetcherDeclaration.class);
+		for (Class<? extends DataParticle> outputParticleClass : fetcherDeclaration
+				.outputs()) {
+			if (fields == null) {
+				fields = ParticleMapper.getFields(outputParticleClass);
+			} else {
+				fields = ParticleMapper.mergeFields(fields,
+						ParticleMapper.getFields(outputParticleClass));
+			}
+		}
+
+		// Add fields from MetaParticles
+		for (Class<? extends MetaParticle> c : registeredMetaParticles) {
+			fields = ParticleMapper.mergeFields(fields,
+					ParticleMapper.getFields(c));
+		}
+		nrOfOutputFields = fields.size();
+		declarer.declare(fields);
 	}
 
 	/**
@@ -169,6 +205,7 @@ public class SensorStormSpout implements IRichSpout {
 				now = particle.getTimestamp();
 			} else {
 				now = System.currentTimeMillis();
+				particle.setTimestamp(now);
 			}
 
 			emitTimerTicks(now);
@@ -192,7 +229,7 @@ public class SensorStormSpout implements IRichSpout {
 		// Do we have to emit timerTicks?
 		if (mainTimerTickFreq != 0) {
 			// firstTime? start from now
-			if (lastKnownNow == null) {
+			if (lastKnownNow == -1) {
 				lastKnownNow = now;
 				// emit first timerTick at the same time as the particle
 				emitParticle(new TimerTickParticle(now));
@@ -206,28 +243,6 @@ public class SensorStormSpout implements IRichSpout {
 		}
 	}
 
-	protected Fields getOutputFields() {
-		// TODO Add also all metaparticles in the outputFields list
-		Fields fields = null;
-		FetcherDeclaration fetcherDeclaration = fetcher.getClass()
-				.getAnnotation(FetcherDeclaration.class);
-		for (Class<? extends DataParticle> outputParticleClass : fetcherDeclaration
-				.outputs()) {
-			if (fields == null) {
-				fields = ParticleMapper.getFields(outputParticleClass);
-			} else {
-				fields = ParticleMapper.mergeFields(fields,
-						ParticleMapper.getFields(outputParticleClass));
-			}
-		}
-
-		// add TimerTickParticle fields
-		fields = ParticleMapper.mergeFields(fields,
-				ParticleMapper.getFields(TimerTickParticle.class));
-
-		return fields;
-	}
-
 	/**
 	 * Emit a particle, both DataParticle and MetaParticle are possible
 	 * 
@@ -235,8 +250,12 @@ public class SensorStormSpout implements IRichSpout {
 	 */
 	public void emitParticle(Particle particle) {
 		if (particle != null) {
-			collector.emit(ParticleMapper.particleToValues(particle,
-					nrOfOutputFields));
+			if (particle instanceof MetaParticle) {
+				((MetaParticle) particle).setOriginId(this.originId);
+			}
+			collector
+					.emit(ParticleMapper.particleToValues(particle,
+							nrOfOutputFields), UUID.randomUUID().toString());
 		}
 	}
 

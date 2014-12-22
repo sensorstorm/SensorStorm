@@ -8,6 +8,7 @@ import nl.tno.sensorstorm.operations.OperationManager;
 import backtype.storm.Config;
 import backtype.storm.tuple.Fields;
 
+// TODO explain this class
 public class MetaParticleUtil {
 
 	public static final String METADATA_FIELDS = "metadata.fields";
@@ -25,7 +26,7 @@ public class MetaParticleUtil {
 	 * This one is for the bolts
 	 */
 	@SuppressWarnings("unchecked")
-	public static Fields registerMetaParticleFieldsWithOperationClass(
+	public static Fields registerMetaParticleFieldsFromOperationClass(
 			Config conf, Class<? extends Operation> operationClass) {
 		Fields metaParticleFields = null;
 		if (conf.containsKey(METADATA_FIELDS)) {
@@ -33,7 +34,7 @@ public class MetaParticleUtil {
 					(List<String>) conf.get(METADATA_FIELDS));
 		}
 		Fields fields = ParticleMapper.mergeFields(metaParticleFields,
-				getMetaParticleOutputFields(operationClass));
+				getMetaParticleOutputFieldsFromOperationClass(operationClass));
 		conf.put(METADATA_FIELDS, fields.toList());
 
 		return fields;
@@ -43,7 +44,7 @@ public class MetaParticleUtil {
 	 * This one is for the spout
 	 */
 	@SuppressWarnings("unchecked")
-	public static Fields registerMetaParticleFieldsWithMetaParticleClass(
+	public static Fields registerMetaParticleFieldsFromMetaParticleClass(
 			Config conf, Class<? extends MetaParticle> metaParticleClass) {
 		Fields metaParticleFields = null;
 		if (conf.containsKey(METADATA_FIELDS)) {
@@ -57,7 +58,7 @@ public class MetaParticleUtil {
 		return fields;
 	}
 
-	public static Fields getMetaParticleOutputFields(
+	public static Fields getMetaParticleOutputFieldsFromOperationClass(
 			Class<? extends Operation> operationClass) {
 		List<Class<? extends MetaParticle>> outputMetaParticles = OperationManager
 				.getOutputMetaParticles(operationClass);
@@ -72,4 +73,5 @@ public class MetaParticleUtil {
 		}
 		return fields;
 	}
+
 }

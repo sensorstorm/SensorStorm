@@ -35,6 +35,7 @@ import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
+// TODO javadoc
 public class SensorStormBolt extends BaseRichBolt {
 
 	// ///////////// //
@@ -74,7 +75,7 @@ public class SensorStormBolt extends BaseRichBolt {
 	 * @param conf
 	 *            Storm configuration map
 	 * @param syncBufferSize
-	 *            size of the SyncBuffer in ms
+	 *            size of the SyncBuffer in milliseconds
 	 * @param batcherClass
 	 *            {@link Class} of the {@link Batcher} implementation
 	 * @param batchOperationClass
@@ -108,7 +109,7 @@ public class SensorStormBolt extends BaseRichBolt {
 	 * @param conf
 	 *            Storm configuration map
 	 * @param syncBufferSize
-	 *            size of the SyncBuffer in ms
+	 *            size of the SyncBuffer in milliseconds
 	 * @param singleOperationClass
 	 *            {@link Class} of the {@link Operation} implementation
 	 * @param fieldGrouperId
@@ -209,7 +210,7 @@ public class SensorStormBolt extends BaseRichBolt {
 		// Initialize data structures
 		this.operationManagers = new HashMap<String, OperationManager>();
 		this.metaParticleFields = MetaParticleUtil
-				.registerMetaParticleFieldsWithOperationClass(config,
+				.registerMetaParticleFieldsFromOperationClass(config,
 						operationClass);
 	}
 
