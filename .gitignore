@@ -2,4 +2,4 @@
 RemoteSystemsTempFiles/
 *.class
 *.svn*
-
+.recommenders/
