@@ -63,7 +63,7 @@ public class OperationManager implements Serializable {
 	 */
 	public OperationManager(String fieldGroupValue,
 			Class<? extends Batcher> batcherClass,
-			Class<? extends BatchOperation> batchOperationClass,
+			Class<? extends ParticleBatchOperation> batchOperationClass,
 			@SuppressWarnings("rawtypes") Map stormNativeConfig,
 			ExternalStormConfiguration stormConfiguration)
 			throws InstantiationException, IllegalAccessException {
@@ -89,7 +89,7 @@ public class OperationManager implements Serializable {
 	 * @throws InstantiationException
 	 */
 	public OperationManager(String fieldGroupValue,
-			Class<? extends SingleOperation> operationClass,
+			Class<? extends SingleParticleOperation> operationClass,
 			@SuppressWarnings("rawtypes") Map stormNativeConfig,
 			ExternalStormConfiguration stormConfiguration)
 			throws InstantiationException, IllegalAccessException {
@@ -172,13 +172,13 @@ public class OperationManager implements Serializable {
 				if (batchedParticles != null) {
 					outputDataParticles = new ArrayList<DataParticle>();
 					for (DataParticleBatch batchedParticle : batchedParticles) {
-						outputDataParticles.addAll(((BatchOperation) operation)
+						outputDataParticles.addAll(((ParticleBatchOperation) operation)
 								.execute(batchedParticle));
 					}
 				}
 			} else {
 				// it is an operation without a batcher
-				outputDataParticles = ((SingleOperation) operation)
+				outputDataParticles = ((SingleParticleOperation) operation)
 						.execute(dataParticle);
 			}
 
@@ -244,13 +244,13 @@ public class OperationManager implements Serializable {
 			operation = operationClass.newInstance();
 
 			// is it a BatchOperation?
-			if (BatchOperation.class.isInstance(operation)) {
-				((BatchOperation) operation).init(fieldGrouperValue, timestamp,
+			if (ParticleBatchOperation.class.isInstance(operation)) {
+				((ParticleBatchOperation) operation).init(fieldGrouperValue, timestamp,
 						stormNativeConfig, zookeeperStormConfiguration);
 			}
 
 			// or is it a SingleOperation?
-			else if (SingleOperation.class.isInstance(operation)) {
+			else if (SingleParticleOperation.class.isInstance(operation)) {
 				operation.init(fieldGrouperValue, timestamp, stormNativeConfig,
 						zookeeperStormConfiguration);
 			}
@@ -259,8 +259,8 @@ public class OperationManager implements Serializable {
 			else {
 				logger.error("Internal error: OperationClass of unknown type "
 						+ operationClass.getName() + ", expected: "
-						+ SingleOperation.class.getName() + " or "
-						+ BatchOperation.class.getName());
+						+ SingleParticleOperation.class.getName() + " or "
+						+ ParticleBatchOperation.class.getName());
 			}
 		} catch (OperationException oe) {
 			// stop creating an operation, and inform the caller why

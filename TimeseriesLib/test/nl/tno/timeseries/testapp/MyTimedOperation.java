@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import nl.tno.sensorstorm.annotation.OperationDeclaration;
-import nl.tno.sensorstorm.operations.SingleOperation;
+import nl.tno.sensorstorm.operations.SingleParticleOperation;
 import nl.tno.sensorstorm.particles.DataParticle;
 import nl.tno.sensorstorm.particles.timer.TimerControllerInterface;
 import nl.tno.sensorstorm.particles.timer.TimerParticleHandler;
@@ -12,7 +12,7 @@ import nl.tno.sensorstorm.particles.timer.TimerTaskInterface;
 import nl.tno.storm.configuration.api.ExternalStormConfiguration;
 
 @OperationDeclaration(inputs = { MyDataParticle.class }, outputs = {}, metaParticleHandlers = { TimerParticleHandler.class })
-public class MyTimedOperation implements SingleOperation, TimerTaskInterface {
+public class MyTimedOperation implements SingleParticleOperation, TimerTaskInterface {
 	private static final long serialVersionUID = 773649574489299505L;
 	TimerControllerInterface timerController = null;
 	private String fieldGrouperValue;

@@ -5,15 +5,15 @@ import java.util.List;
 import nl.tno.sensorstorm.particles.DataParticle;
 
 /**
- * A SingleOperation performs the processing of particles in a channel, each
- * particle will be presented to this operation one by one. The ChannelBolt
+ * A SingleParticleOperation performs the processing of particles in a channel,
+ * each particle will be presented to this operation one by one. The ChannelBolt
  * manages the operations, each channel will have its own operation instance. An
  * operation is created at soon as the ChannelBolt gets a particle with an
  * unknown channelid.
  * 
  * @author waaijbdvd
  */
-public interface SingleOperation extends Operation {
+public interface SingleParticleOperation extends Operation {
 
 	/**
 	 * A new particle has arrived for this operation. A list containing zero or

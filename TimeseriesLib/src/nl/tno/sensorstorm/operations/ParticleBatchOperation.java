@@ -6,15 +6,15 @@ import nl.tno.sensorstorm.particles.DataParticle;
 import nl.tno.sensorstorm.particles.DataParticleBatch;
 
 /**
- * A BatchOperation performs the processing of particles in a channel, particles
- * will be grouped by a Batcher into a list. The ChannelBolt manages the
- * operations, each channel will have its own operation instance. An operation
- * is created at soon as the ChannelBolt gets a particle with an unknown
- * channelid.
+ * A ParticleBatchOperation performs the processing of particles in a channel,
+ * particles will be grouped by a Batcher into a list. The ChannelBolt manages
+ * the operations, each channel will have its own operation instance. An
+ * operation is created at soon as the ChannelBolt gets a particle with an
+ * unknown channelid.
  * 
  * @author waaijbdvd
  */
-public interface BatchOperation extends Operation {
+public interface ParticleBatchOperation extends Operation {
 
 	/**
 	 * A new particle batch has arrived for this operation. A list containing

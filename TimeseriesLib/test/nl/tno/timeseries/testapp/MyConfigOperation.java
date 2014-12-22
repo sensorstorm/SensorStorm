@@ -6,13 +6,13 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import nl.tno.sensorstorm.annotation.OperationDeclaration;
 import nl.tno.sensorstorm.config.OperationConfigManager;
-import nl.tno.sensorstorm.operations.SingleOperation;
+import nl.tno.sensorstorm.operations.SingleParticleOperation;
 import nl.tno.sensorstorm.particles.DataParticle;
 import nl.tno.storm.configuration.api.ExternalStormConfiguration;
 import nl.tno.storm.configuration.api.StormConfigurationException;
 
 @OperationDeclaration(inputs = { MyDataParticle.class }, outputs = {})
-public class MyConfigOperation implements SingleOperation {
+public class MyConfigOperation implements SingleParticleOperation {
 	private static final long serialVersionUID = 773649574489299505L;
 	private String fieldGrouper;
 

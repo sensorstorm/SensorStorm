@@ -9,12 +9,12 @@ import java.util.Map;
 import nl.tno.sensorstorm.batchers.Batcher;
 import nl.tno.sensorstorm.config.EmptyStormConfiguration;
 import nl.tno.sensorstorm.mapper.ParticleMapper;
-import nl.tno.sensorstorm.operations.BatchOperation;
+import nl.tno.sensorstorm.operations.ParticleBatchOperation;
 import nl.tno.sensorstorm.operations.FlushingSyncBuffer;
 import nl.tno.sensorstorm.operations.Operation;
 import nl.tno.sensorstorm.operations.OperationException;
 import nl.tno.sensorstorm.operations.OperationManager;
-import nl.tno.sensorstorm.operations.SingleOperation;
+import nl.tno.sensorstorm.operations.SingleParticleOperation;
 import nl.tno.sensorstorm.operations.SyncBuffer;
 import nl.tno.sensorstorm.particles.DataParticle;
 import nl.tno.sensorstorm.particles.MetaParticle;
@@ -64,7 +64,7 @@ public class SensorStormBolt extends BaseRichBolt {
 	 * @param batcherClass
 	 *            {@link Class} of the {@link Batcher} implementation
 	 * @param batchOperationClass
-	 *            {@link Class} of the {@link BatchOperation} implementation
+	 *            {@link Class} of the {@link ParticleBatchOperation} implementation
 	 * @param fieldGrouperId
 	 *            The field name on which this bolt the operations should
 	 *            instantiated. To specify an single operation, one instance of
@@ -74,7 +74,7 @@ public class SensorStormBolt extends BaseRichBolt {
 	 */
 	public SensorStormBolt(Config config,
 			Class<? extends Batcher> batcherClass,
-			Class<? extends BatchOperation> batchOperationClass,
+			Class<? extends ParticleBatchOperation> batchOperationClass,
 			String fieldGrouperId) throws OperationException {
 		if (batcherClass == null) {
 			throw new OperationException("batcherClass may not be null");
@@ -102,7 +102,7 @@ public class SensorStormBolt extends BaseRichBolt {
 	 * @throws OperationException
 	 */
 	public SensorStormBolt(Config config,
-			Class<? extends SingleOperation> singleOperationClass,
+			Class<? extends SingleParticleOperation> singleOperationClass,
 			String fieldGrouperId) throws OperationException {
 		if (singleOperationClass == null) {
 			throw new OperationException("operationClass may not be null");
@@ -296,17 +296,17 @@ public class SensorStormBolt extends BaseRichBolt {
 			// no operation manager present yet for the fieldGrouper
 			if (operationManager == null) {
 				// is it a single operation?
-				if (SingleOperation.class.isAssignableFrom(operationClass)) {
+				if (SingleParticleOperation.class.isAssignableFrom(operationClass)) {
 					operationManager = new OperationManager(fieldGrouperValue,
-							(Class<? extends SingleOperation>) operationClass,
+							(Class<? extends SingleParticleOperation>) operationClass,
 							stormNativeConfig, zookeeperStormConfiguration);
 				}
 
 				// is it a batch operation?
-				else if (BatchOperation.class.isAssignableFrom(operationClass)) {
+				else if (ParticleBatchOperation.class.isAssignableFrom(operationClass)) {
 					operationManager = new OperationManager(fieldGrouperValue,
 							batcherClass,
-							(Class<? extends BatchOperation>) operationClass,
+							(Class<? extends ParticleBatchOperation>) operationClass,
 							stormNativeConfig, zookeeperStormConfiguration);
 				} else {
 					// Apparently a new constructor is added to create a new

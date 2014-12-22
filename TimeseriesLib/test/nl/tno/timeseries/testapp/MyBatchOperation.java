@@ -4,13 +4,13 @@ import java.util.List;
 import java.util.Map;
 
 import nl.tno.sensorstorm.annotation.OperationDeclaration;
-import nl.tno.sensorstorm.operations.BatchOperation;
+import nl.tno.sensorstorm.operations.ParticleBatchOperation;
 import nl.tno.sensorstorm.particles.DataParticle;
 import nl.tno.sensorstorm.particles.DataParticleBatch;
 import nl.tno.storm.configuration.api.ExternalStormConfiguration;
 
 @OperationDeclaration(inputs = { MyDataParticle.class }, outputs = {})
-public class MyBatchOperation implements BatchOperation {
+public class MyBatchOperation implements ParticleBatchOperation {
 	private static final long serialVersionUID = 773649574489299505L;
 	private String fieldGrouper;
 
