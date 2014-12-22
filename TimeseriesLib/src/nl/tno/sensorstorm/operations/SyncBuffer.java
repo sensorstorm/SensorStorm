@@ -1,6 +1,7 @@
 package nl.tno.sensorstorm.operations;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.TreeSet;
@@ -12,6 +13,10 @@ import nl.tno.sensorstorm.particles.Particle;
  * Class that synchronizes {@link Particle}s coming from multiple (probably
  * parallel executing) sources and filters out duplicate {@link MetaParticle}s.
  * This buffer introduces a configurable delay.
+ * 
+ * When the delay is 0 the buffer will always immediately return the same
+ * particle. Warning: When the size is 0, duplicate MetaParticles will not be
+ * filtered out!
  *
  */
 public class SyncBuffer {
@@ -43,12 +48,18 @@ public class SyncBuffer {
 	private final TreeSet<Particle> particles;
 
 	public SyncBuffer(long bufferSizeMs) {
+		if (bufferSizeMs < 0) {
+			throw new IllegalArgumentException("buffer size cannot be negative");
+		}
 		this.bufferSizeMs = bufferSizeMs;
 		lastSentOutTimestamp = -1;
 		particles = new TreeSet<Particle>(new ParticleComparator());
 	}
 
 	public List<Particle> pushParticle(Particle particle) {
+		if (bufferSizeMs == 0) {
+			return Collections.singletonList(particle);
+		}
 		if (particle != null) {
 			if (particle.getTimestamp() < lastSentOutTimestamp) {
 				// Reject

@@ -163,4 +163,14 @@ public class SyncBufferTest extends TestCase {
 		}
 
 	}
+
+	public void testSizeZero() {
+		SyncBuffer b = new SyncBuffer(0);
+		List<Particle> l;
+
+		TestDataParticle particle = new TestDataParticle(1);
+		l = b.pushParticle(particle);
+		assertEquals(1, l.size());
+		assertEquals(particle, l.get(0));
+	}
 }
