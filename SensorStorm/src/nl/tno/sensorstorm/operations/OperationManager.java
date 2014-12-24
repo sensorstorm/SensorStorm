@@ -164,27 +164,27 @@ public class OperationManager implements Serializable {
 
 		try {
 			// is there a batcher?
+			List<Particle> outputDataParticles = new ArrayList<Particle>();
 			if (batcher != null) {
-				List<Particle> outputDataParticles = null;
 				// batch dataParticle and give it to the batcherOperation
 				List<DataParticleBatch> batchedParticles = batcher
 						.batch(dataParticle);
 
 				// are there one or more particle batches to be processed?
 				if (batchedParticles != null) {
-					outputDataParticles = new ArrayList<Particle>();
 					for (DataParticleBatch batchedParticle : batchedParticles) {
 						List<? extends DataParticle> results = ((ParticleBatchOperation) operation)
 								.execute(batchedParticle);
 						outputDataParticles.addAll(results);
 					}
 				}
-				return outputDataParticles;
 			} else {
 				// it is an operation without a batcher
-				return (List<Particle>) ((SingleParticleOperation) operation)
+				List<? extends DataParticle> results = ((SingleParticleOperation) operation)
 						.execute(dataParticle);
+				outputDataParticles.addAll(results);
 			}
+			return outputDataParticles;
 		} catch (BatcherException | OperationException e) {
 			logger.error(
 					"Unable to execute operation due to: " + e.getMessage(), e);
