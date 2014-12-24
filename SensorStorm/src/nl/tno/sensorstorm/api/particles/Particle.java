@@ -8,6 +8,8 @@ import backtype.storm.tuple.Tuple;
 /**
  * Defines a Particle.
  * 
+ * Particles should always have an empty constructor.
+ * 
  * Particles are strongly typed classes that can be used in {@link Operation}s.
  * They always a timestamp. For transportation between {@link Operation}s they
  * are mapped to Storm {@link Tuple}s. In order to make this translation, fields

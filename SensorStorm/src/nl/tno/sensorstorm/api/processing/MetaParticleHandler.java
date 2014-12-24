@@ -2,16 +2,14 @@ package nl.tno.sensorstorm.api.processing;
 
 import java.util.List;
 
+import nl.tno.sensorstorm.api.annotation.MetaParticleHandlerDeclaration;
 import nl.tno.sensorstorm.api.particles.MetaParticle;
 import nl.tno.sensorstorm.api.particles.Particle;
 
 /**
  * An object must implement this interface to become a handler for a specific
- * MetaParticle. Which particle must be defined using the
- * MetaParticleHandlerDeclaration annotation.
- * 
- * @author waaijbdvd
- * 
+ * type of {@link MetaParticle}. Which particle must be defined using the
+ * {@link MetaParticleHandlerDeclaration} annotation.
  */
 public interface MetaParticleHandler {
 
@@ -19,8 +17,10 @@ public interface MetaParticleHandler {
 	 * Initialize the metaParticle handler connected to the passed operation.
 	 * 
 	 * @param operation
+	 *            {@link Operation} this {@link MetaParticleHandler} must
+	 *            interact with.
 	 */
-	public void init(Operation operation);
+	void init(Operation operation);
 
 	/**
 	 * Passed when this specific metaParticle is received for the connected
@@ -28,8 +28,10 @@ public interface MetaParticleHandler {
 	 * through the topology and does not have to be returned.
 	 * 
 	 * @param metaParticle
-	 * @return Returns a list containing MetaParticles or DataParticles
+	 *            {@link MetaParticle} to process
+	 * @return Returns a list containing new MetaParticles or DataParticles to
+	 *         be submitted in the topology
 	 */
-	public List<? extends Particle> handleMetaParticle(MetaParticle metaParticle);
+	List<? extends Particle> handleMetaParticle(MetaParticle metaParticle);
 
 }

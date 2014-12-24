@@ -8,7 +8,7 @@ public abstract class AbstractParticle implements Particle {
 	protected long timestamp;
 
 	/**
-	 * Empty constructor
+	 * Empty constructor.
 	 */
 	public AbstractParticle() {
 	}
@@ -17,6 +17,7 @@ public abstract class AbstractParticle implements Particle {
 	 * Create a new AbstractParticle with the given timestamp.
 	 * 
 	 * @param timestamp
+	 *            Timestamp to be used
 	 */
 	public AbstractParticle(long timestamp) {
 		this.timestamp = timestamp;

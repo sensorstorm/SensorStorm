@@ -1,5 +1,6 @@
 package nl.tno.sensorstorm.api.particles;
 
+
 /**
  * A default implementation of a {@link Particle} (for convenience).
  */
@@ -7,7 +8,7 @@ public abstract class AbstractDataParticle extends AbstractParticle implements
 		DataParticle {
 
 	/**
-	 * Empty constructor
+	 * Empty constructor.
 	 */
 	public AbstractDataParticle() {
 	}
@@ -16,6 +17,7 @@ public abstract class AbstractDataParticle extends AbstractParticle implements
 	 * Create a new AbstractParticle with the given timestamp.
 	 * 
 	 * @param timestamp
+	 *            Timestamp to be used
 	 */
 	public AbstractDataParticle(long timestamp) {
 		super(timestamp);

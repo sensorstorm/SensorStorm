@@ -9,7 +9,7 @@ public abstract class AbstractMetaParticle extends AbstractParticle implements
 	protected String originId;
 
 	/**
-	 * Empty constructor
+	 * Empty constructor.
 	 */
 	public AbstractMetaParticle() {
 	}
@@ -17,13 +17,11 @@ public abstract class AbstractMetaParticle extends AbstractParticle implements
 	/**
 	 * Create a new AbstractParticle with the given originId and timestamp.
 	 * 
-	 * @param originId
 	 * @param timestamp
+	 *            Timestamp to be used
 	 */
 	public AbstractMetaParticle(long timestamp) {
 		super(timestamp);
-		// TODO originId bepalen
-		this.originId = "";
 	}
 
 	@Override
@@ -39,6 +37,12 @@ public abstract class AbstractMetaParticle extends AbstractParticle implements
 	@Override
 	public String toString() {
 		return "_MP[" + originId + ", " + timestamp + "]";
+	}
+
+	@Override
+	public boolean equalMetaParticle(MetaParticle other) {
+		return (other != null) && getClass().equals(other.getClass())
+				&& (timestamp == other.getTimestamp());
 	}
 
 }
