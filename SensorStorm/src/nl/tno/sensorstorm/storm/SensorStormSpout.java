@@ -10,6 +10,7 @@ import nl.tno.sensorstorm.api.particles.DataParticle;
 import nl.tno.sensorstorm.api.particles.MetaParticle;
 import nl.tno.sensorstorm.api.particles.Particle;
 import nl.tno.sensorstorm.api.processing.Fetcher;
+import nl.tno.sensorstorm.api.processing.Operation;
 import nl.tno.sensorstorm.config.EmptyStormConfiguration;
 import nl.tno.sensorstorm.impl.MetaParticleUtil;
 import nl.tno.sensorstorm.particlemapper.ParticleMapper;
@@ -29,34 +30,27 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
 
 /**
- * @TODO add general sensorspout explanation
+ * This is a generic Spout for the SensorStorm library. The logic for retrieving
+ * data is implemented in a {@link Fetcher}, which runs on top of this spout.
  * 
- *       This spout adds main timer functionality to the SensorStormSpout. The
- *       main timer can be synced to the live timer of the server the spout is
- *       running on or to the time that is used in the DataParticles being
- *       produced by the fetcher. The main timer is sued to insert
- *       TimerTickParticles in each Channel this Spout is producing.
+ * This Spout injects {@link TimerTickParticle}s into the stream. This way,
+ * {@link Operation}s in the topology are able to perform scheduled tasks and
+ * recurring, even if there is no data to trigger processing. There are two ways
+ * of doing this: Using the timestamps as they are set in the {@link Particle}
+ * produced by the {@link Fetcher}, of using the system time. When the system
+ * time is used, the timestamps in the particles will be overwritten before the
+ * are sent to the topology. In both cases measures must be taken to make sure
+ * that the timestamps in Particles are synchronized over all instances of
+ * {@link SensorStormSpout}s.
  * 
- *       In order to be able to sync on the DataParticle timestamp , timertick
- *       particles are inserted only just before the DataParticle is inserted.
- *       they come in batches.
- * 
- *       If the main timer is synced to the live timer and it is time in
- *       relation to the mainTimerTickFreq, timerticks are emitted on all
- *       already discovered channels.
- * 
- *       It is up to the fetchers to create a synced time over all sources. If
- *       there are two or more sources, each with their own timestamp, it is up
- *       to the fetchers to determine a combined timestamp over all sources. The
- *       TimerSensorStormSpout deals with only one timestamp. Also over
- *       SensorStormSpouts of different type, it is up to the fetchers to create
- *       a combined timestamp.
- * 
- * @author waaijbdvd
- * 
+ * In order to implement specific behavior (usually sending out more types of
+ * {@link MetaParticle}s) this class can be extended. When a subclass introduces
+ * new types of {@link MetaParticle}s, the subclass must call the
+ * registerMetaParticle method in the constructor, so the topology will be able
+ * to process the new type of {@link MetaParticle}.
  */
-// TODO explain registerMetaParticle
 public class SensorStormSpout implements IRichSpout {
+
 	private static final long serialVersionUID = -3199538353837853899L;
 
 	protected Logger logger = LoggerFactory.getLogger(SensorStormSpout.class);
@@ -64,75 +58,80 @@ public class SensorStormSpout implements IRichSpout {
 	protected SpoutOutputCollector collector;
 	protected Fetcher fetcher;
 	protected int nrOfOutputFields;
-	private long mainTimerTickFreq;
-	private boolean useParticleTime;
+	private final long mainTimerTickFreqMs;
+	private final boolean useParticleTime;
 	private long lastKnownNow;
-	private List<Class<? extends MetaParticle>> registeredMetaParticles;
+	private final List<Class<? extends MetaParticle>> registeredMetaParticles;
 	private String originId;
 
 	/**
-	 * Construct SensorStormSpout. Subclasses are responsible for adding
-	 * {@link MetaParticle}s to the config map! See ticket #3 for more elegant
-	 * solution?. TODO
+	 * Construct a SensorStormSpout with a {@link Fetcher} and no Timer
+	 * functionality.
 	 * 
 	 * Default is that the main timer will be synced to the incoming particles,
 	 * but the mainTimerTickFreq is set to 0 which means no TimerTickParticles
 	 * will be produced.
 	 * 
 	 * @param config
-	 *            Reference to the Storm config.
+	 *            Reference to the native Storm config.
 	 * @param fetcher
 	 *            Reference to the fetcher instance to be used.
+	 * @throws IllegalArgumentException
+	 *             when the {@link Fetcher} does not have a
+	 *             {@link FetcherDeclaration} annotation
 	 */
 	public SensorStormSpout(Config config, Fetcher fetcher) {
-		sensorStormSpout(fetcher, true, 0L, config);
+		this(config, fetcher, true, 0);
 	}
 
 	/**
-	 * TODO Create a new TimerSensorStormSpout. How to sync the main timer and
-	 * what its frequency is can be specified.
+	 * Construct a SensorStormSpout with a {@link Fetcher} and Timer
+	 * functionality.
 	 * 
 	 * @param config
 	 *            Reference to the Storm config.
 	 * @param fetcher
 	 *            Reference to the fetcher instance to be used.
 	 * @param useParticleTime
-	 *            Parameter to indicate how to sync the main timer. True means
-	 *            it is synced to the time in the DataParticle coming from the
-	 *            fetcher. False means it is synced to the system clock of the
-	 *            server this spout is running on AND that the timestap in the
-	 *            praticles will be overwritten with the system time
+	 *            Parameter to indicate how to synchronize the main timer. True
+	 *            means it is synchronized to the time in the
+	 *            {@link DataParticle} coming from the {@link Fetcher}. False
+	 *            means it is synchronized to the system clock of the server
+	 *            this spout is running on AND that the timestap in the
+	 *            {@link Particle}s will be overwritten with the system time
 	 * @param mainTimerTickFreqMs
 	 *            The frequency the main timer must run on in milliseconds.
+	 * @throws IllegalArgumentException
+	 *             when the {@link Fetcher} does not have a
+	 *             {@link FetcherDeclaration} annotation
 	 */
 	public SensorStormSpout(Config config, Fetcher fetcher,
 			boolean useParticleTime, long mainTimerTickFreqMs) {
-		sensorStormSpout(fetcher, useParticleTime, mainTimerTickFreqMs, config);
-	}
-
-	/**
-	 * Common constructor code.
-	 * 
-	 * @param config
-	 * @param fetcher
-	 * @param useParticleTime
-	 * @param mainTimerTickFreq
-	 */
-	private void sensorStormSpout(Fetcher fetcher, boolean useParticleTime,
-			long mainTimerTickFreq, Config config) {
 		this.fetcher = fetcher;
 		if (fetcher.getClass().getAnnotation(FetcherDeclaration.class) == null) {
-			throw new IllegalArgumentException(
-					"The fetcher is missing the FetcherDeclaration annotation");
+			throw new IllegalArgumentException("The fetcher "
+					+ fetcher.getClass().getName()
+					+ " is missing the FetcherDeclaration annotation");
 		}
-		this.mainTimerTickFreq = mainTimerTickFreq;
+		this.mainTimerTickFreqMs = mainTimerTickFreqMs;
 		this.useParticleTime = useParticleTime;
 		lastKnownNow = -1;
 		registeredMetaParticles = new ArrayList<Class<? extends MetaParticle>>();
 		registerMetaParticle(config, TimerTickParticle.class);
 	}
 
-	// TODO javadoc
+	/**
+	 * Register a new type of {@link MetaParticle} so it can be processed by the
+	 * Storm topology. Subclasses of {@link SensorStormSpout} should call this
+	 * method in the constructor if they introduced new types of
+	 * {@link MetaParticle}s.
+	 * 
+	 * @param config
+	 *            The native storm configuration
+	 * @param metaParticleClass
+	 *            Class of the {@link MetaParticle} that is produces by this
+	 *            spout
+	 */
 	protected void registerMetaParticle(Config config,
 			Class<? extends MetaParticle> metaParticleClass) {
 		MetaParticleUtil.registerMetaParticleFieldsFromMetaParticleClass(
@@ -159,7 +158,7 @@ public class SensorStormSpout implements IRichSpout {
 			fetcher.prepare(stormNativeConfig, zookeeperStormConfiguration,
 					context);
 		} catch (Exception e) {
-			logger.warn("Unable to configure channelSpout "
+			logger.warn("Unable to configure SensorStormSpout "
 					+ this.getClass().getName() + " due to ", e);
 		}
 	}
@@ -223,10 +222,11 @@ public class SensorStormSpout implements IRichSpout {
 	 * including now
 	 * 
 	 * @param now
+	 *            Current time
 	 */
 	private void emitTimerTicks(long now) {
 		// Do we have to emit timerTicks?
-		if (mainTimerTickFreq != 0) {
+		if (mainTimerTickFreqMs != 0) {
 			// firstTime? start from now
 			if (lastKnownNow == -1) {
 				lastKnownNow = now;
@@ -234,8 +234,8 @@ public class SensorStormSpout implements IRichSpout {
 				emitParticle(new TimerTickParticle(now));
 			} else {
 				// emit zero or more timerTicks up to now
-				while ((now - lastKnownNow) >= mainTimerTickFreq) {
-					lastKnownNow = lastKnownNow + mainTimerTickFreq;
+				while ((now - lastKnownNow) >= mainTimerTickFreqMs) {
+					lastKnownNow = lastKnownNow + mainTimerTickFreqMs;
 					emitParticle(new TimerTickParticle(lastKnownNow));
 				}
 			}
@@ -243,9 +243,11 @@ public class SensorStormSpout implements IRichSpout {
 	}
 
 	/**
-	 * Emit a particle, both DataParticle and MetaParticle are possible
+	 * Emit a {@link Particle}, both {@link DataParticle} and
+	 * {@link MetaParticle} are possible.
 	 * 
 	 * @param particle
+	 *            {@link Particle} to emit
 	 */
 	public void emitParticle(Particle particle) {
 		if (particle != null) {

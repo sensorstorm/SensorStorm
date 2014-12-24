@@ -37,7 +37,9 @@ public class SyncBuffer {
 			if (comp == 0) {
 				// Same timestamp
 				if ((p1 instanceof MetaParticle)
-						&& (p2 instanceof MetaParticle) && p1.equals(p2)) {
+						&& (p2 instanceof MetaParticle)
+						&& ((MetaParticle) p1)
+								.equalMetaParticle((MetaParticle) p2)) {
 					// This will filter out duplicate MetaParticles
 					return 0;
 				} else {

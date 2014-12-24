@@ -77,8 +77,7 @@ public class OperationManager implements Serializable {
 	}
 
 	/**
-	 * Creates a new OperationManager for a specific channel with a single
-	 * operation.
+	 * Creates a new OperationManager with a single operation.
 	 * 
 	 * @param fieldGroupValue
 	 *            The fieldGroupValue this operationManager works for. An

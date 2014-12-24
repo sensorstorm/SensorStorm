@@ -41,7 +41,6 @@
     <module name="ExplicitInitialization"/>
     <module name="FallThrough"/>
     <module name="IllegalInstantiation"/>
-    <module name="IllegalCatch"/>
     <module name="IllegalThrows"/>
     <module name="IllegalToken">
       <property name="tokens" value="LITERAL_SWITCH"/>
@@ -66,7 +65,7 @@
       <property name="suppressLoadErrors" value="true"/>
     </module>
     <module name="ReturnCount">
-      <property name="max" value="4"/>
+      <property name="max" value="10"/>
     </module>
     <module name="SimplifyBooleanExpression"/>
     <module name="SimplifyBooleanReturn"/>

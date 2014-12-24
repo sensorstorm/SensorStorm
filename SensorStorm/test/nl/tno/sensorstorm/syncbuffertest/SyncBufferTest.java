@@ -47,26 +47,30 @@ public class SyncBufferTest extends TestCase {
 		}
 
 		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			TestMetaParticle other = (TestMetaParticle) obj;
-			if (timestamp != other.timestamp)
-				return false;
-			return true;
-		}
-
-		@Override
 		public String getOriginId() {
 			return null;
 		}
 
 		@Override
 		public void setOriginId(String originId) {
+		}
+
+		@Override
+		public boolean equalMetaParticle(MetaParticle obj) {
+			if (this == obj) {
+				return true;
+			}
+			if (obj == null) {
+				return false;
+			}
+			if (getClass() != obj.getClass()) {
+				return false;
+			}
+			TestMetaParticle other = (TestMetaParticle) obj;
+			if (timestamp != other.timestamp) {
+				return false;
+			}
+			return true;
 		}
 	}
 

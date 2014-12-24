@@ -5,6 +5,7 @@ import java.util.List;
 import junit.framework.TestCase;
 import nl.tno.sensorstorm.api.particles.AbstractMetaParticle;
 import nl.tno.sensorstorm.api.particles.DataParticle;
+import nl.tno.sensorstorm.api.particles.MetaParticle;
 import nl.tno.sensorstorm.api.particles.Particle;
 import nl.tno.sensorstorm.gracefullshutdown.GracefullShutdownParticle;
 import nl.tno.sensorstorm.impl.FlushingSyncBuffer;
@@ -47,7 +48,7 @@ public class FlushingSyncBufferTest extends TestCase {
 		}
 
 		@Override
-		public boolean equals(Object obj) {
+		public boolean equalMetaParticle(MetaParticle obj) {
 			if (this == obj) {
 				return true;
 			}

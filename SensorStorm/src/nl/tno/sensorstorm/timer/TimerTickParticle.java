@@ -24,4 +24,21 @@ public class TimerTickParticle extends AbstractMetaParticle implements
 		return "_TimerTick[" + originId + "," + timestamp + "]";
 	}
 
+	@Override
+	public boolean equalMetaParticle(MetaParticle other) {
+		if (this == other) {
+			return true;
+		}
+		if (other == null) {
+			return false;
+		}
+		if (getClass() != other.getClass()) {
+			return false;
+		}
+		if (timestamp != other.getTimestamp()) {
+			return false;
+		}
+		return true;
+	}
+
 }
