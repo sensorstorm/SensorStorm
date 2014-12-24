@@ -13,11 +13,12 @@ public interface TimerControllerInterface {
 	 * Register for a recurring task.
 	 * 
 	 * @param timerFreq
-	 *            The frequency how often the recurring task must be triggerd.
+	 *            The frequency how often the recurring task must be triggerd in
+	 *            milliseconds.
 	 * @param timerTask
 	 *            A link to the timerTask recurring method to be called.
 	 */
-	public void registerOperationForRecurringTimerTask(long timerFreq,
+	public void registerOperationForRecurringTimerTask(long timerFreqMs,
 			TimerTaskInterface timerTask);
 
 	/**

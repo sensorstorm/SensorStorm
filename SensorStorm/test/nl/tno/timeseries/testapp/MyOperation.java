@@ -11,13 +11,11 @@ import nl.tno.storm.configuration.api.ExternalStormConfiguration;
 @OperationDeclaration(inputs = { MyDataParticle.class }, outputs = {})
 public class MyOperation implements SingleParticleOperation {
 	private static final long serialVersionUID = 773649574489299505L;
-	private String fieldGroupValue;
 
 	@Override
 	public void init(String fieldGroupValue, long startTimestamp,
 			@SuppressWarnings("rawtypes") Map stormNativeConfig,
 			ExternalStormConfiguration stormConfiguration) {
-		this.fieldGroupValue = fieldGroupValue;
 		System.out.println("myoperation.init for fieldGroupValue "
 				+ fieldGroupValue + " at " + startTimestamp);
 	}

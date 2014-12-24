@@ -102,12 +102,12 @@ public class SensorStormSpout implements IRichSpout {
 	 *            fetcher. False means it is synced to the system clock of the
 	 *            server this spout is running on AND that the timestap in the
 	 *            praticles will be overwritten with the system time
-	 * @param mainTimerTickFreq
-	 *            The frequency the main timer must run on in ms.
+	 * @param mainTimerTickFreqMs
+	 *            The frequency the main timer must run on in milliseconds.
 	 */
 	public SensorStormSpout(Config config, Fetcher fetcher,
-			boolean useParticleTime, long mainTimerTickFreq) {
-		sensorStormSpout(fetcher, useParticleTime, mainTimerTickFreq, config);
+			boolean useParticleTime, long mainTimerTickFreqMs) {
+		sensorStormSpout(fetcher, useParticleTime, mainTimerTickFreqMs, config);
 	}
 
 	/**
@@ -144,8 +144,7 @@ public class SensorStormSpout implements IRichSpout {
 	public void open(@SuppressWarnings("rawtypes") Map stormNativeConfig,
 			TopologyContext context, SpoutOutputCollector collector) {
 		this.collector = collector;
-		this.originId = this.getClass().getName() + "."
-				+ context.getThisTaskIndex();
+		originId = this.getClass().getName() + "." + context.getThisTaskIndex();
 
 		try {
 			zookeeperStormConfiguration = ZookeeperStormConfigurationFactory
@@ -235,7 +234,7 @@ public class SensorStormSpout implements IRichSpout {
 				emitParticle(new TimerTickParticle(now));
 			} else {
 				// emit zero or more timerTicks up to now
-				while (now - lastKnownNow >= mainTimerTickFreq) {
+				while ((now - lastKnownNow) >= mainTimerTickFreq) {
 					lastKnownNow = lastKnownNow + mainTimerTickFreq;
 					emitParticle(new TimerTickParticle(lastKnownNow));
 				}
@@ -251,7 +250,7 @@ public class SensorStormSpout implements IRichSpout {
 	public void emitParticle(Particle particle) {
 		if (particle != null) {
 			if (particle instanceof MetaParticle) {
-				((MetaParticle) particle).setOriginId(this.originId);
+				((MetaParticle) particle).setOriginId(originId);
 			}
 			collector
 					.emit(ParticleMapper.particleToValues(particle,

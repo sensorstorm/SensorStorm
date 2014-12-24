@@ -3,6 +3,7 @@ package nl.tno.sensorstorm.example;
 import nl.tno.sensorstorm.stormcomponents.SensorStormBolt;
 import nl.tno.sensorstorm.stormcomponents.SensorStormSpout;
 import nl.tno.sensorstorm.stormcomponents.groupers.SensorStormFieldGrouping;
+import nl.tno.sensorstorm.stormcomponents.groupers.SensorStormShuffleGrouping;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
@@ -17,12 +18,20 @@ public class Main {
 
 		TopologyBuilder builder = new TopologyBuilder();
 		builder.setSpout("spout", new SensorStormSpout(conf,
-				new BlockFetcher(), true, 5000), 1);
+				new BlockFetcher(), true, 1000), 1);
 		builder.setBolt(
-				"bolt",
+				"average",
 				new SensorStormBolt(conf, 1000, WindowBatcher.class,
-						AverageOperation.class, "sensorId"), 3).customGrouping(
+						AverageOperation.class, "sensorId"), 2).customGrouping(
 				"spout", new SensorStormFieldGrouping("sensorId"));
+		builder.setBolt(
+				"printspeed",
+				new SensorStormBolt(conf, 1000,
+						PrintParticleSpeedOperation.class, null), 2)
+				.customGrouping("average", new SensorStormShuffleGrouping());
+		builder.setBolt("printparticle",
+				new SensorStormBolt(conf, 1000, PrintOperation.class, null), 2)
+				.customGrouping("printspeed", new SensorStormShuffleGrouping());
 
 		if ((args != null) && (args.length > 0)) {
 			conf.setNumWorkers(3);
