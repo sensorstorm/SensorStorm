@@ -38,7 +38,7 @@ public class SensorParticle extends AbstractDataParticle {
 
 	@Override
 	public String toString() {
-		return "SensorParticle [sensorId=" + sensorId + ", mesaurement="
+		return "SensorParticle [sensorId=" + sensorId + ", measurement="
 				+ measurement + ", timestamp=" + timestamp + "]";
 	}
 
