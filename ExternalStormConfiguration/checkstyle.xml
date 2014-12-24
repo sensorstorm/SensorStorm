@@ -87,4 +87,7 @@
     <module name="AnnotationLocation"/>
   </module>
   <module name="StrictDuplicateCode"/>
+  <module name="SuppressionFilter">
+    <property name="file" value="${samedir}/suppressions.xml"/>
+  </module>
 </module>
