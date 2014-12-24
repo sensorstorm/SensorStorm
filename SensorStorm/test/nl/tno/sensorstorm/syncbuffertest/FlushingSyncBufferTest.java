@@ -75,8 +75,8 @@ public class FlushingSyncBufferTest extends TestCase {
 		b.pushParticle(new TestMetaParticle(1, "Two"));
 		b.pushParticle(new TestMetaParticle(1, "Three"));
 
-		assertTrue(new TestMetaParticle(1, "One").equals(new TestMetaParticle(
-				1, "two")));
+		assertTrue(new TestMetaParticle(1, "One")
+				.equalMetaParticle(new TestMetaParticle(1, "two")));
 
 		// Fill
 		b.pushParticle(new TestDataParticle(1));
@@ -84,7 +84,7 @@ public class FlushingSyncBufferTest extends TestCase {
 		b.pushParticle(new TestDataParticle(3));
 
 		assertTrue(new GracefullShutdownParticle(1, "One")
-				.equals(new GracefullShutdownParticle(1, "Two")));
+				.equalMetaParticle(new GracefullShutdownParticle(1, "Two")));
 
 		// Trigger
 		l = b.pushParticle(new GracefullShutdownParticle(1, "One"));
