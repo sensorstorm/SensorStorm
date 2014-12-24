@@ -14,7 +14,7 @@ import nl.tno.sensorstorm.particles.MetaParticleHandler;
  * register.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE })
+@Target(ElementType.TYPE)
 public @interface MetaParticleHandlerDeclaration {
 	/**
 	 * The types of {@link MetaParticle}s this {@link MetaParticleHandler}

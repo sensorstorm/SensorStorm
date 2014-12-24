@@ -17,10 +17,17 @@ import nl.tno.sensorstorm.particles.Particle;
  * When the delay is 0 the buffer will always immediately return the same
  * particle. Warning: When the size is 0, duplicate MetaParticles will not be
  * filtered out!
- *
  */
 public class SyncBuffer {
 
+	private static final int INITIAL_CAPACITY_RETURN_LIST = 5;
+
+	/**
+	 * Special {@link Comparator} used by the {@link SyncBuffer}. It sorts
+	 * {@link Particle}s based on their timestamp. Additionally, duplicate
+	 * {@link MetaParticle}s (with possibly a different originId) will return 0,
+	 * which results in removing the duplicates from the TreeSet.
+	 */
 	private static class ParticleComparator implements Comparator<Particle> {
 
 		@Override
@@ -28,8 +35,8 @@ public class SyncBuffer {
 			int comp = Long.compare(p1.getTimestamp(), p2.getTimestamp());
 			if (comp == 0) {
 				// Same timestamp
-				if (p1 instanceof MetaParticle && p2 instanceof MetaParticle
-						&& p1.equals(p2)) {
+				if ((p1 instanceof MetaParticle)
+						&& (p2 instanceof MetaParticle) && p1.equals(p2)) {
 					// This will filter out duplicate MetaParticles
 					return 0;
 				} else {
@@ -44,9 +51,18 @@ public class SyncBuffer {
 	}
 
 	private final long bufferSizeMs;
-	private long lastSentOutTimestamp;
 	private final TreeSet<Particle> particles;
+	private long lastSentOutTimestamp;
 
+	/**
+	 * Create a new {@link SyncBuffer} with a predefined buffer time. A value of
+	 * 0 will effectively disable the buffer, and disable the filtering of
+	 * duplicate {@link MetaParticle}s.
+	 * 
+	 * @param bufferSizeMs
+	 *            Amount of time {@link Particle}s are kept in the buffer in
+	 *            milliseconds
+	 */
 	public SyncBuffer(long bufferSizeMs) {
 		if (bufferSizeMs < 0) {
 			throw new IllegalArgumentException("buffer size cannot be negative");
@@ -56,6 +72,19 @@ public class SyncBuffer {
 		particles = new TreeSet<Particle>(new ParticleComparator());
 	}
 
+	/**
+	 * Push a new {@link Particle} in into the {@link SyncBuffer}. When pushing
+	 * a {@link Particle}, zero or more {@link Particle}s will leave the buffer
+	 * and can be processed by the {@link Operation}. When a {@link Particle} is
+	 * too late to be synchronized it will be rejected.
+	 * 
+	 * @param particle
+	 *            {@link Particle} to add to the {@link SyncBuffer}
+	 * @return List of {@link Particle} that leave the buffer (can be empty)
+	 * @throws IllegalArgumentException
+	 *             When the {@link Particle} is too late to be synchronized in
+	 *             the buffer
+	 */
 	public List<Particle> pushParticle(Particle particle) {
 		if (bufferSizeMs == 0) {
 			return Collections.singletonList(particle);
@@ -63,13 +92,13 @@ public class SyncBuffer {
 		if (particle != null) {
 			if (particle.getTimestamp() < lastSentOutTimestamp) {
 				// Reject
-				// TODO We should probably indicate this with metrics
 				throw new IllegalArgumentException(
 						"Particle arrived too late, rejected by SyncBuffer");
 			}
 			particles.add(particle);
 		}
-		ArrayList<Particle> list = new ArrayList<Particle>(5);
+		ArrayList<Particle> list = new ArrayList<Particle>(
+				INITIAL_CAPACITY_RETURN_LIST);
 		long target = highestTimestamp() - bufferSizeMs;
 		while (lowestTimestamp() <= target) {
 			list.add(particles.pollFirst());
@@ -80,8 +109,13 @@ public class SyncBuffer {
 		return list;
 	}
 
+	/**
+	 * Remove all elements from the {@link SyncBuffer}.
+	 * 
+	 * @return Sorted List of elements that were in the {@link SyncBuffer}
+	 */
 	public List<Particle> flush() {
-		ArrayList<Particle> list = new ArrayList<Particle>(this.size());
+		ArrayList<Particle> list = new ArrayList<Particle>(size());
 		list.addAll(particles);
 		particles.clear();
 		if (!list.isEmpty()) {
@@ -90,6 +124,12 @@ public class SyncBuffer {
 		return list;
 	}
 
+	/**
+	 * Return the timestamp of the youngest {@link Particle} in the
+	 * {@link SyncBuffer}.
+	 * 
+	 * @return Highest timestamp of a {@link Particle} in the buffer
+	 */
 	public long highestTimestamp() {
 		if (size() == 0) {
 			return -1;
@@ -97,6 +137,12 @@ public class SyncBuffer {
 		return particles.last().getTimestamp();
 	}
 
+	/**
+	 * Return the timestamp of the oldest {@link Particle} in the
+	 * {@link SyncBuffer}.
+	 * 
+	 * @return Lowest timestamp of a {@link Particle} in the buffer
+	 */
 	public long lowestTimestamp() {
 		if (size() == 0) {
 			return -1;
@@ -104,6 +150,9 @@ public class SyncBuffer {
 		return particles.first().getTimestamp();
 	}
 
+	/**
+	 * @return Number of {@link Particle}s in the buffer
+	 */
 	public int size() {
 		return particles.size();
 	}

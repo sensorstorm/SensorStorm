@@ -20,6 +20,15 @@ public class FlushingSyncBuffer extends SyncBuffer {
 
 	private final Map<String, Boolean> receivedShutdownFromOrigins = new HashMap<String, Boolean>();
 
+	/**
+	 * Create a new {@link FlushingSyncBuffer} with a predefined buffer time. A
+	 * value of 0 will effectively disable the buffer, and disable the filtering
+	 * of duplicate {@link MetaParticle}s.
+	 * 
+	 * @param bufferSizeMs
+	 *            Amount of time {@link Particle}s are kept in the buffer in
+	 *            milliseconds
+	 */
 	public FlushingSyncBuffer(long bufferSizeMs) {
 		super(bufferSizeMs);
 	}
@@ -45,6 +54,12 @@ public class FlushingSyncBuffer extends SyncBuffer {
 		return super.pushParticle(particle);
 	}
 
+	/**
+	 * Check if this buffer has received a {@link GracefullShutdownParticle}
+	 * form all known origins.
+	 * 
+	 * @return Should the buffer flush?
+	 */
 	private boolean shouldFlush() {
 		for (Boolean b : receivedShutdownFromOrigins.values()) {
 			if (!b) {

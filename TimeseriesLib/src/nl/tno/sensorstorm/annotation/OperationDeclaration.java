@@ -15,7 +15,7 @@ import nl.tno.sensorstorm.particles.MetaParticleHandler;
  * are optional.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE })
+@Target(ElementType.TYPE)
 public @interface OperationDeclaration {
 	/**
 	 * An array containing one or more types of {@link DataParticle}s that this

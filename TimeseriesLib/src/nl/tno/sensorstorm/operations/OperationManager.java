@@ -21,17 +21,17 @@ import org.slf4j.LoggerFactory;
 
 /**
  * An OperationManager manages for a specific fieldGrouper the operation
- * instance and optional batcher and optional one or more metahandlers.
- * 
- * @author waaijbdvd
+ * instance and optional batcher and optional one or more
+ * {@link MetaParticleHandler}s.
  * 
  */
 public class OperationManager implements Serializable {
-	protected Logger logger = LoggerFactory.getLogger(OperationManager.class);
 
 	private static final long serialVersionUID = 3141072548366321818L;
+	private static final Logger logger = LoggerFactory
+			.getLogger(OperationManager.class);
 
-	/** The fieldGroupValue this manager works for. */
+	/** The fieldGroupValue this manager works for, can be null. */
 	private String fieldGrouperValue;
 
 	private Operation operation;
@@ -57,7 +57,7 @@ public class OperationManager implements Serializable {
 	 *            The class of the batcher to be used.
 	 * @param batchOperationClass
 	 *            The class of the batched operation to be used.
-	 * @param conf
+	 * @param stormNativeConfig
 	 *            A reference to the storm config
 	 * @throws IllegalAccessException
 	 * @throws InstantiationException
@@ -99,7 +99,7 @@ public class OperationManager implements Serializable {
 	}
 
 	/**
-	 * An internal class to create the operationManager
+	 * An internal class to create the operationManager.
 	 * 
 	 * @param fieldGroupValue
 	 * @param batcherClass
@@ -131,7 +131,7 @@ public class OperationManager implements Serializable {
 	}
 
 	/**
-	 * Process a DataParticle
+	 * Process a DataParticle.
 	 * 
 	 * @param dataParticle
 	 *            DataParticle to be processed. If the particle == null, null is
@@ -200,7 +200,7 @@ public class OperationManager implements Serializable {
 	}
 
 	/**
-	 * Process a MetaParticle
+	 * Process a MetaParticle.
 	 * 
 	 * @param metaParticle
 	 *            Particle to be processed. If the particle == null, null is
@@ -218,7 +218,7 @@ public class OperationManager implements Serializable {
 	}
 
 	/**
-	 * Create a new operation with Batcher and metaParticleHandlers
+	 * Create a new operation with Batcher and metaParticleHandlers.
 	 * 
 	 * @param firstParticle
 	 * @throws InstantiationException
@@ -247,21 +247,17 @@ public class OperationManager implements Serializable {
 			// create new operation and initialize it
 			operation = operationClass.newInstance();
 
-			// is it a BatchOperation?
 			if (ParticleBatchOperation.class.isInstance(operation)) {
+				// BatchOperation
 				((ParticleBatchOperation) operation).init(fieldGrouperValue,
 						timestamp, stormNativeConfig,
 						zookeeperStormConfiguration);
-			}
-
-			// or is it a SingleOperation?
-			else if (SingleParticleOperation.class.isInstance(operation)) {
+			} else if (SingleParticleOperation.class.isInstance(operation)) {
+				// SingleOperation
 				operation.init(fieldGrouperValue, timestamp, stormNativeConfig,
 						zookeeperStormConfiguration);
-			}
-
-			// unknown operation type
-			else {
+			} else {
+				// unknown operation type
 				logger.error("Internal error: OperationClass of unknown type "
 						+ operationClass.getName() + ", expected: "
 						+ SingleParticleOperation.class.getName() + " or "
@@ -278,7 +274,7 @@ public class OperationManager implements Serializable {
 	}
 
 	/**
-	 * Create all metaHandlers as specified in the annotations
+	 * Create all metaHandlers as specified in the annotations.
 	 * 
 	 * @param operation
 	 * @throws InstantiationException
@@ -316,7 +312,7 @@ public class OperationManager implements Serializable {
 
 	/**
 	 * Given an Operation class, figure out all the types of particles (both
-	 * DataParticles and MetaParticles) produced by this Operation
+	 * DataParticles and MetaParticles) produced by this {@link Operation}.
 	 * 
 	 * @param operationClass
 	 *            Class of the Operation
@@ -341,7 +337,7 @@ public class OperationManager implements Serializable {
 
 	/**
 	 * Given an Operation class, figure out all the types of DataParticles
-	 * produced by this Operation
+	 * produced by this Operation.
 	 * 
 	 * @param operationClass
 	 *            Class of the Operation
@@ -360,7 +356,7 @@ public class OperationManager implements Serializable {
 
 	/**
 	 * Given an Operation class, figure out all the types of MetaParticles
-	 * produced by this Operation
+	 * produced by this Operation.
 	 * 
 	 * @param operationClass
 	 *            Class of the Operation

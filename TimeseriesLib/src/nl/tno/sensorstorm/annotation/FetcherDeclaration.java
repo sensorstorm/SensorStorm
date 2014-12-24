@@ -14,7 +14,7 @@ import nl.tno.sensorstorm.particles.DataParticle;
  * promises to return.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE })
+@Target(ElementType.TYPE)
 public @interface FetcherDeclaration {
 	/**
 	 * List of types of {@link DataParticle}s produced by this {@link Fetcher}.

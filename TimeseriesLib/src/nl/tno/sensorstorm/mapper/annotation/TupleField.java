@@ -12,7 +12,7 @@ import nl.tno.sensorstorm.particles.Particle;
  * if the {@link Particle} doesn't have a custom mapper.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.FIELD })
+@Target(ElementType.FIELD)
 public @interface TupleField {
 
 	/**

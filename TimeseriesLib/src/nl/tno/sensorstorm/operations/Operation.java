@@ -13,16 +13,14 @@ import nl.tno.storm.configuration.api.ExternalStormConfiguration;
  * SensorStormBolt gets a particle with an unknown fieldGroupValue.
  * 
  * An operation must also add the annotation OperationDeclaration annotation.
- * 
- * @author waaijbdvd
- * 
  */
-public abstract interface Operation extends Serializable {
+public interface Operation extends Serializable {
 
 	/**
-	 * Init this operation.
+	 * Initialize this operation.
 	 * 
 	 * @param fieldGrouperValue
+	 *            Value for the grouping field if any, otherwise null
 	 * @param startTimeStamp
 	 *            The time of the first particle this operation will get. Or -1
 	 *            if a single operation is created for all particles (in the
@@ -30,21 +28,14 @@ public abstract interface Operation extends Serializable {
 	 * @param stormNativeConfig
 	 *            A reference to the storm config object
 	 * @param zookeeperStormConfiguration
-	 *            A reference to the zookeeper storm config api
+	 *            A reference to the {@link ExternalStormConfiguration}
+	 * @throws OperationException
+	 *             If an error occurs in the {@link Operation}
+	 * 
 	 */
-	public void init(String fieldGrouperValue, long startTimeStamp,
+	void init(String fieldGrouperValue, long startTimeStamp,
 			@SuppressWarnings("rawtypes") Map stormNativeConfig,
 			ExternalStormConfiguration zookeeperStormConfiguration)
 			throws OperationException;
-
-	/**
-	 * @param startTimestamp
-	 *            The timestamp of the first particle, this is the first
-	 *            particle this operation instance has to process
-	 * 
-	 * @param startTimestamp
-	 */
-	// public void prepareForFirstParticle(long startTimestamp)
-	// throws OperationException;
 
 }
