@@ -50,13 +50,6 @@ public abstract class SensorStormGrouping implements CustomStreamGrouping,
 			routeToBoltIds = getBoltIdsForDefaultTuple(values);
 		}
 
-		if (particleClass == null) {
-			System.out.println("Non particle routed to bolts ["
-					+ routeToBoltIds + "]");
-		} else {
-			System.out.println("Particle (" + particleClass.getName()
-					+ ") routed to bolts [" + routeToBoltIds + "]");
-		}
 		return routeToBoltIds;
 	}
 

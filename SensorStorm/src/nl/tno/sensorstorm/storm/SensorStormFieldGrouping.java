@@ -25,8 +25,6 @@ public class SensorStormFieldGrouping extends SensorStormGrouping {
 		if ((fieldIdIndex >= 0) && (fieldIdIndex <= values.size())) {
 			Object fieldValue = values.get(fieldIdIndex);
 			int targetBoltId = selectTargetBoltId(targetBoltIdList, fieldValue);
-			System.out.println("  selected bolt " + targetBoltId
-					+ " based on field " + fieldId + "(" + fieldValue + ")");
 			boltIds.add(targetBoltId);
 		}
 		return boltIds;
