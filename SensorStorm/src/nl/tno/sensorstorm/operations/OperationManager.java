@@ -140,6 +140,7 @@ public class OperationManager implements Serializable {
 	 *         should be emitted by the bolt. Or null in case of an error, which
 	 *         will be logged
 	 */
+	@SuppressWarnings("unchecked")
 	public List<Particle> processDataParticle(DataParticle dataParticle) {
 		if (dataParticle == null) {
 			return null;
@@ -162,36 +163,28 @@ public class OperationManager implements Serializable {
 		}
 
 		try {
-			List<DataParticle> outputDataParticles = null;
-
 			// is there a batcher?
 			if (batcher != null) {
+				List<Particle> outputDataParticles = null;
 				// batch dataParticle and give it to the batcherOperation
 				List<DataParticleBatch> batchedParticles = batcher
 						.batch(dataParticle);
 
 				// are there one or more particle batches to be processed?
 				if (batchedParticles != null) {
-					outputDataParticles = new ArrayList<DataParticle>();
+					outputDataParticles = new ArrayList<Particle>();
 					for (DataParticleBatch batchedParticle : batchedParticles) {
-						outputDataParticles
-								.addAll(((ParticleBatchOperation) operation)
-										.execute(batchedParticle));
+						List<? extends DataParticle> results = ((ParticleBatchOperation) operation)
+								.execute(batchedParticle);
+						outputDataParticles.addAll(results);
 					}
 				}
+				return outputDataParticles;
 			} else {
 				// it is an operation without a batcher
-				outputDataParticles = ((SingleParticleOperation) operation)
+				return (List<Particle>) ((SingleParticleOperation) operation)
 						.execute(dataParticle);
 			}
-
-			// are there any particles to be emitted, convert into Particle
-			// list?
-			List<Particle> result = new ArrayList<Particle>();
-			if (outputDataParticles != null) {
-				result.addAll(outputDataParticles);
-			}
-			return result;
 		} catch (BatcherException | OperationException e) {
 			logger.error(
 					"Unable to execute operation due to: " + e.getMessage(), e);

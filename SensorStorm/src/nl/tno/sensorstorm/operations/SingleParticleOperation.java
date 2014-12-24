@@ -24,7 +24,7 @@ public interface SingleParticleOperation extends Operation {
 	 * @return Returns a list of zero or more data particles to be sent further
 	 *         up to the topology.
 	 */
-	public List<DataParticle> execute(DataParticle inputParticle)
+	public List<? extends DataParticle> execute(DataParticle inputParticle)
 			throws OperationException;
 
 }

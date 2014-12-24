@@ -5,9 +5,8 @@ import java.util.Map;
 
 import nl.tno.sensorstorm.particles.DataParticle;
 import nl.tno.sensorstorm.particles.DataParticleBatch;
+import nl.tno.sensorstorm.particles.Particle;
 import nl.tno.storm.configuration.api.ExternalStormConfiguration;
-
-import com.sun.xml.internal.bind.v2.schemagen.xmlschema.Particle;
 
 /**
  * An interface describing the batch functionality: to collect one or more

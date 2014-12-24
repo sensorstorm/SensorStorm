@@ -6,12 +6,11 @@ import java.util.Map;
 import nl.tno.sensorstorm.annotation.FetcherDeclaration;
 import nl.tno.sensorstorm.particles.DataParticle;
 import nl.tno.sensorstorm.particles.MetaParticle;
+import nl.tno.sensorstorm.particles.Particle;
 import nl.tno.sensorstorm.stormcomponents.SensorStormSpout;
 import nl.tno.storm.configuration.api.ExternalStormConfiguration;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.tuple.Tuple;
-
-import com.sun.xml.internal.bind.v2.schemagen.xmlschema.Particle;
 
 /**
  * A Fetcher retrieves data from a specific source. It is called from the

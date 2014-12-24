@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import nl.tno.sensorstorm.annotation.OperationDeclaration;
 import nl.tno.sensorstorm.batchers.Batcher;
 import nl.tno.sensorstorm.config.EmptyStormConfiguration;
 import nl.tno.sensorstorm.mapper.ParticleMapper;
@@ -240,6 +241,13 @@ public class SensorStormBolt extends BaseRichBolt {
 		this.batcherClass = batcherClass;
 		this.operationClass = operationClass;
 		this.fieldGrouperId = fieldGrouperId;
+
+		// Check annotations
+		if (!operationClass.isAnnotationPresent(OperationDeclaration.class)) {
+			throw new IllegalArgumentException("The operation "
+					+ operationClass.getName()
+					+ " does not have an OperationDecleration");
+		}
 
 		// Initialize data structures
 		metaParticleFields = MetaParticleUtil
