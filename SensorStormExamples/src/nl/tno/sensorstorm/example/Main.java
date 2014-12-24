@@ -1,9 +1,9 @@
 package nl.tno.sensorstorm.example;
 
-import nl.tno.sensorstorm.stormcomponents.SensorStormBolt;
-import nl.tno.sensorstorm.stormcomponents.SensorStormSpout;
-import nl.tno.sensorstorm.stormcomponents.groupers.SensorStormFieldGrouping;
-import nl.tno.sensorstorm.stormcomponents.groupers.SensorStormShuffleGrouping;
+import nl.tno.sensorstorm.storm.SensorStormBolt;
+import nl.tno.sensorstorm.storm.SensorStormFieldGrouping;
+import nl.tno.sensorstorm.storm.SensorStormShuffleGrouping;
+import nl.tno.sensorstorm.storm.SensorStormSpout;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;

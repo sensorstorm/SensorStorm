@@ -5,13 +5,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import nl.tno.sensorstorm.annotation.OperationDeclaration;
-import nl.tno.sensorstorm.operations.OperationException;
-import nl.tno.sensorstorm.operations.SingleParticleOperation;
-import nl.tno.sensorstorm.particles.DataParticle;
-import nl.tno.sensorstorm.particles.timer.TimerControllerInterface;
-import nl.tno.sensorstorm.particles.timer.TimerParticleHandler;
-import nl.tno.sensorstorm.particles.timer.TimerTaskInterface;
+import nl.tno.sensorstorm.api.annotation.OperationDeclaration;
+import nl.tno.sensorstorm.api.particles.DataParticle;
+import nl.tno.sensorstorm.api.processing.OperationException;
+import nl.tno.sensorstorm.api.processing.SingleParticleOperation;
+import nl.tno.sensorstorm.timer.TimerControllerInterface;
+import nl.tno.sensorstorm.timer.TimerParticleHandler;
+import nl.tno.sensorstorm.timer.TimerTaskInterface;
 import nl.tno.storm.configuration.api.ExternalStormConfiguration;
 
 @OperationDeclaration(inputs = SensorParticle.class, outputs = SensorParticle.class, metaParticleHandlers = TimerParticleHandler.class)

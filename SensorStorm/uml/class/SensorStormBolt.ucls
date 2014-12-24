@@ -19,8 +19,8 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <interface id="3" language="java" name="nl.tno.sensorstorm.operations.Operation" project="SensorStorm" 
-    file="/SensorStorm/src/nl/tno/sensorstorm/operations/Operation.java" binary="false" corner="BOTTOM_RIGHT">    
+  <interface id="3" language="java" name="nl.tno.sensorstorm.processing.Operation" project="SensorStorm" 
+    file="/SensorStorm/src/nl/tno/sensorstorm/processing/Operation.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="812" y="361"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
@@ -28,8 +28,8 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </interface>  
-  <interface id="4" language="java" name="nl.tno.sensorstorm.operations.SingleParticleOperation" project="SensorStorm" 
-    file="/SensorStorm/src/nl/tno/sensorstorm/operations/SingleParticleOperation.java" binary="false" 
+  <interface id="4" language="java" name="nl.tno.sensorstorm.processing.SingleParticleOperation" project="SensorStorm" 
+    file="/SensorStorm/src/nl/tno/sensorstorm/processing/SingleParticleOperation.java" binary="false" 
     corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="660" y="513"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
@@ -38,8 +38,8 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </interface>  
-  <interface id="5" language="java" name="nl.tno.sensorstorm.operations.ParticleBatchOperation" project="SensorStorm" 
-    file="/SensorStorm/src/nl/tno/sensorstorm/operations/ParticleBatchOperation.java" binary="false" 
+  <interface id="5" language="java" name="nl.tno.sensorstorm.processing.ParticleBatchOperation" project="SensorStorm" 
+    file="/SensorStorm/src/nl/tno/sensorstorm/processing/ParticleBatchOperation.java" binary="false" 
     corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="950" y="512"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 

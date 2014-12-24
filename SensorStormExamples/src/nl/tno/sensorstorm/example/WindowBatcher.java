@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
-import nl.tno.sensorstorm.batchers.Batcher;
-import nl.tno.sensorstorm.batchers.BatcherException;
-import nl.tno.sensorstorm.particles.DataParticle;
-import nl.tno.sensorstorm.particles.DataParticleBatch;
+import nl.tno.sensorstorm.api.particles.DataParticle;
+import nl.tno.sensorstorm.api.particles.DataParticleBatch;
+import nl.tno.sensorstorm.api.processing.Batcher;
+import nl.tno.sensorstorm.api.processing.BatcherException;
 import nl.tno.storm.configuration.api.ExternalStormConfiguration;
 
 public class WindowBatcher implements Batcher {

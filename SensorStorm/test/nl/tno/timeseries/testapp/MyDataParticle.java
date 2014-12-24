@@ -1,8 +1,8 @@
 package nl.tno.timeseries.testapp;
 
-import nl.tno.sensorstorm.mapper.annotation.TupleField;
-import nl.tno.sensorstorm.particles.AbstractDataParticle;
-import nl.tno.sensorstorm.particles.DataParticle;
+import nl.tno.sensorstorm.api.annotation.TupleField;
+import nl.tno.sensorstorm.api.particles.AbstractDataParticle;
+import nl.tno.sensorstorm.api.particles.DataParticle;
 
 public class MyDataParticle<T> extends AbstractDataParticle implements
 		DataParticle {

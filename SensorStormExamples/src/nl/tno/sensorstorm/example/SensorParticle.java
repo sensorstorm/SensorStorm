@@ -1,7 +1,7 @@
 package nl.tno.sensorstorm.example;
 
-import nl.tno.sensorstorm.mapper.annotation.TupleField;
-import nl.tno.sensorstorm.particles.AbstractDataParticle;
+import nl.tno.sensorstorm.api.annotation.TupleField;
+import nl.tno.sensorstorm.api.particles.AbstractDataParticle;
 
 public class SensorParticle extends AbstractDataParticle {
 

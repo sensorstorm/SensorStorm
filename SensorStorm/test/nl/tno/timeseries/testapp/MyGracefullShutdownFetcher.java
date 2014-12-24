@@ -2,9 +2,9 @@ package nl.tno.timeseries.testapp;
 
 import java.util.Map;
 
-import nl.tno.sensorstorm.annotation.FetcherDeclaration;
-import nl.tno.sensorstorm.fetchers.Fetcher;
-import nl.tno.sensorstorm.particles.DataParticle;
+import nl.tno.sensorstorm.api.annotation.FetcherDeclaration;
+import nl.tno.sensorstorm.api.particles.DataParticle;
+import nl.tno.sensorstorm.api.processing.Fetcher;
 import nl.tno.storm.configuration.api.ExternalStormConfiguration;
 import backtype.storm.task.TopologyContext;
 

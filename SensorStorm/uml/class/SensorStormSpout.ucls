@@ -11,8 +11,8 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <interface id="2" language="java" name="nl.tno.sensorstorm.fetchers.Fetcher" project="SensorStorm" 
-    file="/SensorStorm/src/nl/tno/sensorstorm/fetchers/Fetcher.java" binary="false" corner="BOTTOM_RIGHT">    
+  <interface id="2" language="java" name="nl.tno.sensorstorm.processing.Fetcher" project="SensorStorm" 
+    file="/SensorStorm/src/nl/tno/sensorstorm/processing/Fetcher.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="592" y="202"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      

@@ -3,10 +3,10 @@ package nl.tno.timeseries.testapp;
 import java.util.List;
 import java.util.Map;
 
-import nl.tno.sensorstorm.annotation.OperationDeclaration;
-import nl.tno.sensorstorm.operations.ParticleBatchOperation;
-import nl.tno.sensorstorm.particles.DataParticle;
-import nl.tno.sensorstorm.particles.DataParticleBatch;
+import nl.tno.sensorstorm.api.annotation.OperationDeclaration;
+import nl.tno.sensorstorm.api.particles.DataParticle;
+import nl.tno.sensorstorm.api.particles.DataParticleBatch;
+import nl.tno.sensorstorm.api.processing.ParticleBatchOperation;
 import nl.tno.storm.configuration.api.ExternalStormConfiguration;
 
 @OperationDeclaration(inputs = { MyDataParticle.class }, outputs = {})
