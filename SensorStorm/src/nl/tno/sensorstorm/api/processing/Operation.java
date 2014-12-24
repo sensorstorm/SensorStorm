@@ -7,10 +7,11 @@ import nl.tno.storm.configuration.api.ExternalStormConfiguration;
 
 /**
  * An operation performs the processing of particles in a fieldGroupValue. This
- * is the abstract interface or the SingleOperation and the BatchOperation The
- * SensorStormBolt manages the operations, each fieldGroupValue will have its
- * own operation instance. An operation is created at soon as the
- * SensorStormBolt gets a particle with an unknown fieldGroupValue.
+ * is the abstract interface or the {@link SingleParticleOperation} and the
+ * {@link ParticleBatchOperation} The SensorStormBolt manages the operations,
+ * each fieldGroupValue will have its own operation instance. An operation is
+ * created at soon as the SensorStormBolt gets a particle with an unknown
+ * fieldGroupValue.
  * 
  * An operation must also add the annotation OperationDeclaration annotation.
  */

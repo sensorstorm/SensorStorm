@@ -218,8 +218,8 @@ public class SensorStormBolt extends BaseRichBolt {
 	}
 
 	/**
-	 * General logic for the constructors of the singleOperation and the
-	 * batchOperation.
+	 * General logic for the constructors of the {@link SingleParticleOperation}
+	 * and the {@link ParticleBatchOperation}.
 	 * 
 	 * @param config
 	 *            Storm configuration map

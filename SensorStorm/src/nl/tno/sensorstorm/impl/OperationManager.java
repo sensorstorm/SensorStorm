@@ -248,12 +248,12 @@ public class OperationManager implements Serializable {
 			operation = operationClass.newInstance();
 
 			if (ParticleBatchOperation.class.isInstance(operation)) {
-				// BatchOperation
+				// ParticleBatchOperation
 				((ParticleBatchOperation) operation).init(fieldGrouperValue,
 						timestamp, stormNativeConfig,
 						zookeeperStormConfiguration);
 			} else if (SingleParticleOperation.class.isInstance(operation)) {
-				// SingleOperation
+				// SingleParticleOperation
 				operation.init(fieldGrouperValue, timestamp, stormNativeConfig,
 						zookeeperStormConfiguration);
 			} else {
