@@ -9,8 +9,8 @@ import nl.tno.sensorstorm.api.particles.DataParticle;
 import nl.tno.sensorstorm.api.processing.Fetcher;
 
 /**
- * Annotation for the {@link Fetcher}. The parameter outputs is an array
- * containing zero or more {@link DataParticle} which the {@link Fetcher}
+ * Mandatory annotation for the {@link Fetcher}. The parameter outputs is an
+ * array containing zero or more {@link DataParticle} which the {@link Fetcher}
  * promises to return.
  */
 @Retention(RetentionPolicy.RUNTIME)

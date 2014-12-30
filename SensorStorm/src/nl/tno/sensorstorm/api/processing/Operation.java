@@ -3,6 +3,8 @@ package nl.tno.sensorstorm.api.processing;
 import java.io.Serializable;
 import java.util.Map;
 
+import nl.tno.sensorstorm.api.annotation.OperationDeclaration;
+import nl.tno.sensorstorm.storm.SensorStormBolt;
 import nl.tno.storm.configuration.api.ExternalStormConfiguration;
 
 /**
@@ -12,8 +14,9 @@ import nl.tno.storm.configuration.api.ExternalStormConfiguration;
  * each fieldGroupValue will have its own operation instance. An operation is
  * created at soon as the SensorStormBolt gets a particle with an unknown
  * fieldGroupValue.
- * 
- * An operation must also add the annotation OperationDeclaration annotation.
+ * <p>
+ * An Operation must have an {@link OperationDeclaration} annotation, otherwise
+ * it will be rejected by the {@link SensorStormBolt}.
  */
 public interface Operation extends Serializable {
 

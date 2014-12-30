@@ -15,7 +15,7 @@ import nl.tno.sensorstorm.storm.SensorStormBolt;
  * {@link Batcher} and the {@link ParticleBatchOperation} on the same
  * {@link SensorStormBolt} for different values of a field (see
  * {@link SensorStormBolt}).
- * 
+ * <p>
  * A {@link ParticleBatchOperation} must have an {@link OperationDeclaration}
  * annotation.
  */

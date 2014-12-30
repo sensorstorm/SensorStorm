@@ -10,9 +10,9 @@ import nl.tno.sensorstorm.api.processing.MetaParticleHandler;
 import nl.tno.sensorstorm.api.processing.Operation;
 
 /**
- * Annotation for the {@link Operation}. There can be three parameters (inputs,
- * outputs and metaParticleHandlers). The inputs is mandatory and the other two
- * are optional.
+ * Mandatory annotation for the {@link Operation}. There can be three parameters
+ * (inputs, outputs and metaParticleHandlers). The inputs is mandatory and the
+ * other two are optional.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

@@ -9,9 +9,9 @@ import nl.tno.sensorstorm.api.particles.MetaParticle;
 import nl.tno.sensorstorm.api.processing.MetaParticleHandler;
 
 /**
- * Annotation for the {@link MetaParticleHandler}. The parameter metaParticle
- * specifies for which metaParticle the {@link MetaParticleHandler} wants to
- * register.
+ * Mandatory annotation for the {@link MetaParticleHandler}. The parameter
+ * metaParticle specifies for which metaParticle the {@link MetaParticleHandler}
+ * wants to register.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

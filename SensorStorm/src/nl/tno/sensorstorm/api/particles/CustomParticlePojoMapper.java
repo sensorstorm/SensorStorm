@@ -8,7 +8,7 @@ import backtype.storm.tuple.Values;
 
 /**
  * Custom mapper for a Particle.
- * 
+ * <p>
  * Particles are represented in Storm by dynamically typed Tuples.For
  * transportation Particles are mapped to Tuples. Particles are automatically
  * mapped if they contain the {@link TupleField} annotation. However, in some

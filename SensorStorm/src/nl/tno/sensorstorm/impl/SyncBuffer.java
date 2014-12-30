@@ -14,7 +14,7 @@ import nl.tno.sensorstorm.api.processing.Operation;
  * Class that synchronizes {@link Particle}s coming from multiple (probably
  * parallel executing) sources and filters out duplicate {@link MetaParticle}s.
  * This buffer introduces a configurable delay.
- * 
+ * <p>
  * When the delay is 0 the buffer will always immediately return the same
  * particle. Warning: When the size is 0, duplicate MetaParticles will not be
  * filtered out!

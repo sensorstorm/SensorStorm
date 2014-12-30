@@ -9,7 +9,7 @@ import nl.tno.sensorstorm.storm.SensorStormSpout;
  * A marker interface that indicates this particle is a {@link MetaParticle}
  * (instead of a {@link DataParticle}). {@link MetaParticle}s are handled by
  * {@link MetaParticleHandler}s and are used to trigger special behavior.
- * 
+ * <p>
  * {@link MetaParticle}s need to implement their own version of equals called
  * equalMetaParticle, which ignores the originId. This method is used by the
  * {@link SyncBuffer} in order to remove duplicate {@link MetaParticle}s.

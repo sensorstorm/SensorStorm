@@ -16,6 +16,9 @@ import backtype.storm.tuple.Tuple;
  * A Fetcher retrieves data from a specific source. It is called from the
  * {@link SensorStormSpout}. The spout also takes care of {@link MetaParticle}
  * and mapping between {@link Tuple}s and {@link Particle}s.
+ * <p>
+ * Every Fetcher must have a {@link FetcherDeclaration} annotation, otherwise
+ * the Fetcher will be rejected by the {@link SensorStormSpout}.
  */
 public interface Fetcher extends Serializable {
 

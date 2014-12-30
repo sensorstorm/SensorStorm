@@ -32,7 +32,7 @@ import backtype.storm.tuple.Fields;
 /**
  * This is a generic Spout for the SensorStorm library. The logic for retrieving
  * data is implemented in a {@link Fetcher}, which runs on top of this spout.
- * 
+ * <p>
  * This Spout injects {@link TimerTickParticle}s into the stream. This way,
  * {@link Operation}s in the topology are able to perform scheduled tasks and
  * recurring, even if there is no data to trigger processing. There are two ways
@@ -42,7 +42,7 @@ import backtype.storm.tuple.Fields;
  * are sent to the topology. In both cases measures must be taken to make sure
  * that the timestamps in Particles are synchronized over all instances of
  * {@link SensorStormSpout}s.
- * 
+ * <p>
  * In order to implement specific behavior (usually sending out more types of
  * {@link MetaParticle}s) this class can be extended. When a subclass introduces
  * new types of {@link MetaParticle}s, the subclass must call the

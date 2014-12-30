@@ -11,7 +11,7 @@ import nl.tno.sensorstorm.gracefullshutdown.GracefullShutdownParticle;
 /**
  * Special type of {@link SyncBuffer} which flushes itself after receiving a
  * {@link GracefullShutdownParticle} from all it's sources.
- * 
+ * <p>
  * This SyncBuffer learns who it's sources are. When it received a
  * {@link GracefullShutdownParticle} from all it's sources, the pushParticle
  * will behave like a flush.

@@ -12,7 +12,7 @@ import nl.tno.sensorstorm.storm.SensorStormBolt;
  * Optionally there can be separate instances {@link SingleParticleOperation} on
  * the same {@link SensorStormBolt} for different values of a field (see
  * {@link SensorStormBolt}).
- * 
+ * <p>
  * A {@link SingleParticleOperation} must have an {@link OperationDeclaration}
  * annotation.
  */

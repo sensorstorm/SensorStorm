@@ -41,13 +41,13 @@ import backtype.storm.tuple.Tuple;
  * configurations of this bolt possible. There are different constructors
  * different configurations. On top a {@link SensorStormBolt} you can run an
  * {@link Operation} and optionally a {@link Batcher}.
- * 
+ * <p>
  * You can use this Bolt without a {@link Batcher}. In that case you can run a
  * {@link SingleParticleOperation} on top of this Bolt.
- * 
+ * <p>
  * You can also put a {@link Batcher} on this bolt. In that case you have to run
  * a {@link ParticleBatchOperation} on top of this Bolt.
- * 
+ * <p>
  * Additionally, you can choose to have one instance of the {@link Operation}
  * (and possibly the {@link Batcher}), or you can have a separate
  * {@link Operation} (and possible {@link Batcher}) for each value of a field in
@@ -112,6 +112,9 @@ public class SensorStormBolt extends BaseRichBolt {
 	 *            be null.
 	 * @throws NullPointerException
 	 *             When batchOperationClass or batchOperationClass is null
+	 * @throws IllegalArgumentException
+	 *             When the {@link Operation} doesn't have an
+	 *             {@link OperationDeclaration} annotation
 	 */
 	public SensorStormBolt(Config config, long syncBufferSize,
 			Class<? extends Batcher> batcherClass,
@@ -144,6 +147,9 @@ public class SensorStormBolt extends BaseRichBolt {
 	 *            be null.
 	 * @throws NullPointerException
 	 *             When singleOperationClass is null
+	 * @throws IllegalArgumentException
+	 *             When the {@link Operation} doesn't have an
+	 *             {@link OperationDeclaration} annotation
 	 */
 	public SensorStormBolt(Config config, long syncBufferSize,
 			Class<? extends SingleParticleOperation> singleOperationClass,
@@ -174,6 +180,9 @@ public class SensorStormBolt extends BaseRichBolt {
 	 *            be null.
 	 * @throws NullPointerException
 	 *             When batcherClass or batchOperationClass is null
+	 * @throws IllegalArgumentException
+	 *             When the {@link Operation} doesn't have an
+	 *             {@link OperationDeclaration} annotation
 	 */
 	public SensorStormBolt(Config config,
 			Class<? extends Batcher> batcherClass,
@@ -205,6 +214,9 @@ public class SensorStormBolt extends BaseRichBolt {
 	 *            be null.
 	 * @throws NullPointerException
 	 *             When singleOperationClass is null
+	 * @throws IllegalArgumentException
+	 *             When the {@link Operation} doesn't have an
+	 *             {@link OperationDeclaration} annotation
 	 */
 	public SensorStormBolt(Config config,
 			Class<? extends SingleParticleOperation> singleOperationClass,
@@ -231,6 +243,9 @@ public class SensorStormBolt extends BaseRichBolt {
 	 *            Class of the {@link Operation}
 	 * @param fieldGrouperId
 	 *            Field name to group on
+	 * @throws IllegalArgumentException
+	 *             When the {@link Operation} doesn't have an
+	 *             {@link OperationDeclaration} annotation
 	 */
 	private void sensorStormBolt(Config config, long syncBufferSize,
 			Class<? extends Batcher> batcherClass,
@@ -243,7 +258,7 @@ public class SensorStormBolt extends BaseRichBolt {
 
 		// Check annotations
 		if (!operationClass.isAnnotationPresent(OperationDeclaration.class)) {
-			throw new IllegalArgumentException("The operation "
+			throw new IllegalArgumentException("The Operation "
 					+ operationClass.getName()
 					+ " does not have an OperationDecleration");
 		}
