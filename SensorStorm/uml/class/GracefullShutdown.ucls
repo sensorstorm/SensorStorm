@@ -1,55 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<class-diagram version="1.1.7" icons="true" automaticImage="PNG" always-add-relationships="false" generalizations="true" 
+<class-diagram version="1.1.5" icons="true" automaticImage="PNG" always-add-relationships="false" generalizations="true" 
   realizations="true" associations="true" dependencies="false" nesting-relationships="true">  
-  <interface id="1" language="java" name="nl.tno.sensorstorm.particles.gracefullshutdown.GracefullShutdownInterface" 
-    project="SensorStorm" 
-    file="/SensorStorm/src/nl/tno/sensorstorm/particles/gracefullshutdown/GracefullShutdownInterface.java" 
-    binary="false" corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="347" y="382"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
-      sort-features="false" accessors="true" visibility="true">      
+  <interface id="1" language="java" name="nl.tno.sensorstorm.api.processing.MetaParticleHandler" project="SensorStorm" 
+    file="/SensorStorm/src/nl/tno/sensorstorm/api/processing/MetaParticleHandler.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="99" width="300" x="152" y="56"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </interface>  
-  <class id="2" language="java" name="nl.tno.sensorstorm.particles.gracefullshutdown.GracefulShutdownParticleHandler" 
+  <class id="2" language="java" name="nl.tno.sensorstorm.gracefullshutdown.GracefulShutdownParticleHandler" 
     project="SensorStorm" 
-    file="/SensorStorm/src/nl/tno/sensorstorm/particles/gracefullshutdown/GracefulShutdownParticleHandler.java" 
-    binary="false" corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="345" y="212"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
-      sort-features="false" accessors="true" visibility="true">      
+    file="/SensorStorm/src/nl/tno/sensorstorm/gracefullshutdown/GracefulShutdownParticleHandler.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="299" y="286"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <interface id="3" language="java" name="nl.tno.sensorstorm.particles.MetaParticleHandler" project="SensorStorm" 
-    file="/SensorStorm/src/nl/tno/sensorstorm/particles/MetaParticleHandler.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="99" width="300" x="197" y="-10"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
-      sort-features="false" accessors="true" visibility="true">      
+  <interface id="3" language="java" name="nl.tno.sensorstorm.gracefullshutdown.GracefullShutdownInterface" 
+    project="SensorStorm" file="/SensorStorm/src/nl/tno/sensorstorm/gracefullshutdown/GracefullShutdownInterface.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="300" y="478"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </interface>  
   <realization id="4">    
     <end type="SOURCE" refId="2"/>    
-    <end type="TARGET" refId="3"/>  
+    <end type="TARGET" refId="1"/>  
   </realization>  
   <association id="5">    
     <end type="SOURCE" refId="2" navigable="false">      
-      <attribute id="6" name="graceFullShutdownOperation">        
-        <position height="0" width="0" x="0" y="0"/>      
-      </attribute>      
-      <multiplicity id="7" minimum="0" maximum="1">        
-        <position height="0" width="0" x="0" y="0"/>      
-      </multiplicity>    
+      <attribute id="6" name="graceFullShutdownOperation"/>      
+      <multiplicity id="7" minimum="0" maximum="1"/>    
     </end>    
-    <end type="TARGET" refId="1" navigable="true"/>    
+    <end type="TARGET" refId="3" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
   <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
-    sort-features="false" accessors="true" visibility="true">    
+    accessors="true" visibility="true">    
     <attributes public="true" package="true" protected="true" private="true" static="true"/>    
     <operations public="true" package="true" protected="true" private="true" static="true"/>  
   </classifier-display>  

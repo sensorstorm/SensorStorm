@@ -1,62 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sequence-diagram version="1.1.5" icons="true" automaticImage="PNG">  
-  <object id="1" language="java" name="backtype.storm.topology.IRichSpout" project="TimeseriesLib" 
+  <object id="1" language="java" name="backtype.storm.topology.IRichSpout" project="SensorStorm" 
     file="C:/programs/apache-maven-3.0.4/repositorylocaldata/m2-repository/org/apache/storm/storm-core/0.9.2-incubating/storm-core-0.9.2-incubating.jar" 
     binary="true" label="iRichSpout" type="interface" autoSize="true">    
-    <position height="-1" width="-1" x="330" y="0"/>    
+    <position height="-1" width="-1" x="100" y="0"/>    
     <execution id="2">      
-      <position height="555" width="112" x="5" y="99"/>    
+      <position height="567" width="112" x="5" y="99"/>    
     </execution>  
   </object>  
-  <object id="11" language="java" name="nl.tno.sensorstorm.stormcomponents.SensorStormSpout" project="TimeseriesLib" 
-    file="/TimeseriesLib/src/nl/tno/sensorstorm/stormcomponents/SensorStormSpout.java" binary="false" 
-    label="sensorStormSpout" type="class" autoSize="true">    
-    <position height="-1" width="-1" x="172" y="0"/>    
+  <object id="11" language="java" name="nl.tno.sensorstorm.storm.SensorStormSpout" project="SensorStorm" 
+    file="/SensorStorm/src/nl/tno/sensorstorm/storm/SensorStormSpout.java" binary="false" label="sensorStormSpout" 
+    type="class" autoSize="true">    
+    <position height="-1" width="-1" x="241" y="0"/>    
     <execution id="4">      
-      <position height="63" width="163" x="121" y="120"/>    
+      <position height="63" width="132" x="121" y="120"/>    
     </execution>    
     <execution id="6">      
-      <position height="278" width="163" x="121" y="201"/>    
-    </execution>    
-    <execution id="8">      
-      <position height="60" width="163" x="121" y="514"/>    
-    </execution>    
-    <execution id="10">      
-      <position height="63" width="163" x="121" y="570"/>    
+      <position height="274" width="132" x="121" y="200"/>    
     </execution>    
     <execution id="17">      
-      <position height="63" width="7" x="199" y="285"/>    
+      <position height="63" width="132" x="121" y="285"/>    
     </execution>    
     <execution id="19">      
-      <position height="63" width="7" x="199" y="395"/>    
+      <position height="63" width="132" x="121" y="390"/>    
+    </execution>    
+    <execution id="8">      
+      <position height="63" width="132" x="121" y="495"/>    
+    </execution>    
+    <execution id="10">      
+      <position height="63" width="132" x="121" y="582"/>    
     </execution>  
   </object>  
-  <object id="28" language="java" name="nl.tno.sensorstorm.fetchers.Fetcher" project="TimeseriesLib" 
-    file="/TimeseriesLib/src/nl/tno/sensorstorm/fetchers/Fetcher.java" binary="false" label="fetcher" type="interface" 
-    autoSize="true">    
-    <position height="-1" width="-1" x="311" y="0"/>    
+  <object id="28" language="java" name="nl.tno.sensorstorm.api.processing.Fetcher" project="SensorStorm" 
+    file="/SensorStorm/src/nl/tno/sensorstorm/api/processing/Fetcher.java" binary="false" label="fetcher" 
+    type="interface" autoSize="true">    
+    <position height="-1" width="-1" x="352" y="0"/>    
     <execution id="13">      
-      <position height="21" width="123" x="288" y="141"/>    
+      <position height="21" width="148" x="257" y="141"/>    
     </execution>    
     <execution id="15">      
-      <position height="21" width="123" x="288" y="222"/>    
+      <position height="21" width="148" x="257" y="221"/>    
     </execution>    
-    <execution id="21">      
-      <position height="21" width="123" x="288" y="532"/>    
-    </execution>    
-    <execution id="23">      
-      <position height="21" width="123" x="288" y="591"/>    
-    </execution>  
-  </object>  
-  <object id="29" language="java" name="backtype.storm.spout.SpoutOutputCollector" project="TimeseriesLib" 
-    file="C:/programs/apache-maven-3.0.4/repositorylocaldata/m2-repository/org/apache/storm/storm-core/0.9.2-incubating/storm-core-0.9.2-incubating.jar" 
-    binary="true" label="spoutOutputCollector" type="class" autoSize="true">    
-    <position height="-1" width="-1" x="473" y="0"/>    
     <execution id="25">      
-      <position height="21" width="145" x="415" y="306"/>    
+      <position height="21" width="148" x="257" y="516"/>    
     </execution>    
     <execution id="27">      
-      <position height="21" width="145" x="415" y="416"/>    
+      <position height="21" width="148" x="257" y="603"/>    
+    </execution>  
+  </object>  
+  <object id="29" language="java" name="backtype.storm.spout.SpoutOutputCollector" project="SensorStorm" 
+    file="C:/programs/apache-maven-3.0.4/repositorylocaldata/m2-repository/org/apache/storm/storm-core/0.9.2-incubating/storm-core-0.9.2-incubating.jar" 
+    binary="true" label="spoutOutputCollector" type="class" autoSize="true">    
+    <position height="-1" width="-1" x="453" y="0"/>    
+    <execution id="23">      
+      <position height="21" width="145" x="409" y="411"/>    
+    </execution>    
+    <execution id="21">      
+      <position height="21" width="145" x="409" y="306"/>    
     </execution>  
   </object>  
   <message id="3" 
@@ -81,7 +81,7 @@
     <end type="SOURCE" refId="4"/>    
     <end type="TARGET" refId="13"/>  
   </message>  
-  <message id="14" operation="fetchParticle():nl.tno.sensorstorm.particles.DataParticle">    
+  <message id="14" operation="fetchParticle():nl.tno.sensorstorm.api.particles.DataParticle">    
     <end type="SOURCE" refId="6"/>    
     <end type="TARGET" refId="15"/>  
   </message>  
@@ -89,24 +89,24 @@
     <end type="SOURCE" refId="6"/>    
     <end type="TARGET" refId="17"/>  
   </message>  
-  <message id="18" operation="emitParticle(nl.tno.sensorstorm.particles.Particle):void">    
+  <message id="18" operation="emitParticle(nl.tno.sensorstorm.api.particles.Particle):void">    
     <end type="SOURCE" refId="6"/>    
     <end type="TARGET" refId="19"/>  
   </message>  
-  <message id="20" operation="activate():void">    
-    <end type="SOURCE" refId="8"/>    
+  <message id="20" operation="emit(java.util.List&lt;java.lang.Object&gt;):java.util.List&lt;java.lang.Integer&gt;">    
+    <end type="SOURCE" refId="17"/>    
     <end type="TARGET" refId="21"/>  
   </message>  
-  <message id="22" operation="deactivate():void">    
-    <end type="SOURCE" refId="10"/>    
+  <message id="22" operation="emit(java.util.List&lt;java.lang.Object&gt;):java.util.List&lt;java.lang.Integer&gt;">    
+    <end type="SOURCE" refId="19"/>    
     <end type="TARGET" refId="23"/>  
   </message>  
-  <message id="24" operation="emit(java.util.List&lt;java.lang.Object&gt;):java.util.List&lt;java.lang.Integer&gt;">    
-    <end type="SOURCE" refId="17"/>    
+  <message id="24" operation="activate():void">    
+    <end type="SOURCE" refId="8"/>    
     <end type="TARGET" refId="25"/>  
   </message>  
-  <message id="26" operation="emit(java.util.List&lt;java.lang.Object&gt;):java.util.List&lt;java.lang.Integer&gt;">    
-    <end type="SOURCE" refId="19"/>    
+  <message id="26" operation="deactivate():void">    
+    <end type="SOURCE" refId="10"/>    
     <end type="TARGET" refId="27"/>  
   </message>
 </sequence-diagram>

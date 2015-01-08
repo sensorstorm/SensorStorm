@@ -1,39 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<class-diagram version="1.1.7" icons="true" automaticImage="PNG" always-add-relationships="false" generalizations="true" 
+<class-diagram version="1.1.5" icons="true" automaticImage="PNG" always-add-relationships="false" generalizations="true" 
   realizations="true" associations="true" dependencies="false" nesting-relationships="true">  
-  <class id="1" language="java" name="nl.tno.sensorstorm.stormcomponents.SensorStormSpout" project="SensorStorm" 
-    file="/SensorStorm/src/nl/tno/sensorstorm/stormcomponents/SensorStormSpout.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="495" width="306" x="35" y="-47"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
-      sort-features="false" accessors="true" visibility="true">      
+  <class id="1" language="java" name="nl.tno.sensorstorm.storm.SensorStormSpout" project="SensorStorm" 
+    file="/SensorStorm/src/nl/tno/sensorstorm/storm/SensorStormSpout.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="513" width="322" x="-48" y="-80"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <interface id="2" language="java" name="nl.tno.sensorstorm.processing.Fetcher" project="SensorStorm" 
-    file="/SensorStorm/src/nl/tno/sensorstorm/processing/Fetcher.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="592" y="202"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
-      sort-features="false" accessors="true" visibility="true">      
+  <interface id="2" language="java" name="nl.tno.sensorstorm.api.processing.Fetcher" project="SensorStorm" 
+    file="/SensorStorm/src/nl/tno/sensorstorm/api/processing/Fetcher.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="525" y="174"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </interface>  
   <association id="3">    
     <end type="SOURCE" refId="1" navigable="false">      
-      <attribute id="4" name="fetcher">        
-        <position height="0" width="0" x="0" y="0"/>      
-      </attribute>      
-      <multiplicity id="5" minimum="0" maximum="1">        
-        <position height="0" width="0" x="0" y="0"/>      
-      </multiplicity>    
+      <attribute id="4" name="fetcher"/>      
+      <multiplicity id="5" minimum="0" maximum="1"/>    
     </end>    
     <end type="TARGET" refId="2" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
   <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
-    sort-features="false" accessors="true" visibility="true">    
+    accessors="true" visibility="true">    
     <attributes public="true" package="true" protected="true" private="true" static="true"/>    
     <operations public="true" package="true" protected="true" private="true" static="true"/>  
   </classifier-display>  

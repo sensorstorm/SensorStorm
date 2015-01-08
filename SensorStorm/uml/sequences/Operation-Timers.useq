@@ -1,75 +1,75 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sequence-diagram version="1.1.5" icons="true" automaticImage="PNG">  
-  <object id="1" language="java" name="nl.tno.sensorstorm.stormcomponents.SensorStormBolt" project="TimeseriesLib" 
-    file="/TimeseriesLib/src/nl/tno/sensorstorm/stormcomponents/SensorStormBolt.java" binary="false" 
-    label="sensorStormBolt" type="class" autoSize="true">    
-    <position height="-1" width="-1" x="101" y="0"/>    
+  <object id="1" language="java" name="nl.tno.sensorstorm.storm.SensorStormBolt" project="SensorStorm" 
+    file="/SensorStorm/src/nl/tno/sensorstorm/storm/SensorStormBolt.java" binary="false" label="sensorStormBolt" 
+    type="class" autoSize="true">    
+    <position height="-1" width="-1" x="119" y="0"/>    
     <execution id="2">      
-      <position height="181" width="163" x="5" y="316"/>    
+      <position height="185" width="121" x="5" y="302"/>    
     </execution>  
   </object>  
-  <object id="5" language="java" name="nl.tno.sensorstorm.operations.OperationManager" project="TimeseriesLib" 
-    file="/TimeseriesLib/src/nl/tno/sensorstorm/operations/OperationManager.java" binary="false" 
-    label="operationManager" type="class" autoSize="true">    
-    <position height="-1" width="-1" x="292" y="0"/>    
+  <object id="5" language="java" name="nl.tno.sensorstorm.impl.OperationManager" project="SensorStorm" 
+    file="/SensorStorm/src/nl/tno/sensorstorm/impl/OperationManager.java" binary="false" label="operationManager" 
+    type="class" autoSize="true">    
+    <position height="-1" width="-1" x="238" y="0"/>    
     <execution id="6">      
-      <position height="181" width="131" x="172" y="99"/>    
+      <position height="182" width="129" x="130" y="99"/>    
     </execution>    
     <execution id="4">      
-      <position height="139" width="131" x="172" y="337"/>    
+      <position height="143" width="129" x="130" y="323"/>    
     </execution>  
   </object>  
-  <object id="11" language="java" name="nl.tno.sensorstorm.particles.timer.TimerParticleHandler" project="TimeseriesLib" 
-    file="/TimeseriesLib/src/nl/tno/sensorstorm/particles/timer/TimerParticleHandler.java" binary="false" 
+  <object id="11" language="java" name="nl.tno.sensorstorm.timer.TimerParticleHandler" project="SensorStorm" 
+    file="/SensorStorm/src/nl/tno/sensorstorm/timer/TimerParticleHandler.java" binary="false" 
     label="timerParticleHandler" type="class" autoSize="true">    
-    <position height="-1" width="-1" x="395" y="0"/>    
+    <position height="-1" width="-1" x="364" y="0"/>    
     <execution id="8">      
-      <position height="139" width="147" x="307" y="120"/>    
+      <position height="140" width="144" x="263" y="120"/>    
     </execution>    
     <execution id="10">      
-      <position height="97" width="147" x="307" y="358"/>    
+      <position height="101" width="144" x="263" y="344"/>    
     </execution>  
   </object>  
-  <object id="18" language="java" name="nl.tno.sensorstorm.particles.timer.TimerTaskInterface" project="TimeseriesLib" 
-    file="/TimeseriesLib/src/nl/tno/sensorstorm/particles/timer/TimerTaskInterface.java" binary="false" 
-    label="timerTaskInterface" type="interface" autoSize="true">    
-    <position height="-1" width="-1" x="639" y="0"/>    
+  <object id="18" language="java" name="nl.tno.sensorstorm.timer.TimerTaskInterface" project="SensorStorm" 
+    file="/SensorStorm/src/nl/tno/sensorstorm/timer/TimerTaskInterface.java" binary="false" label="timerTaskInterface" 
+    type="interface" autoSize="true">    
+    <position height="-1" width="-1" x="513" y="0"/>    
     <execution id="13">      
-      <position height="97" width="147" x="760" y="141"/>    
+      <position height="98" width="134" x="411" y="141"/>    
     </execution>    
     <execution id="15">      
-      <position height="21" width="147" x="458" y="379"/>    
+      <position height="21" width="134" x="411" y="365"/>    
     </execution>    
     <execution id="17">      
-      <position height="21" width="147" x="458" y="413"/>    
+      <position height="21" width="134" x="411" y="403"/>    
     </execution>  
   </object>  
-  <object id="23" language="java" name="nl.tno.sensorstorm.particles.timer.TimerControllerInterface" 
-    project="TimeseriesLib" file="/TimeseriesLib/src/nl/tno/sensorstorm/particles/timer/TimerControllerInterface.java" 
-    binary="false" label="timerControllerInterface" type="interface" autoSize="true">    
-    <position height="-1" width="-1" x="535" y="0"/>    
+  <object id="23" language="java" name="nl.tno.sensorstorm.timer.TimerControllerInterface" project="SensorStorm" 
+    file="/SensorStorm/src/nl/tno/sensorstorm/timer/TimerControllerInterface.java" binary="false" 
+    label="timerControllerInterface" type="interface" autoSize="true">    
+    <position height="-1" width="-1" x="618" y="0"/>    
     <execution id="20">      
-      <position height="21" width="163" x="911" y="162"/>    
+      <position height="21" width="163" x="549" y="162"/>    
     </execution>    
     <execution id="22">      
-      <position height="21" width="163" x="911" y="196"/>    
+      <position height="21" width="163" x="549" y="197"/>    
     </execution>  
   </object>  
   <message id="3" 
-    operation="handleMetaParticle(nl.tno.sensorstorm.particles.MetaParticle):java.util.List&lt;Particle&gt;">    
+    operation="handleMetaParticle(nl.tno.sensorstorm.api.particles.MetaParticle):java.util.List&lt;Particle&gt;">    
     <end type="SOURCE" refId="2"/>    
     <end type="TARGET" refId="4"/>  
   </message>  
-  <message id="7" operation="init(nl.tno.sensorstorm.operations.Operation):void">    
+  <message id="7" operation="init(nl.tno.sensorstorm.api.processing.Operation):void">    
     <end type="SOURCE" refId="6"/>    
     <end type="TARGET" refId="8"/>  
   </message>  
   <message id="9" 
-    operation="handleMetaParticle(nl.tno.sensorstorm.particles.MetaParticle):java.util.List&lt;Particle&gt;">    
+    operation="handleMetaParticle(nl.tno.sensorstorm.api.particles.MetaParticle):java.util.List&lt;Particle&gt;">    
     <end type="SOURCE" refId="4"/>    
     <end type="TARGET" refId="10"/>  
   </message>  
-  <message id="12" operation="setTimerController(nl.tno.sensorstorm.particles.timer.TimerControllerInterface):void">    
+  <message id="12" operation="setTimerController(nl.tno.sensorstorm.timer.TimerControllerInterface):void">    
     <end type="SOURCE" refId="8"/>    
     <end type="TARGET" refId="13"/>  
   </message>  
@@ -82,12 +82,12 @@
     <end type="TARGET" refId="17"/>  
   </message>  
   <message id="19" 
-    operation="registerOperationForSingleTimerTask(java.lang.String,long,nl.tno.sensorstorm.particles.timer.TimerTaskInterface):void">    
+    operation="registerOperationForSingleTimerTask(long,nl.tno.sensorstorm.timer.TimerTaskInterface):void">    
     <end type="SOURCE" refId="13"/>    
     <end type="TARGET" refId="20"/>  
   </message>  
   <message id="21" 
-    operation="registerOperationForRecurringTimerTask(java.lang.String,long,nl.tno.sensorstorm.particles.timer.TimerTaskInterface):void">    
+    operation="registerOperationForRecurringTimerTask(long,nl.tno.sensorstorm.timer.TimerTaskInterface):void">    
     <end type="SOURCE" refId="13"/>    
     <end type="TARGET" refId="22"/>  
   </message>

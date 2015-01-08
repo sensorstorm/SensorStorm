@@ -1,72 +1,79 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<class-diagram version="1.1.7" icons="true" automaticImage="PNG" always-add-relationships="false" generalizations="true" 
+<class-diagram version="1.1.5" icons="true" automaticImage="PNG" always-add-relationships="false" generalizations="true" 
   realizations="true" associations="true" dependencies="false" nesting-relationships="true">  
-  <interface id="1" language="java" name="nl.tno.sensorstorm.particles.Particle" project="SensorStorm" 
-    file="/SensorStorm/src/nl/tno/sensorstorm/particles/Particle.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="195" y="84"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
-      sort-features="false" accessors="true" visibility="true">      
+  <interface id="1" language="java" name="nl.tno.sensorstorm.api.particles.Particle" project="SensorStorm" 
+    file="/SensorStorm/src/nl/tno/sensorstorm/api/particles/Particle.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="99" width="143" x="166" y="92"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </interface>  
-  <interface id="2" language="java" name="nl.tno.sensorstorm.particles.DataParticle" project="SensorStorm" 
-    file="/SensorStorm/src/nl/tno/sensorstorm/particles/DataParticle.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="63" width="126" x="41" y="230"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
-      sort-features="false" accessors="true" visibility="true">      
+  <interface id="2" language="java" name="nl.tno.sensorstorm.api.particles.DataParticle" project="SensorStorm" 
+    file="/SensorStorm/src/nl/tno/sensorstorm/api/particles/DataParticle.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="96" y="277"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </interface>  
-  <interface id="3" language="java" name="nl.tno.sensorstorm.particles.MetaParticle" project="SensorStorm" 
-    file="/SensorStorm/src/nl/tno/sensorstorm/particles/MetaParticle.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="99" width="136" x="224" y="230"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
-      sort-features="false" accessors="true" visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </interface>  
-  <class id="4" language="java" name="nl.tno.sensorstorm.particles.gracefullshutdown.GracefullShutdownParticle" 
-    project="SensorStorm" 
-    file="/SensorStorm/src/nl/tno/sensorstorm/particles/gracefullshutdown/GracefullShutdownParticle.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="416" y="473"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
-      sort-features="false" accessors="true" visibility="true">      
+  <class id="3" language="java" name="nl.tno.sensorstorm.api.particles.DataParticleBatch" project="SensorStorm" 
+    file="/SensorStorm/src/nl/tno/sensorstorm/api/particles/DataParticleBatch.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="86" y="414"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="5" language="java" name="nl.tno.sensorstorm.particles.timer.TimerTickParticle" project="SensorStorm" 
-    file="/SensorStorm/src/nl/tno/sensorstorm/particles/timer/TimerTickParticle.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="176" y="455"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
-      sort-features="false" accessors="true" visibility="true">      
+  <interface id="4" language="java" name="nl.tno.sensorstorm.api.particles.MetaParticle" project="SensorStorm" 
+    file="/SensorStorm/src/nl/tno/sensorstorm/api/particles/MetaParticle.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="478" y="277"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </interface>  
+  <class id="5" language="java" name="nl.tno.sensorstorm.timer.TimerTickParticle" project="SensorStorm" 
+    file="/SensorStorm/src/nl/tno/sensorstorm/timer/TimerTickParticle.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="371" y="456"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <realization id="6">    
-    <end type="SOURCE" refId="5"/>    
-    <end type="TARGET" refId="3"/>  
-  </realization>  
+  <class id="6" language="java" name="nl.tno.sensorstorm.gracefullshutdown.GracefullShutdownParticle" 
+    project="SensorStorm" file="/SensorStorm/src/nl/tno/sensorstorm/gracefullshutdown/GracefullShutdownParticle.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="619" y="454"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
   <generalization id="7">    
-    <end type="SOURCE" refId="3"/>    
-    <end type="TARGET" refId="1"/>  
-  </generalization>  
-  <generalization id="8">    
     <end type="SOURCE" refId="2"/>    
     <end type="TARGET" refId="1"/>  
   </generalization>  
-  <realization id="9">    
+  <realization id="8">    
+    <end type="SOURCE" refId="6"/>    
+    <end type="TARGET" refId="4"/>  
+  </realization>  
+  <generalization id="9">    
     <end type="SOURCE" refId="4"/>    
-    <end type="TARGET" refId="3"/>  
+    <end type="TARGET" refId="1"/>  
+  </generalization>  
+  <realization id="10">    
+    <end type="SOURCE" refId="5"/>    
+    <end type="TARGET" refId="4"/>  
   </realization>  
   <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
-    sort-features="false" accessors="true" visibility="true">    
+    accessors="true" visibility="true">    
     <attributes public="true" package="true" protected="true" private="true" static="true"/>    
     <operations public="true" package="true" protected="true" private="true" static="true"/>  
   </classifier-display>  
